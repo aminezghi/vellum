@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Key, ShieldCheck, Check, X, Sparkles, ExternalLink, HelpCircle } from "lucide-react";
+import { STORAGE_KEYS } from "@/lib/storageNamespace";
 
 export interface CustomTokens {
   openAlexToken: string;
@@ -27,7 +28,7 @@ export function TokensModal({ isOpen, onClose, onSave }: TokensModalProps) {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("vellum-custom-tokens");
+      const stored = localStorage.getItem(STORAGE_KEYS.tokens);
       if (stored) {
         try {
           setTokens(JSON.parse(stored));
@@ -42,7 +43,7 @@ export function TokensModal({ isOpen, onClose, onSave }: TokensModalProps) {
 
   const handleSave = () => {
     if (typeof window !== "undefined") {
-      localStorage.setItem("vellum-custom-tokens", JSON.stringify(tokens));
+      localStorage.setItem(STORAGE_KEYS.tokens, JSON.stringify(tokens));
     }
     if (onSave) onSave(tokens);
     setSavedSuccess(true);
@@ -61,7 +62,7 @@ export function TokensModal({ isOpen, onClose, onSave }: TokensModalProps) {
     };
     setTokens(emptyTokens);
     if (typeof window !== "undefined") {
-      localStorage.removeItem("vellum-custom-tokens");
+      localStorage.removeItem(STORAGE_KEYS.tokens);
     }
     if (onSave) onSave(emptyTokens);
   };

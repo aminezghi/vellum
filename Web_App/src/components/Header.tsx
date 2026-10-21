@@ -15,6 +15,7 @@ import {
   Sun,
   Trash2,
 } from "lucide-react";
+import { STORAGE_KEYS } from "@/lib/storageNamespace";
 
 interface HeaderProps {
   activeTab: string;
@@ -46,7 +47,7 @@ export function Header({
   // Initialize theme and design style from localStorage or system preference
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const savedTheme = localStorage.getItem("vellum-theme");
+      const savedTheme = localStorage.getItem(STORAGE_KEYS.theme);
       const shouldBeDark =
         savedTheme === "dark" ||
         (!savedTheme && window.matchMedia("(prefers-color-scheme: dark)").matches);
@@ -63,7 +64,7 @@ export function Header({
         document.documentElement.setAttribute("data-theme", "light");
       }
 
-      const savedDesign = (localStorage.getItem("vellum-design-style") as "apple" | "wispr") || "apple";
+      const savedDesign = (localStorage.getItem(STORAGE_KEYS.designStyle) as "apple" | "wispr") || "apple";
       setDesignStyle(savedDesign);
       document.documentElement.setAttribute("data-design", savedDesign);
     }
@@ -77,12 +78,12 @@ export function Header({
         document.documentElement.classList.add("dark");
         document.body.classList.add("dark");
         document.documentElement.setAttribute("data-theme", "dark");
-        localStorage.setItem("vellum-theme", "dark");
+        localStorage.setItem(STORAGE_KEYS.theme, "dark");
       } else {
         document.documentElement.classList.remove("dark");
         document.body.classList.remove("dark");
         document.documentElement.setAttribute("data-theme", "light");
-        localStorage.setItem("vellum-theme", "light");
+        localStorage.setItem(STORAGE_KEYS.theme, "light");
       }
     }
   };
@@ -91,7 +92,7 @@ export function Header({
     const nextDesign = designStyle === "apple" ? "wispr" : "apple";
     setDesignStyle(nextDesign);
     if (typeof window !== "undefined") {
-      localStorage.setItem("vellum-design-style", nextDesign);
+      localStorage.setItem(STORAGE_KEYS.designStyle, nextDesign);
       document.documentElement.setAttribute("data-design", nextDesign);
     }
   };

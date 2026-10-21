@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { AcademicPaperResult } from "@/app/api/search/route";
 import { fetchAndStorePaperPdf, triggerBrowserFileDownload } from "@/lib/pdfDownloader";
+import { STORAGE_KEYS } from "@/lib/storageNamespace";
 import { TokensModal, CustomTokens } from "./TokensModal";
 import {
   Search,
@@ -83,7 +84,7 @@ export function AcademicSearchHub({ onAddToNotebook, onInspectPaper }: AcademicS
   // Check custom tokens on mount
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("vellum-custom-tokens");
+      const stored = localStorage.getItem(STORAGE_KEYS.tokens);
       if (stored) {
         try {
           const parsed = JSON.parse(stored);
@@ -163,7 +164,7 @@ export function AcademicSearchHub({ onAddToNotebook, onInspectPaper }: AcademicS
       // Read custom tokens
       let headers: Record<string, string> = {};
       if (typeof window !== "undefined") {
-        const stored = localStorage.getItem("vellum-custom-tokens");
+        const stored = localStorage.getItem(STORAGE_KEYS.tokens);
         if (stored) {
           try {
             const tokens: CustomTokens = JSON.parse(stored);

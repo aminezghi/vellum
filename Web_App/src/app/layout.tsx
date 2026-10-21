@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Figtree, EB_Garamond } from "next/font/google";
+import { LEGACY_STORAGE_BOOT, STORAGE_KEYS } from "@/lib/storageNamespace";
 import "./globals.css";
 
 const figtree = Figtree({
@@ -35,8 +36,9 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html: `
+              ${LEGACY_STORAGE_BOOT}
               try {
-                var theme = localStorage.getItem('vellum-theme');
+                var theme = localStorage.getItem('${STORAGE_KEYS.theme}');
                 if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                   document.documentElement.classList.add('dark');
                   document.documentElement.setAttribute('data-theme', 'dark');
@@ -44,7 +46,7 @@ export default function RootLayout({
                   document.documentElement.classList.remove('dark');
                   document.documentElement.setAttribute('data-theme', 'light');
                 }
-                var design = localStorage.getItem('vellum-design-style') || 'apple';
+                var design = localStorage.getItem('${STORAGE_KEYS.designStyle}') || 'apple';
                 document.documentElement.setAttribute('data-design', design);
               } catch (e) {}
             `,

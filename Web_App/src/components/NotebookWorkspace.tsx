@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Notebook, Source, Note, db } from "@/lib/db";
+import { STORAGE_KEYS } from "@/lib/storageNamespace";
 import { fetchAndStorePaperPdf } from "@/lib/pdfDownloader";
 import {
   ArrowLeft,
@@ -69,12 +70,12 @@ export function NotebookWorkspace({ notebook, onBack, onUpdate }: NotebookWorksp
         document.documentElement.classList.add("dark");
         document.body.classList.add("dark");
         document.documentElement.setAttribute("data-theme", "dark");
-        localStorage.setItem("vellum-theme", "dark");
+        localStorage.setItem(STORAGE_KEYS.theme, "dark");
       } else {
         document.documentElement.classList.remove("dark");
         document.body.classList.remove("dark");
         document.documentElement.setAttribute("data-theme", "light");
-        localStorage.setItem("vellum-theme", "light");
+        localStorage.setItem(STORAGE_KEYS.theme, "light");
       }
     }
   };

@@ -12,7 +12,7 @@ import { AddToNotebookModal } from "@/components/AddToNotebookModal";
 import { EmptyNotebooksState } from "@/components/EmptyNotebooksState";
 import { CleanNotebooksModal } from "@/components/CleanNotebooksModal";
 import { Footer } from "@/components/Footer";
-import { db, Notebook, Source, seedInitialNotebooks } from "@/lib/db";
+import { db, Notebook, Source, initializeStorage } from "@/lib/db";
 import { AcademicPaperResult } from "@/app/api/search/route";
 import { Plus, BookOpen, Layers, Sparkles, Flame, Search, Trash2 } from "lucide-react";
 
@@ -30,7 +30,7 @@ export default function Home() {
   const [paperForAddModal, setPaperForAddModal] = useState<AcademicPaperResult | null>(null);
 
   const fetchNotebooks = async () => {
-    await seedInitialNotebooks();
+    await initializeStorage();
     const all = await db.notebooks.toArray();
     all.sort((a, b) => b.updatedAt - a.updatedAt);
     setNotebooks(all);
