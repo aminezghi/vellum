@@ -1,14 +1,19 @@
 /**
- * Per-edition storage identity.
+ * Storage identity for this edition.
  *
- * IndexedDB and localStorage are both partitioned by origin (scheme://host:port),
- * so editions served on different ports already get separate storage. Naming the
- * database and the localStorage keys per edition makes that isolation independent
- * of the port assignment: `next dev` falls back to the next free port when the
- * requested one is busy, which can place two editions on one origin. With
- * per-edition names they still cannot read or overwrite each other's notebooks.
+ * IndexedDB and localStorage are both partitioned by origin (scheme://host:port).
+ * The database and the localStorage keys are nevertheless named explicitly, for
+ * two reasons:
  *
- * Editions: Web_App (port 3000), Web_App_Apple (port 3001), Web_App_Fernly (port 3002).
+ * 1. Earlier builds of every Vellum web edition shared one database called
+ *    "VellumWebDB" and one set of localStorage keys. Anything already stored
+ *    under those names is migrated once, into the namespaced names below, so
+ *    existing notebooks, preferences and API tokens survive the rename.
+ * 2. The namespace keeps this edition's data under a name of its own, so it
+ *    can never be read or overwritten by another Vellum app running on the same
+ *    origin (for example when a dev server falls back to a busy port).
+ *
+ * Edition: Vellum Web - Fernly Botanical Bento (port 3002).
  */
 
 /** Identifies this edition. Must stay unique across the Vellum web editions. */
@@ -23,15 +28,15 @@ export const DB_NAME = `VellumWebDB_${APP_ID}`;
 export const LEGACY_DB_NAME = "VellumWebDB";
 
 /**
- * Which edition already migrated LEGACY_DB_NAME on this origin.
+ * Which app already migrated LEGACY_DB_NAME on this origin.
  *
- * Deliberately not app-scoped: every edition sharing an origin must observe the
- * same claim, otherwise two editions would each copy the same legacy library and
- * the collision would survive the migration.
+ * Deliberately not app-scoped: every Vellum app sharing an origin must observe
+ * the same claim, otherwise two of them would each copy the same legacy library
+ * and the collision would survive the migration.
  */
 export const LEGACY_CLAIM_KEY = "vellum:legacy-db-claim";
 
-/** Namespace a localStorage key so editions cannot overwrite each other's state. */
+/** Namespace a localStorage key so no other app can overwrite this edition's state. */
 export function scopedKey(key: string): string {
   return `vellum:${APP_ID}:${key}`;
 }

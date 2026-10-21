@@ -169,6 +169,26 @@ function openExistingDatabase(name: string): Promise<IDBDatabase | null> {
   });
 }
 
+/**
+ * Whether a database already exists on this origin.
+ *
+ * `indexedDB.open` creates the database as a side effect, so probing for a
+ * legacy database that is not there would leave an empty one behind. Where the
+ * browser can enumerate its databases we ask first and only open a known
+ * database; older browsers fall back to opening it.
+ */
+async function databaseExists(name: string): Promise<boolean> {
+  if (typeof indexedDB === "undefined" || typeof indexedDB.databases !== "function") {
+    return true;
+  }
+  try {
+    const databases = await indexedDB.databases();
+    return databases.some((database) => database.name === name);
+  } catch {
+    return true;
+  }
+}
+
 /** Read every object store of an existing database. */
 function readAllStores(handle: IDBDatabase): Promise<LegacyRows> {
   const storeNames = Array.from(handle.objectStoreNames);
@@ -213,6 +233,10 @@ export async function migrateLegacyDatabase(): Promise<boolean> {
     }
 
     if (localStorage.getItem(LEGACY_CLAIM_KEY)) {
+      return false;
+    }
+
+    if (!(await databaseExists(LEGACY_DB_NAME))) {
       return false;
     }
 

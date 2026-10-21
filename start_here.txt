@@ -25,13 +25,6 @@ on your machine - no account, no cloud, no telemetry.
    -> Double-click: 3_launch_both_apps.bat
    (Desktop on 8501 + Web on 3002, side by side)
 
-5. THE OTHER TWO WEB EDITIONS:
-   -> 4_launch_web_app.bat          Classic edition  (http://localhost:3000)
-   -> 5_launch_apple_web_app.bat    Apple edition   (http://localhost:3001)
-   -> 6_launch_all_web_apps.bat     All three web editions at once
-   Each edition keeps its own notebooks and preferences, so they never
-   overwrite each other's work.
-
 For the full feature list, testing scenarios and technical details:
 -> Open: README_FOR_COLLEAGUES.pdf
 -> Or the Markdown source: README_FOR_COLLEAGUES.md
