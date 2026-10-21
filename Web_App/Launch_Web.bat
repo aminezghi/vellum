@@ -35,7 +35,14 @@ echo [*] Starting Next.js 16 Turbopack server on http://localhost:3000 ...
 :: Launch browser in background after 2 seconds
 start "" cmd /c "timeout /t 2 >nul & start http://localhost:3000"
 
-:: Start the Next.js dev server
-call npm run dev
+:: Start the Next.js dev server on port 3000.
+:: The port is pinned on purpose: an unpinned "next dev" falls back to the next
+:: free port, which would let this edition land on another edition's port.
+set PORT=3000
+call npx next dev --turbopack -p 3000
+if %errorlevel% neq 0 (
+    echo [ERROR] Next.js dev server exited with an error.
+    pause
+)
 
 pause
