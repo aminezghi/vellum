@@ -1,0 +1,331 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *));
+
+:root {
+  /* Wispr Flow Core Color Palette */
+  --base-lumen: #ffffeb;        /* Primary canvas warm cream / linen */
+  --base-lumen-dark: #e4e4d0;   /* Slightly deepened cream for borders/cards */
+  --base-vast: #1a1a1a;         /* Deep charcoal typography */
+  --base-fathom: #034f46;       /* Signature deep forest green */
+  --base-fathom-dark: #023630;  /* Darker forest green on active */
+  --base-dawn: #f0d7ff;         /* Soft lilac accent */
+  --base-signal: #ffbcf2;       /* Soft rose accent */
+  --base-glow: #ffa946;         /* Warm amber accent */
+  --base-flare: #ff6c4c;        /* Coral accent */
+  --base-success: #cef5ca;      /* Soft sage green pill */
+  --base-success-dark: #114e0b; /* Dark green pill text */
+
+  /* UI Tokens */
+  --background: var(--base-lumen);
+  --foreground: var(--base-vast);
+}
+
+html.dark,
+body.dark,
+[data-theme="dark"] {
+  --base-lumen: #121413;
+  --base-lumen-dark: #1e2220;
+  --base-vast: #e8eae6;
+  --base-fathom: #1f8a70;
+  --base-fathom-dark: #166e59;
+  --background: #121413;
+  --foreground: #e8eae6;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-figtree);
+  --font-serif: var(--font-garamond);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-figtree), Figtree, system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+html.dark body {
+  background-color: #121413;
+  color: #e8eae6;
+}
+
+/* Wispr Flow Selection */
+::selection {
+  background-color: #cef5ca;
+  color: #114e0b;
+}
+
+html.dark ::selection {
+  background-color: #034f46;
+  color: #cef5ca;
+}
+
+/* Wispr Flow Sleek Scrollbars */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f4f4dc;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d4d4be;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #b8b8a0;
+}
+
+/* Wispr Flow Card & Button Utilities */
+.wispr-card {
+  background-color: #ffffff;
+  border: 1px solid rgba(26, 26, 26, 0.08);
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 20px -2px rgba(26, 26, 26, 0.03);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.wispr-card:hover {
+  border-color: rgba(3, 79, 70, 0.25);
+  box-shadow: 0 12px 30px -4px rgba(26, 26, 26, 0.07);
+}
+
+.wispr-btn-primary {
+  background-color: #034f46;
+  color: #ffffeb;
+  border-radius: 9999px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.wispr-btn-primary:hover {
+  background-color: #023630;
+  transform: translateY(-1px);
+}
+
+.wispr-btn-secondary {
+  background-color: #ffffff;
+  color: #1a1a1a;
+  border: 1px solid rgba(26, 26, 26, 0.12);
+  border-radius: 9999px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.wispr-btn-secondary:hover {
+  background-color: #f7f7e9;
+  border-color: rgba(26, 26, 26, 0.2);
+}
+
+/* =====================================================================
+   APPLE DESIGN SYSTEM EXTENSION (WWDC Fluid Interfaces & Emil Kowalski)
+   ===================================================================== */
+
+:root {
+  --apple-spring-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+  --apple-spring-snappy: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --apple-spring-sheet: cubic-bezier(0.32, 0.72, 0, 1);
+  --apple-blue: #0071e3;
+  --apple-blue-hover: #0077ed;
+  --apple-blue-active: #005bb5;
+  --apple-emerald: #34c759;
+  --apple-amber: #ff9f0a;
+  --apple-rose: #ff3b30;
+  --apple-purple: #af52de;
+}
+
+/* Apple Design Mode Overrides */
+html[data-design="apple"] {
+  --background: #f5f5f7;
+  --foreground: #1d1d1f;
+  --base-fathom: #0071e3;
+  --base-fathom-dark: #005bb5;
+}
+
+html[data-design="apple"].dark,
+html[data-design="apple"][data-theme="dark"] {
+  --background: #000000;
+  --foreground: #f5f5f7;
+  --base-fathom: #0a84ff;
+  --base-fathom-dark: #0071e3;
+}
+
+html[data-design="apple"] body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "SF Pro", system-ui, sans-serif;
+  letter-spacing: -0.011em;
+}
+
+html[data-design="apple"] ::selection {
+  background-color: rgba(0, 113, 227, 0.25);
+  color: #0071e3;
+}
+
+html[data-design="apple"].dark ::selection {
+  background-color: rgba(10, 132, 255, 0.35);
+  color: #ffffff;
+}
+
+/* Apple Tactile Pointer-Down Feedback (Zero-Latency Rule from Skill) */
+.apple-press {
+  transform: translateZ(0);
+  transition: transform 120ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 120ms ease;
+  will-change: transform;
+}
+.apple-press:active {
+  transform: scale(0.965);
+  opacity: 0.88;
+}
+
+/* Apple Translucent Frosted Glass Materials */
+.apple-glass {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 8px 30px -4px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+html.dark .apple-glass,
+[data-theme="dark"] .apple-glass {
+  background: rgba(24, 24, 27, 0.75);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.4),
+    0 12px 40px -4px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* Apple Floating Elevated Card */
+.apple-card {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 1.25rem;
+  box-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.04),
+    0 6px 20px -2px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transition: 
+    transform 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.2s ease;
+}
+
+.apple-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(0, 113, 227, 0.28);
+  box-shadow: 
+    0 3px 6px rgba(0, 0, 0, 0.04),
+    0 16px 36px -4px rgba(0, 0, 0, 0.09);
+}
+
+.apple-card:active {
+  transform: scale(0.985);
+  transition: transform 90ms ease-out;
+}
+
+html.dark .apple-card,
+[data-theme="dark"] .apple-card {
+  background: #161618;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.4),
+    0 8px 24px -2px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+html.dark .apple-card:hover,
+[data-theme="dark"] .apple-card:hover {
+  border-color: rgba(10, 132, 255, 0.35);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.5),
+    0 20px 45px -4px rgba(0, 0, 0, 0.7);
+}
+
+/* Apple Segmented Control (Pill switch) */
+.apple-segmented {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 9999px;
+  padding: 3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+html.dark .apple-segmented,
+[data-theme="dark"] .apple-segmented {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.apple-segmented-item {
+  border-radius: 9999px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  color: rgba(0, 0, 0, 0.65);
+  cursor: pointer;
+}
+
+.apple-segmented-item.active {
+  background: #ffffff;
+  color: #1d1d1f;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12), 0 1px 1px rgba(0, 0, 0, 0.06);
+}
+
+html.dark .apple-segmented-item {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+html.dark .apple-segmented-item.active {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Apple Button Primary */
+.apple-btn-primary {
+  background: #0071e3;
+  color: #ffffff;
+  border-radius: 9999px;
+  font-weight: 500;
+  box-shadow: 0 1px 2px rgba(0, 113, 227, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: all 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+.apple-btn-primary:hover {
+  background: #0077ed;
+  box-shadow: 0 4px 12px rgba(0, 113, 227, 0.35);
+}
+.apple-btn-primary:active {
+  transform: scale(0.965);
+  background: #005bb5;
+}
+
+html.dark .apple-btn-primary {
+  background: #0a84ff;
+  color: #ffffff;
+}
+html.dark .apple-btn-primary:hover {
+  background: #2491ff;
+}
+
+
+

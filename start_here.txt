@@ -1,0 +1,31 @@
+=====================================================================
+    VELLUM - ACADEMIC RESEARCH SUITE (WINDOWS EDITION)
+    Author & Lead Architect: Amine Zouaghi
+    Desktop V2.0 (Fernly Botanical Bento) + Web (Fernly Botanical Bento)
+=====================================================================
+
+Welcome! This pack contains 2 applications. Everything runs locally
+on your machine - no account, no cloud, no telemetry.
+
+1. TO INSTALL VELLUM DESKTOP V2.0 (RECOMMENDED):
+   -> Double-click: dist\Vellum-Desktop-V2.0-Setup-x64.exe
+   (Standard Windows installer. No admin rights needed. Adds a Start
+    Menu entry and a proper uninstaller. No Python required.)
+
+2. TO TRY THE DESKTOP WORKBENCH WITHOUT INSTALLING:
+   -> Double-click: 1_launch_desktop_app.bat
+   (Runs from source using the bundled virtual environment.
+    Opens at http://localhost:8501)
+
+3. TO TRY THE WEB RESEARCH STUDIO:
+   -> Double-click: 2_launch_fernly_web_app.bat
+   (Requires Node.js 18+. Opens at http://localhost:3002)
+
+4. TO RUN BOTH AT THE SAME TIME:
+   -> Double-click: 3_launch_both_apps.bat
+   (Desktop on 8501 + Web on 3002, side by side)
+
+For the full feature list, testing scenarios and technical details:
+-> Open: README_FOR_COLLEAGUES.pdf
+-> Or the Markdown source: README_FOR_COLLEAGUES.md
+=====================================================================

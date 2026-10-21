@@ -1,0 +1,383 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *));
+
+:root {
+  /* Fernly Core Palette (Botanical Sage Day) */
+  --page: #e9ebe9;          /* Main canvas sage tint */
+  --panel: #f5f6f5;         /* Soft pale sage container */
+  --card: #fdfdfc;          /* Pure crisp milk white bento card */
+  --hair: #e3e7e4;          /* Ultra-fine hairline border */
+  --ink: #131a15;           /* Deep botanical charcoal text */
+  --muted: #646d67;         /* Secondary muted text */
+  --faint: #8d9a92;         /* Tertiary faint helper text */
+
+  /* Deep Botanical Greens (Default Emerald Accent) */
+  --g-950: #0d3a23;         /* Deep Forest Pine */
+  --g-800: #155a37;         /* Rich Pine */
+  --g-700: #1d7347;         /* Vibrant Fern Green */
+  --g-600: #27865a;         /* Emerald Plant Green */
+  --g-400: #5dbd8b;         /* Mint Leaf Glow */
+  --g-100: #e3f2e9;         /* Pale Mint Foam */
+  --deep: #071a10;          /* Deepest Botanical Dark */
+  --swirl: rgba(93, 189, 139, 0.22);
+
+  /* Functional Accents */
+  --amber: #b06d0a;
+  --amber-bg: #fdf3e2;
+  --rose: #c23b3b;
+  --rose-bg: #fdeceb;
+  --sky: #1f6fa8;
+  --sky-bg: #e6f3fc;
+
+  /* Sizing & Bento Radii */
+  --r-xl: 32px;
+  --r-lg: 26px;
+  --r-md: 20px;
+  --r-sm: 14px;
+  --r-pill: 9999px;
+
+  /* Shadows & Physics */
+  --shadow-sm: 0 1px 2px rgba(19, 26, 21, 0.04);
+  --shadow-bento: 0 1px 3px rgba(19, 26, 21, 0.04), 0 10px 24px -12px rgba(19, 26, 21, 0.08);
+  --shadow-hero: 0 16px 36px -12px rgba(13, 58, 35, 0.40);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --focus: 0 0 0 3px var(--card), 0 0 0 5px var(--g-600);
+
+  /* Tailwind UI Tokens */
+  --background: var(--page);
+  --foreground: var(--ink);
+}
+
+/* Fernly 4 Accent Themes */
+[data-accent="emerald"] {
+  --g-950: #0d3a23;
+  --g-800: #155a37;
+  --g-700: #1d7347;
+  --g-600: #27865a;
+  --g-400: #5dbd8b;
+  --g-100: #e3f2e9;
+  --deep: #071a10;
+  --swirl: rgba(93, 189, 139, 0.22);
+}
+
+[data-accent="ocean"] {
+  --g-950: #0f2a5c;
+  --g-800: #173f86;
+  --g-700: #1f4fa8;
+  --g-600: #2f66c9;
+  --g-400: #6d9bec;
+  --g-100: #e6eefc;
+  --deep: #061530;
+  --swirl: rgba(109, 155, 236, 0.22);
+}
+
+[data-accent="plum"] {
+  --g-950: #331653;
+  --g-800: #4c2580;
+  --g-700: #6a3fb0;
+  --g-600: #7d52c4;
+  --g-400: #ad8ce6;
+  --g-100: #f0e9fb;
+  --deep: #1d0933;
+  --swirl: rgba(173, 140, 230, 0.22);
+}
+
+[data-accent="ember"] {
+  --g-950: #4d1b08;
+  --g-800: #7c2e10;
+  --g-700: #b1491d;
+  --g-600: #c85a2a;
+  --g-400: #ec9a6c;
+  --g-100: #fcebe2;
+  --deep: #2a0b02;
+  --swirl: rgba(236, 154, 108, 0.22);
+}
+
+/* Dark Mode (Nocturnal Deep Forest / Moss) */
+html.dark,
+body.dark,
+[data-theme="dark"] {
+  --page: #08110b;          /* Nocturnal deep forest moss canvas */
+  --panel: #0d1a12;         /* Nocturnal forest panel */
+  --card: #122419;          /* Dark bento card */
+  --hair: #1a3324;          /* Dark minty border */
+  --ink: #f1f8f3;           /* Crisp glowing cream/white text */
+  --muted: #8fa194;         /* Soft sage secondary text */
+  --faint: #5b6f61;         /* Deep faint helper text */
+
+  --g-950: #040f08;
+  --g-800: #0a2717;
+  --g-700: #175e39;
+  --g-600: #238555;
+  --g-400: #55c78f;
+  --g-100: #143321;
+  --deep: #020704;
+
+  --amber: #e8a317;
+  --amber-bg: #291e08;
+  --rose: #e05555;
+  --rose-bg: #2d1010;
+  --sky: #4ab6e8;
+  --sky-bg: #0d2331;
+
+  --shadow-bento: 0 2px 6px rgba(0, 0, 0, 0.4), 0 16px 36px -12px rgba(0, 0, 0, 0.6);
+  --shadow-hero: 0 16px 40px -10px rgba(0, 0, 0, 0.7);
+  --focus: 0 0 0 3px var(--card), 0 0 0 5px var(--g-400);
+
+  --background: var(--page);
+  --foreground: var(--ink);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-plus-jakarta);
+}
+
+body {
+  background-color: var(--page);
+  color: var(--ink);
+  font-family: var(--font-plus-jakarta), "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  transition: background-color 0.25s var(--ease), color 0.25s var(--ease);
+}
+
+/* Fernly Selection Glow */
+::selection {
+  background-color: var(--g-100);
+  color: var(--g-950);
+}
+
+html.dark ::selection {
+  background-color: var(--g-700);
+  color: #ffffff;
+}
+
+/* Fernly Organic Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--panel);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--hair);
+  border-radius: var(--r-pill);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--faint);
+}
+
+/* =========================================================================
+   FERNLY BENTO & COMPONENT UTILITY CLASSES
+   ========================================================================= */
+
+/* Bento Card */
+.fernly-card {
+  background-color: var(--card);
+  border: 1px solid var(--hair);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-bento);
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), border-color 0.25s var(--ease);
+  position: relative;
+}
+
+.fernly-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(93, 189, 139, 0.35);
+  box-shadow: 0 4px 12px rgba(19, 26, 21, 0.06), 0 16px 36px -12px rgba(19, 26, 21, 0.12);
+}
+
+/* Hero Stat Bento Card with Glowing Gradient */
+.fernly-stat-hero {
+  color: #f1f8f3 !important;
+  background: linear-gradient(135deg, var(--g-800) 0%, var(--g-950) 100%) !important;
+  border-radius: var(--r-md);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: var(--shadow-hero);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.fernly-stat-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(90% 80% at 100% 100%, var(--swirl), transparent 60%);
+  z-index: -1;
+}
+
+/* Rotating Arrow Pill */
+.fernly-arrow {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--r-pill);
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  border: 1.5px solid currentColor;
+  transition: transform 0.3s var(--ease), background-color 0.2s var(--ease), color 0.2s var(--ease);
+}
+
+.fernly-arrow:hover {
+  transform: rotate(45deg);
+  background-color: var(--ink);
+  color: var(--card);
+  border-color: var(--ink);
+}
+
+/* Primary Botanical Gradient Button */
+.btn-fernly-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 48px;
+  padding: 0 24px;
+  border-radius: var(--r-pill);
+  font-size: 15px;
+  font-weight: 600;
+  color: #f2f8f4;
+  background: linear-gradient(180deg, var(--g-700), var(--g-950));
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(13, 58, 35, 0.2);
+  transition: background 0.2s var(--ease), transform 0.15s var(--ease), box-shadow 0.2s var(--ease);
+}
+
+.btn-fernly-primary:hover {
+  background: linear-gradient(180deg, var(--g-600), var(--g-800));
+  box-shadow: 0 4px 16px rgba(13, 58, 35, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-fernly-primary:active {
+  transform: scale(0.98);
+}
+
+/* Ghost / Secondary Button */
+.btn-fernly-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 48px;
+  padding: 0 20px;
+  border-radius: var(--r-pill);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--card);
+  border: 1.5px solid var(--hair);
+  cursor: pointer;
+  transition: all 0.2s var(--ease);
+}
+
+.btn-fernly-ghost:hover {
+  background: var(--g-100);
+  border-color: var(--g-400);
+  color: var(--g-950);
+  transform: translateY(-1px);
+}
+
+.btn-fernly-ghost:active {
+  transform: scale(0.98);
+}
+
+/* Status Badges */
+.fernly-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: var(--r-pill);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  border: 1px solid transparent;
+}
+
+.badge-done {
+  color: var(--g-700);
+  background: var(--g-100);
+  border-color: rgba(29, 115, 71, 0.2);
+}
+
+.badge-prog {
+  color: var(--amber);
+  background: var(--amber-bg);
+  border-color: rgba(176, 109, 10, 0.2);
+}
+
+.badge-pend {
+  color: var(--rose);
+  background: var(--rose-bg);
+  border-color: rgba(194, 59, 59, 0.2);
+}
+
+.badge-sky {
+  color: var(--sky);
+  background: var(--sky-bg);
+  border-color: rgba(31, 111, 168, 0.2);
+}
+
+/* Fernly Inputs */
+.fernly-input {
+  background: var(--panel);
+  border: 1.5px solid var(--hair);
+  border-radius: var(--r-sm);
+  color: var(--ink);
+  padding: 10px 16px;
+  font-size: 14.5px;
+  font-weight: 500;
+  outline: none;
+  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+
+.fernly-input-search {
+  padding-left: 48px !important;
+  padding-right: 20px !important;
+}
+
+.fernly-input:focus {
+  border-color: var(--g-600);
+  box-shadow: 0 0 0 3px rgba(39, 134, 90, 0.18);
+}
+
+.fernly-input::placeholder {
+  color: var(--faint);
+}
+
+/* Stretchy Rail Animation */
+@keyframes railStretch {
+  0% { transform: scaleY(1); }
+  50% { transform: scaleY(1.35); }
+  100% { transform: scaleY(1); }
+}
+
+.animate-rail-stretch {
+  animation: railStretch 0.35s var(--ease);
+}
+
+/* Soft Fade In Up Entrance */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.4s var(--ease) forwards;
+}
