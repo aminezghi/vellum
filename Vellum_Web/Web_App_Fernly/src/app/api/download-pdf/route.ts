@@ -46,7 +46,35 @@ async function fetchPdfBuffer(url: string, timeoutMs = 8000): Promise<{ buf: Uin
   }
 }
 
-async function fetchJsonWithTimeout(url: string, timeoutMs = 5000): Promise<any | null> {
+// ---------------------------------------------------------------------------
+// Upstream payloads. Four registries are consulted in parallel and each has its
+// own shape; only the fields this route reads are described.
+// ---------------------------------------------------------------------------
+
+interface CrossrefEnvelope {
+  message?: {
+    title?: string[];
+    link?: { URL?: string }[];
+  };
+}
+
+interface UnpaywallEnvelope {
+  oa_locations?: { url_for_pdf?: string; url?: string }[];
+}
+
+interface SemanticScholarEnvelope {
+  openAccessPdf?: { url?: string };
+}
+
+interface OpenAlexEnvelope {
+  title?: string;
+  display_name?: string;
+  primary_location?: { pdf_url?: string };
+  best_oa_location?: { pdf_url?: string };
+  open_access?: { oa_url?: string };
+}
+
+async function fetchJsonWithTimeout<T>(url: string, timeoutMs = 5000): Promise<T | null> {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeoutMs);
   try {
@@ -54,7 +82,7 @@ async function fetchJsonWithTimeout(url: string, timeoutMs = 5000): Promise<any 
       signal: controller.signal,
       headers: { "User-Agent": USER_AGENT },
     });
-    if (res.ok) return await res.json();
+    if (res.ok) return (await res.json()) as T;
     return null;
   } catch {
     return null;
@@ -222,10 +250,10 @@ export async function POST(req: NextRequest) {
 
     // ── Fast Parallel Queries across Registries (Crossref, Unpaywall, Semantic Scholar, OpenAlex) ─
     const [crData, unpData, s2Data, oaData] = await Promise.all([
-      fetchJsonWithTimeout(`https://api.crossref.org/works/${doi}`, 5000),
-      fetchJsonWithTimeout(`https://api.unpaywall.org/v2/${doi}?email=researcher@vellum.app`, 5000),
-      fetchJsonWithTimeout(`https://api.semanticscholar.org/graph/v1/paper/DOI:${doi}?fields=openAccessPdf,title`, 5000),
-      fetchJsonWithTimeout(`https://api.openalex.org/works/https://doi.org/${doi}`, 5000),
+      fetchJsonWithTimeout<CrossrefEnvelope>(`https://api.crossref.org/works/${doi}`, 5000),
+      fetchJsonWithTimeout<UnpaywallEnvelope>(`https://api.unpaywall.org/v2/${doi}?email=researcher@vellum.app`, 5000),
+      fetchJsonWithTimeout<SemanticScholarEnvelope>(`https://api.semanticscholar.org/graph/v1/paper/DOI:${doi}?fields=openAccessPdf,title`, 5000),
+      fetchJsonWithTimeout<OpenAlexEnvelope>(`https://api.openalex.org/works/https://doi.org/${doi}`, 5000),
     ]);
 
     if (crData?.message) {
@@ -235,7 +263,7 @@ export async function POST(req: NextRequest) {
       }
       if (Array.isArray(crMsg.link)) {
         for (const lk of crMsg.link) {
-          const u = lk?.URL;
+          const u = lk.URL;
           if (u && u.startsWith("http")) {
             candidateUrls.push({ url: u, source: "Crossref Full-Text" });
           }
@@ -384,10 +412,10 @@ export async function POST(req: NextRequest) {
       },
       { status: 404 }
     );
-  } catch (err: any) {
+  } catch (err) {
     console.error("Fast download-pdf error:", err);
     return NextResponse.json(
-      { success: false, message: err.message || "Failed to download PDF" },
+      { success: false, message: err instanceof Error ? err.message : "Failed to download PDF" },
       { status: 500 }
     );
   }

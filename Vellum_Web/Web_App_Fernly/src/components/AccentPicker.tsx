@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import type { Accent } from "@/lib/theme";
 
 /**
  * AccentPicker — the four Fernly accent colourways, behind one control.
@@ -12,7 +13,7 @@ import React, { useEffect, useRef, useState } from "react";
  * that is spoken rather than only seen.
  */
 
-export type FernlyAccent = "emerald" | "ocean" | "plum" | "ember";
+export type FernlyAccent = Accent;
 
 const ACCENTS: { id: FernlyAccent; name: string; color: string }[] = [
   { id: "emerald", name: "Fernly Emerald", color: "#1d7347" },

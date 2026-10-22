@@ -1,4 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  OpenAlexPage,
+  authorNames,
+  bareDoi,
+  nonEmpty,
+  reconstructAbstract,
+  workTopics,
+} from "@/lib/openalex";
 
 export interface AcademicPaperResult {
   id: string;
@@ -15,17 +23,43 @@ export interface AcademicPaperResult {
   topics?: string[];
 }
 
-// Helper to reconstruct abstract from OpenAlex inverted index
-function reconstructAbstract(invertedIndex?: Record<string, number[]>): string | undefined {
-  if (!invertedIndex || Object.keys(invertedIndex).length === 0) return undefined;
-  const positions: [number, string][] = [];
-  for (const [word, indices] of Object.entries(invertedIndex)) {
-    for (const idx of indices) {
-      positions.push([idx, word]);
-    }
-  }
-  positions.sort((a, b) => a[0] - b[0]);
-  return positions.map((p) => p[1]).join(" ");
+// ---------------------------------------------------------------------------
+// Upstream payloads. These are third-party APIs we do not control, so only the
+// fields this route actually reads are described; everything else is ignored.
+// OpenAlex lives in @/lib/openalex because three routes read it.
+// ---------------------------------------------------------------------------
+
+interface SemanticScholarPaper {
+  paperId?: string;
+  title?: string;
+  authors?: { name?: string }[];
+  year?: number;
+  venue?: string;
+  citationCount?: number;
+  isOpenAccess?: boolean;
+  openAccessPdf?: { url?: string };
+  abstract?: string;
+  externalIds?: { DOI?: string };
+}
+
+interface CrossrefItem {
+  author?: { given?: string; family?: string }[];
+  title?: string[];
+  "published-print"?: { "date-parts"?: number[][] };
+  "published-online"?: { "date-parts"?: number[][] };
+  created?: { "date-parts"?: number[][] };
+  "container-title"?: string[];
+  publisher?: string;
+  DOI?: string;
+  link?: { "content-type"?: string; URL?: string }[];
+  "is-referenced-by-count"?: number;
+  license?: unknown[];
+  abstract?: string;
+}
+
+/** Describe a caught value without assuming it is an Error. */
+function errorMessage(err: unknown): string {
+  return err instanceof Error ? err.message : String(err);
 }
 
 // Parse arXiv Atom XML using regex without heavy dependencies
@@ -107,7 +141,7 @@ export async function GET(req: NextRequest) {
   const tokenCrossref = req.headers.get("x-token-crossref") || searchParams.get("tokenCrossref") || "";
 
   // Compose synthesized query string
-  let queryTerms: string[] = [];
+  const queryTerms: string[] = [];
   if (doiQuery.trim()) {
     queryTerms.push(doiQuery.trim());
   }
@@ -184,11 +218,9 @@ export async function GET(req: NextRequest) {
       });
 
       if (oaRes.ok) {
-        const data = await oaRes.json();
-        for (const w of data.results || []) {
-          const authors = (w.authorships || [])
-            .map((a: any) => a.author?.display_name)
-            .filter(Boolean);
+        const data = (await oaRes.json()) as OpenAlexPage;
+        for (const w of data.results ?? []) {
+          const authors = authorNames(w);
 
           const venue =
             w.primary_location?.source?.display_name ||
@@ -201,8 +233,8 @@ export async function GET(req: NextRequest) {
             (w.best_oa_location?.pdf_url ?? undefined);
 
           const abstract = reconstructAbstract(w.abstract_inverted_index);
-          const topics = (w.topics || w.concepts || []).slice(0, 3).map((c: any) => c.display_name);
-          const doiClean = w.doi ? w.doi.replace(/^https?:\/\/doi\.org\//i, "") : undefined;
+          const topics = workTopics(w);
+          const doiClean = bareDoi(w.doi);
 
           results.push({
             id: w.id || `openalex-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
@@ -220,9 +252,9 @@ export async function GET(req: NextRequest) {
           });
         }
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error("OpenAlex source error:", err);
-      errors.push(`OpenAlex: ${err.message}`);
+      errors.push(`OpenAlex: ${errorMessage(err)}`);
     }
   }
 
@@ -256,9 +288,9 @@ export async function GET(req: NextRequest) {
         const arxivPapers = parseArxivXml(xmlText);
         results.push(...arxivPapers);
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error("arXiv source error:", err);
-      errors.push(`arXiv: ${err.message}`);
+      errors.push(`arXiv: ${errorMessage(err)}`);
     }
   }
 
@@ -291,9 +323,9 @@ export async function GET(req: NextRequest) {
       });
 
       if (s2Res.ok) {
-        const s2Data = await s2Res.json();
-        for (const p of s2Data.data || []) {
-          const authors = (p.authors || []).map((a: any) => a.name).filter(Boolean);
+        const s2Data = (await s2Res.json()) as { data?: SemanticScholarPaper[] };
+        for (const p of s2Data.data ?? []) {
+          const authors = nonEmpty((p.authors ?? []).map((a) => a.name));
           const doi = p.externalIds?.DOI || undefined;
           results.push({
             id: `s2-${p.paperId}`,
@@ -311,9 +343,9 @@ export async function GET(req: NextRequest) {
           });
         }
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error("Semantic Scholar source error:", err);
-      errors.push(`Semantic Scholar: ${err.message}`);
+      errors.push(`Semantic Scholar: ${errorMessage(err)}`);
     }
   }
 
@@ -337,9 +369,11 @@ export async function GET(req: NextRequest) {
       });
 
       if (crRes.ok) {
-        const crData = await crRes.json();
-        for (const item of crData.message?.items || []) {
-          const authors = (item.author || []).map((a: any) => `${a.given || ""} ${a.family || ""}`.trim()).filter(Boolean);
+        const crData = (await crRes.json()) as { message?: { items?: CrossrefItem[] } };
+        for (const item of crData.message?.items ?? []) {
+          const authors = nonEmpty(
+            (item.author ?? []).map((a) => `${a.given || ""} ${a.family || ""}`.trim())
+          );
           const title = item.title?.[0] || "Crossref Document";
           const year = item["published-print"]?.["date-parts"]?.[0]?.[0] ||
                        item["published-online"]?.["date-parts"]?.[0]?.[0] ||
@@ -347,7 +381,7 @@ export async function GET(req: NextRequest) {
                        parseInt(startYear, 10);
           const venue = item["container-title"]?.[0] || item.publisher || "Crossref Publication";
           const doi = item.DOI;
-          const pdfLink = item.link?.find((l: any) => l["content-type"] === "application/pdf")?.URL;
+          const pdfLink = item.link?.find((l) => l["content-type"] === "application/pdf")?.URL;
 
           results.push({
             id: `crossref-${item.DOI || Math.random().toString(36).substring(2, 6)}`,
@@ -357,7 +391,7 @@ export async function GET(req: NextRequest) {
             venue,
             doi,
             citationCount: item["is-referenced-by-count"] || 0,
-            isOpenAccess: item.license && item.license.length > 0,
+            isOpenAccess: (item.license?.length ?? 0) > 0,
             pdfUrl: pdfLink || undefined,
             abstract: item.abstract ? item.abstract.replace(/<[^>]+>/g, "").trim() : undefined,
             source: "Crossref",
@@ -365,9 +399,9 @@ export async function GET(req: NextRequest) {
           });
         }
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error("Crossref source error:", err);
-      errors.push(`Crossref: ${err.message}`);
+      errors.push(`Crossref: ${errorMessage(err)}`);
     }
   }
 

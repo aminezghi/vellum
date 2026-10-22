@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Notebook, db, ScreeningSession, ScreeningItem } from "@/lib/db";
 import { STORAGE_KEYS } from "@/lib/storageNamespace";
 import { Modal } from "@/components/Modal";
@@ -18,16 +18,11 @@ import {
   RotateCcw,
   Sparkles,
   Layers,
-  FileText,
   Upload,
-  ArrowRight,
   TrendingUp,
   ExternalLink,
   BookOpen,
   Download,
-  Check,
-  Zap,
-  Info,
   ShieldCheck,
   ChevronRight,
   ChevronDown,
@@ -35,19 +30,11 @@ import {
   Plus,
   Trash2,
   Edit3,
-  Copy,
-  Clock,
-  Save,
-  CheckCheck,
   Database,
-  Filter,
-  AlertCircle,
-  FileSpreadsheet,
 } from "lucide-react";
 
 interface ScreeningHubProps {
   notebooks: Notebook[];
-  onAddToNotebook?: (paper: any) => void;
 }
 
 interface StagedSource {
@@ -58,7 +45,14 @@ interface StagedSource {
   candidates: ScreeningCandidate[];
 }
 
-export function ScreeningHub({ notebooks, onAddToNotebook }: ScreeningHubProps) {
+/** File extensions the import path accepts; anything else is treated as CSV. */
+const STAGED_FILE_TYPES = ["csv", "ris", "bib", "json"] as const;
+
+function isStagedFileType(value: string): value is (typeof STAGED_FILE_TYPES)[number] {
+  return (STAGED_FILE_TYPES as readonly string[]).includes(value);
+}
+
+export function ScreeningHub({ notebooks }: ScreeningHubProps) {
   // Session State
   const [sessions, setSessions] = useState<ScreeningSession[]>([]);
   const [activeSession, setActiveSession] = useState<ScreeningSession | null>(null);
@@ -73,7 +67,6 @@ export function ScreeningHub({ notebooks, onAddToNotebook }: ScreeningHubProps) 
   const [consecutiveExcludes, setConsecutiveExcludes] = useState(0);
   const [showIncludedDrawer, setShowIncludedDrawer] = useState(false);
   const [feedbackAnimation, setFeedbackAnimation] = useState<"included" | "excluded" | null>(null);
-  const [lastSavedTime, setLastSavedTime] = useState<number>(Date.now());
 
   // Multi-Source Staging & Deduplication
   const [stagedSources, setStagedSources] = useState<StagedSource[]>([]);
@@ -98,57 +91,8 @@ export function ScreeningHub({ notebooks, onAddToNotebook }: ScreeningHubProps) 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const addMoreFileInputRef = useRef<HTMLInputElement>(null);
 
-  // 1. Initial Load: Load all sessions from Dexie
-  useEffect(() => {
-    loadSessions();
-  }, []);
-
-  const loadSessions = async () => {
-    try {
-      const allSessions = await db.screeningSessions.orderBy("updatedAt").reverse().toArray();
-      setSessions(allSessions);
-
-      const savedActiveId = localStorage.getItem(STORAGE_KEYS.activeScreeningSession);
-      let current = allSessions.find((s) => s.id === savedActiveId);
-
-      if (!current && allSessions.length > 0) {
-        current = allSessions[0];
-      }
-
-      if (current) {
-        await activateSession(current);
-      } else {
-        // Check for any legacy items from version 2
-        const legacyItems = await db.screeningItems.toArray();
-        if (legacyItems.length > 0) {
-          const defaultSession: ScreeningSession = {
-            id: `session-migrated-${Date.now()}`,
-            name: "Default Systematic Review",
-            createdAt: Date.now(),
-            updatedAt: Date.now(),
-            totalCount: legacyItems.length,
-            screenedCount: legacyItems.filter((i) => i.decision !== "pending").length,
-            includedCount: legacyItems.filter((i) => i.decision === "included").length,
-            excludedCount: legacyItems.filter((i) => i.decision === "excluded").length,
-            consecutiveExcludes: 0,
-            sourcesList: ["Migrated Records"],
-            duplicatesRemoved: 0,
-          };
-          await db.screeningSessions.put(defaultSession);
-          for (const item of legacyItems) {
-            await db.screeningItems.update(item.id, { sessionId: defaultSession.id });
-          }
-          setSessions([defaultSession]);
-          await activateSession(defaultSession);
-        }
-      }
-    } catch (err) {
-      console.error("Error loading screening sessions:", err);
-    }
-  };
-
-  // 2. Activate / Switch to a Session
-  const activateSession = async (session: ScreeningSession) => {
+  // 1. Activate / Switch to a Session
+  const activateSession = useCallback(async (session: ScreeningSession) => {
     setActiveSession(session);
     setSessionName(session.name);
     setConsecutiveExcludes(session.consecutiveExcludes || 0);
@@ -159,8 +103,59 @@ export function ScreeningHub({ notebooks, onAddToNotebook }: ScreeningHubProps) 
     const sorted = classifier.retrainAndRank(items as ScreeningCandidate[]);
     setCandidates(sorted);
     setHistory([]);
-    setLastSavedTime(session.updatedAt || Date.now());
-  };
+  }, [classifier]);
+
+  // 2. Initial Load: restore the most recent session, or adopt any records left
+  // over from version 2. This lives in the effect rather than a helper because
+  // it stamps records with the current time, which is only safe off-render.
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const allSessions = await db.screeningSessions.orderBy("updatedAt").reverse().toArray();
+        setSessions(allSessions);
+
+        const savedActiveId = localStorage.getItem(STORAGE_KEYS.activeScreeningSession);
+        let current = allSessions.find((s) => s.id === savedActiveId);
+
+        if (!current && allSessions.length > 0) {
+          current = allSessions[0];
+        }
+
+        if (current) {
+          await activateSession(current);
+          return;
+        }
+
+        // No session yet: adopt any records left behind by version 2.
+        const legacyItems = await db.screeningItems.toArray();
+        if (legacyItems.length === 0) return;
+
+        const defaultSession: ScreeningSession = {
+          id: `session-migrated-${Date.now()}`,
+          name: "Default Systematic Review",
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+          totalCount: legacyItems.length,
+          screenedCount: legacyItems.filter((i) => i.decision !== "pending").length,
+          includedCount: legacyItems.filter((i) => i.decision === "included").length,
+          excludedCount: legacyItems.filter((i) => i.decision === "excluded").length,
+          consecutiveExcludes: 0,
+          sourcesList: ["Migrated Records"],
+          duplicatesRemoved: 0,
+        };
+        await db.screeningSessions.put(defaultSession);
+        for (const item of legacyItems) {
+          await db.screeningItems.update(item.id, { sessionId: defaultSession.id });
+        }
+        setSessions([defaultSession]);
+        await activateSession(defaultSession);
+      } catch (err) {
+        console.error("Error loading screening sessions:", err);
+      }
+    };
+
+    void load();
+  }, [activateSession]);
 
   // 3. Create a New Session
   const handleCreateNewSession = async (customName?: string) => {
@@ -236,7 +231,7 @@ export function ScreeningHub({ notebooks, onAddToNotebook }: ScreeningHubProps) 
   };
 
   // 6. Sync candidate changes to DB
-  const syncCandidatesToDb = async (
+  const syncCandidatesToDb = useCallback(async (
     updatedCandidates: ScreeningCandidate[],
     updatedSessionMeta?: Partial<ScreeningSession>
   ) => {
@@ -269,8 +264,7 @@ export function ScreeningHub({ notebooks, onAddToNotebook }: ScreeningHubProps) 
 
     setActiveSession(updatedSession);
     setSessions((prev) => prev.map((s) => (s.id === updatedSession.id ? updatedSession : s)));
-    setLastSavedTime(Date.now());
-  };
+  }, [activeSession]);
 
   // 7. Simulated upload progress helper
   const simulateUploadProgress = async (
@@ -352,14 +346,14 @@ export function ScreeningHub({ notebooks, onAddToNotebook }: ScreeningHubProps) 
       const newSource: StagedSource = {
         id: `source-${Date.now()}`,
         name: file.name,
-        type: (["csv", "ris", "bib", "json"].includes(ext) ? ext : "csv") as any,
+        type: isStagedFileType(ext) ? ext : "csv",
         count: candidates.length,
         candidates,
       };
 
       setStagedSources((prev) => [...prev, newSource]);
-    } catch (err: any) {
-      alert(`Error reading file "${file.name}": ${err.message || err}`);
+    } catch (err) {
+      alert(`Error reading file "${file.name}": ${err instanceof Error ? err.message : String(err)}`);
     } finally {
       if (fileInputRef.current) fileInputRef.current.value = "";
       if (addMoreFileInputRef.current) addMoreFileInputRef.current.value = "";
@@ -518,7 +512,7 @@ export function ScreeningHub({ notebooks, onAddToNotebook }: ScreeningHubProps) 
   const progressPercent = totalCount > 0 ? Math.round((screenedCount / totalCount) * 100) : 0;
 
   // 16. Decision Handler (Include / Exclude)
-  const handleDecision = async (decision: "included" | "excluded") => {
+  const handleDecision = useCallback(async (decision: "included" | "excluded") => {
     if (!currentCandidate) return;
 
     setFeedbackAnimation(decision);
@@ -530,7 +524,7 @@ export function ScreeningHub({ notebooks, onAddToNotebook }: ScreeningHubProps) 
       screenedAt: Date.now(),
     };
 
-    let newConsecutive = decision === "excluded" ? consecutiveExcludes + 1 : 0;
+    const newConsecutive = decision === "excluded" ? consecutiveExcludes + 1 : 0;
     setConsecutiveExcludes(newConsecutive);
     setHistory((prev) => [...prev, { id: currentCandidate.id, decision }]);
 
@@ -541,10 +535,10 @@ export function ScreeningHub({ notebooks, onAddToNotebook }: ScreeningHubProps) 
     const reranked = classifier.retrainAndRank(updatedCandidates);
     setCandidates(reranked);
     await syncCandidatesToDb(reranked, { consecutiveExcludes: newConsecutive });
-  };
+  }, [currentCandidate, consecutiveExcludes, candidates, classifier, syncCandidatesToDb]);
 
   // 17. Undo Last Decision
-  const handleUndo = async () => {
+  const handleUndo = useCallback(async () => {
     if (history.length === 0) return;
     const lastAction = history[history.length - 1];
 
@@ -558,7 +552,7 @@ export function ScreeningHub({ notebooks, onAddToNotebook }: ScreeningHubProps) 
     const reranked = classifier.retrainAndRank(updatedCandidates);
     setCandidates(reranked);
     await syncCandidatesToDb(reranked);
-  };
+  }, [history, candidates, classifier, syncCandidatesToDb]);
 
   // 18. Keyboard Shortcuts (I = Include, E = Exclude, U = Undo)
   useEffect(() => {
@@ -587,7 +581,7 @@ export function ScreeningHub({ notebooks, onAddToNotebook }: ScreeningHubProps) 
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [currentCandidate, history, showSessionsModal, showDuplicateModal, showAddSourcesModal]);
+  }, [currentCandidate, history, showSessionsModal, showDuplicateModal, showAddSourcesModal, handleDecision, handleUndo]);
 
   // 19. Flow to Review Notebook
   const handleSaveToNotebook = async () => {

@@ -5,24 +5,15 @@ import { Notebook } from "@/lib/db";
 import { fetchAndStorePaperPdf, triggerBrowserFileDownload } from "@/lib/pdfDownloader";
 import {
   DownloadCloud,
-  FileText,
-  Upload,
-  CheckCircle2,
-  AlertCircle,
   Zap,
-  RotateCcw,
   ExternalLink,
-  Layers,
   ArrowUpRight,
-  ShieldCheck,
-  Check,
   FolderDown,
   Trash2,
 } from "lucide-react";
 
 interface BatchDownloaderHubProps {
   notebooks: Notebook[];
-  onAddToNotebook?: (paper: any) => void;
 }
 
 interface QueueItem {
@@ -183,14 +174,14 @@ export function BatchDownloaderHub({ notebooks }: BatchDownloaderHubProps) {
             )
           );
         }
-      } catch (err: any) {
+      } catch (err) {
         setQueue((prev) =>
           prev.map((q, idx) =>
             idx === i
               ? {
                   ...q,
                   status: "failed",
-                  message: err.message || "Network error",
+                  message: err instanceof Error ? err.message : "Network error",
                 }
               : q
           )

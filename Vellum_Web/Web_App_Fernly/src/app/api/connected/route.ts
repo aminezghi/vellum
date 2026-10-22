@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { OpenAlexPage, OpenAlexWork, authorNames, bareDoi, reconstructAbstract } from "@/lib/openalex";
 
 export interface ConnectedGraphNode {
   id: string;
@@ -32,19 +33,6 @@ export interface ConnectedGraphResponse {
   derivativeWorksCount: number;
   priorWorks?: ConnectedGraphNode[];
   derivativeWorks?: ConnectedGraphNode[];
-}
-
-// Reconstruct abstract from OpenAlex inverted index
-function reconstructAbstract(invertedIndex?: Record<string, number[]>): string | undefined {
-  if (!invertedIndex || Object.keys(invertedIndex).length === 0) return undefined;
-  const positions: [number, string][] = [];
-  for (const [word, indices] of Object.entries(invertedIndex)) {
-    for (const idx of indices) {
-      positions.push([idx, word]);
-    }
-  }
-  positions.sort((a, b) => a[0] - b[0]);
-  return positions.map((p) => p[1]).join(" ");
 }
 
 // Format author label (e.g. "Sa, 2016" or "Redmon, 2015")
@@ -446,23 +434,25 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(CURATED_GRAPHS["deepfruits"]);
     }
 
-    const data = await response.json();
-    const work = data.results ? data.results[0] : data;
+    // This endpoint accepts either a DOI lookup (a single work) or a search
+    // (a results page), so both shapes have to be accepted here.
+    const payload = (await response.json()) as OpenAlexPage & OpenAlexWork;
+    const work: OpenAlexWork | undefined = payload.results ? payload.results[0] : payload;
 
     if (!work || !work.title) {
       return NextResponse.json(CURATED_GRAPHS["deepfruits"]);
     }
 
     // Build origin node
-    const originAuthors = (work.authorships || []).map((a: any) => a.author?.display_name).filter(Boolean);
+    const originAuthors = authorNames(work);
     const originYear = work.publication_year || 2024;
     const originNode: ConnectedGraphNode = {
-      id: work.id,
+      id: work.id ?? `origin-${Date.now()}`,
       title: work.title,
       authors: originAuthors.length > 0 ? originAuthors : ["Primary Investigator"],
       year: originYear,
       venue: work.primary_location?.source?.display_name || "Peer-Reviewed Proceedings",
-      doi: work.doi ? work.doi.replace(/^https?:\/\/doi\.org\//i, "") : undefined,
+      doi: bareDoi(work.doi),
       citationCount: work.cited_by_count || 0,
       isOpenAccess: !!work.is_oa,
       pdfUrl: work.open_access?.oa_url || work.primary_location?.pdf_url || undefined,
@@ -490,25 +480,26 @@ export async function GET(req: NextRequest) {
       });
 
       if (batchRes.ok) {
-        const batchData = await batchRes.json();
-        const rawPapers = batchData.results || [];
+        const batchData = (await batchRes.json()) as OpenAlexPage;
+        const rawPapers = batchData.results ?? [];
 
         for (const w of rawPapers) {
-          const auths = (w.authorships || []).map((a: any) => a.author?.display_name).filter(Boolean);
+          const auths = authorNames(w);
           const y = w.publication_year || 2024;
           if (y < minYear) minYear = y;
           if (y > maxYear) maxYear = y;
 
           const abs = reconstructAbstract(w.abstract_inverted_index) || "";
-          const sim = Math.max(0.65, Math.min(0.96, computeTextSimilarity(originNode.title, w.title) + 0.65));
+          const title = w.title || "Untitled Work";
+          const sim = Math.max(0.65, Math.min(0.96, computeTextSimilarity(originNode.title, title) + 0.65));
 
           const node: ConnectedGraphNode = {
-            id: w.id,
-            title: w.title,
+            id: w.id ?? `related-${nodes.length}`,
+            title,
             authors: auths.length > 0 ? auths : ["Researcher"],
             year: y,
             venue: w.primary_location?.source?.display_name || "Journal",
-            doi: w.doi ? w.doi.replace(/^https?:\/\/doi\.org\//i, "") : undefined,
+            doi: bareDoi(w.doi),
             citationCount: w.cited_by_count || 0,
             isOpenAccess: !!w.is_oa,
             pdfUrl: w.open_access?.oa_url || w.primary_location?.pdf_url || undefined,
@@ -575,7 +566,7 @@ export async function GET(req: NextRequest) {
       priorWorks,
       derivativeWorks,
     });
-  } catch (err: any) {
+  } catch (err) {
     console.error("Connected graph API error:", err);
     const fallback = CURATED_GRAPHS["deepfruits"];
     const priorWorks = fallback.nodes.filter((n) => !n.isOrigin && n.year <= fallback.origin.year);

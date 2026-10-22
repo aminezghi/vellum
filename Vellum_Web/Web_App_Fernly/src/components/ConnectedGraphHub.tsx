@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useMemo } from "react";
-import { Notebook } from "@/lib/db";
-import { AcademicPaperResult } from "@/app/api/search/route";
+import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import { AddablePaper } from "@/lib/paper";
 import { fetchAndStorePaperPdf, triggerBrowserFileDownload } from "@/lib/pdfDownloader";
 import {
   ConnectedGraphNode,
@@ -11,11 +10,9 @@ import {
 } from "@/app/api/connected/route";
 import {
   Search,
-  Sparkles,
   ExternalLink,
   BookOpen,
   Download,
-  Share2,
   ZoomIn,
   ZoomOut,
   Maximize2,
@@ -23,20 +20,12 @@ import {
   Pause,
   HelpCircle,
   X,
-  Layers,
-  ArrowRight,
-  Filter,
-  Check,
-  TrendingUp,
   FileText,
-  RotateCcw,
   Network,
 } from "lucide-react";
 
 interface ConnectedGraphHubProps {
-  notebooks: Notebook[];
-  onAddToNotebook?: (paper: any) => void;
-  onInspectPaper?: (paper: any) => void;
+  onAddToNotebook?: (paper: AddablePaper) => void;
   initialSeed?: string;
 }
 
@@ -73,9 +62,7 @@ const EXAMPLE_SEEDS = [
 ];
 
 export function ConnectedGraphHub({
-  notebooks,
   onAddToNotebook,
-  onInspectPaper,
   initialSeed,
 }: ConnectedGraphHubProps) {
   const [searchQuery, setSearchQuery] = useState(initialSeed || "DeepFruits: A Fruit Detection System Using Deep Neural Networks");
@@ -98,27 +85,6 @@ export function ConnectedGraphHub({
   const simEdgesRef = useRef<ConnectedGraphEdge[]>([]);
   const animFrameRef = useRef<number | null>(null);
 
-  // Load graph on mount
-  useEffect(() => {
-    fetchGraph(searchQuery);
-  }, []);
-
-  const fetchGraph = async (term: string) => {
-    if (!term.trim()) return;
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/connected?q=${encodeURIComponent(term.trim())}`);
-      const data: ConnectedGraphResponse = await res.json();
-      setGraphData(data);
-      setSelectedNodeId(data.origin.id);
-      initializeSimulation(data);
-    } catch (err) {
-      console.error("Failed to load connected graph:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   // Interpolate year color from light mint/teal (#a7d7c5) to deep emerald/pine (#1b4332)
   const getYearColor = (year: number, minYear: number, maxYear: number) => {
     const range = Math.max(1, maxYear - minYear);
@@ -133,7 +99,7 @@ export function ConnectedGraphHub({
   };
 
   // Initialize nodes for force simulation
-  const initializeSimulation = (data: ConnectedGraphResponse) => {
+  const initializeSimulation = useCallback((data: ConnectedGraphResponse) => {
     const width = 800;
     const height = 600;
     const centerX = width / 2;
@@ -166,113 +132,34 @@ export function ConnectedGraphHub({
     simNodesRef.current = simNodes;
     simEdgesRef.current = data.edges;
     setTransform({ x: 0, y: 0, k: 1 });
-  };
+  }, []);
 
-  // Force-directed simulation tick
+  const fetchGraph = useCallback(async (term: string) => {
+    if (!term.trim()) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/connected?q=${encodeURIComponent(term.trim())}`);
+      const data: ConnectedGraphResponse = await res.json();
+      setGraphData(data);
+      setSelectedNodeId(data.origin.id);
+      initializeSimulation(data);
+    } catch (err) {
+      console.error("Failed to load connected graph:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [initializeSimulation]);
+
+  // Load the seeded graph once, on mount. Reading the seed from a ref keeps the
+  // effect from refiring on every keystroke: `searchQuery` changes as the user
+  // types, but only submitting the form should run a new search.
+  const initialQueryRef = useRef(searchQuery);
   useEffect(() => {
-    let lastTime = performance.now();
-
-    const tick = (now: number) => {
-      const dt = Math.min(32, now - lastTime) / 1000;
-      lastTime = now;
-
-      if (physicsRunning) {
-        const nodes = simNodesRef.current;
-        const edges = simEdgesRef.current;
-        const width = 800;
-        const height = 600;
-        const centerX = width / 2;
-        const centerY = height / 2;
-
-        // 1. Coulomb repulsion between all node pairs
-        for (let i = 0; i < nodes.length; i++) {
-          for (let j = i + 1; j < nodes.length; j++) {
-            const na = nodes[i];
-            const nb = nodes[j];
-            const dx = nb.x - na.x;
-            const dy = nb.y - na.y;
-            const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-            const minDist = na.radius + nb.radius + 30;
-
-            if (dist < 400) {
-              const force = (12000 / (dist * dist)) * (dist < minDist ? 2.5 : 1);
-              const fx = (dx / dist) * force;
-              const fy = (dy / dist) * force;
-
-              if (na !== draggedNode.current && !na.isOrigin) {
-                na.vx -= fx * dt;
-                na.vy -= fy * dt;
-              }
-              if (nb !== draggedNode.current && !nb.isOrigin) {
-                nb.vx += fx * dt;
-                nb.vy += fy * dt;
-              }
-            }
-          }
-        }
-
-        // 2. Hooke's spring attraction along edges
-        const nodeMap = new Map(nodes.map((n) => [n.id, n]));
-        for (const edge of edges) {
-          const na = nodeMap.get(edge.source);
-          const nb = nodeMap.get(edge.target);
-          if (na && nb) {
-            const dx = nb.x - na.x;
-            const dy = nb.y - na.y;
-            const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-            const targetDist = 90 + (1 - (edge.weight || 0.5)) * 140;
-            const force = (dist - targetDist) * 1.8 * (edge.weight || 0.5);
-            const fx = (dx / dist) * force;
-            const fy = (dy / dist) * force;
-
-            if (na !== draggedNode.current && !na.isOrigin) {
-              na.vx += fx * dt;
-              na.vy += fy * dt;
-            }
-            if (nb !== draggedNode.current && !nb.isOrigin) {
-              nb.vx -= fx * dt;
-              nb.vy -= fy * dt;
-            }
-          }
-        }
-
-        // 3. Center gravity pull towards center
-        for (const n of nodes) {
-          if (n.isOrigin) {
-            n.x = centerX;
-            n.y = centerY;
-            n.vx = 0;
-            n.vy = 0;
-            continue;
-          }
-          if (n === draggedNode.current) continue;
-
-          const dx = centerX - n.x;
-          const dy = centerY - n.y;
-          const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-          n.vx += (dx / dist) * 20 * dt;
-          n.vy += (dy / dist) * 20 * dt;
-
-          // Apply velocity with damping
-          n.x += n.vx;
-          n.y += n.vy;
-          n.vx *= 0.88;
-          n.vy *= 0.88;
-        }
-      }
-
-      renderCanvas();
-      animFrameRef.current = requestAnimationFrame(tick);
-    };
-
-    animFrameRef.current = requestAnimationFrame(tick);
-    return () => {
-      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
-    };
-  }, [physicsRunning, hoveredNodeId, selectedNodeId, transform]);
+    void fetchGraph(initialQueryRef.current);
+  }, [fetchGraph]);
 
   // Render Canvas with High-DPI support
-  const renderCanvas = () => {
+  const renderCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -415,7 +302,110 @@ export function ConnectedGraphHub({
     }
 
     ctx.restore();
-  };
+  }, [transform, hoveredNodeId, selectedNodeId]);
+
+  // Force-directed simulation tick
+  useEffect(() => {
+    let lastTime = performance.now();
+
+    const tick = (now: number) => {
+      const dt = Math.min(32, now - lastTime) / 1000;
+      lastTime = now;
+
+      if (physicsRunning) {
+        const nodes = simNodesRef.current;
+        const edges = simEdgesRef.current;
+        const width = 800;
+        const height = 600;
+        const centerX = width / 2;
+        const centerY = height / 2;
+
+        // 1. Coulomb repulsion between all node pairs
+        for (let i = 0; i < nodes.length; i++) {
+          for (let j = i + 1; j < nodes.length; j++) {
+            const na = nodes[i];
+            const nb = nodes[j];
+            const dx = nb.x - na.x;
+            const dy = nb.y - na.y;
+            const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+            const minDist = na.radius + nb.radius + 30;
+
+            if (dist < 400) {
+              const force = (12000 / (dist * dist)) * (dist < minDist ? 2.5 : 1);
+              const fx = (dx / dist) * force;
+              const fy = (dy / dist) * force;
+
+              if (na !== draggedNode.current && !na.isOrigin) {
+                na.vx -= fx * dt;
+                na.vy -= fy * dt;
+              }
+              if (nb !== draggedNode.current && !nb.isOrigin) {
+                nb.vx += fx * dt;
+                nb.vy += fy * dt;
+              }
+            }
+          }
+        }
+
+        // 2. Hooke's spring attraction along edges
+        const nodeMap = new Map(nodes.map((n) => [n.id, n]));
+        for (const edge of edges) {
+          const na = nodeMap.get(edge.source);
+          const nb = nodeMap.get(edge.target);
+          if (na && nb) {
+            const dx = nb.x - na.x;
+            const dy = nb.y - na.y;
+            const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+            const targetDist = 90 + (1 - (edge.weight || 0.5)) * 140;
+            const force = (dist - targetDist) * 1.8 * (edge.weight || 0.5);
+            const fx = (dx / dist) * force;
+            const fy = (dy / dist) * force;
+
+            if (na !== draggedNode.current && !na.isOrigin) {
+              na.vx += fx * dt;
+              na.vy += fy * dt;
+            }
+            if (nb !== draggedNode.current && !nb.isOrigin) {
+              nb.vx -= fx * dt;
+              nb.vy -= fy * dt;
+            }
+          }
+        }
+
+        // 3. Center gravity pull towards center
+        for (const n of nodes) {
+          if (n.isOrigin) {
+            n.x = centerX;
+            n.y = centerY;
+            n.vx = 0;
+            n.vy = 0;
+            continue;
+          }
+          if (n === draggedNode.current) continue;
+
+          const dx = centerX - n.x;
+          const dy = centerY - n.y;
+          const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+          n.vx += (dx / dist) * 20 * dt;
+          n.vy += (dy / dist) * 20 * dt;
+
+          // Apply velocity with damping
+          n.x += n.vx;
+          n.y += n.vy;
+          n.vx *= 0.88;
+          n.vy *= 0.88;
+        }
+      }
+
+      renderCanvas();
+      animFrameRef.current = requestAnimationFrame(tick);
+    };
+
+    animFrameRef.current = requestAnimationFrame(tick);
+    return () => {
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+    };
+  }, [physicsRunning, hoveredNodeId, selectedNodeId, transform, renderCanvas]);
 
   // Convert canvas client mouse coordinates to simulation world coordinates
   const getCanvasCoords = (e: React.MouseEvent<HTMLCanvasElement>) => {

@@ -2,12 +2,12 @@
 
 import React, { useState } from "react";
 import { db, Notebook, Source } from "@/lib/db";
-import { AcademicPaperResult } from "@/app/api/search/route";
+import { AddablePaper } from "@/lib/paper";
 import { CheckCircle2, BookmarkPlus } from "lucide-react";
 import { Modal } from "@/components/Modal";
 
 interface AddToNotebookModalProps {
-  paper: AcademicPaperResult | null;
+  paper: AddablePaper | null;
   notebooks: Notebook[];
   isOpen: boolean;
   onClose: () => void;
@@ -64,7 +64,7 @@ export function AddToNotebookModal({
       title: paper.title,
       authors: paper.authors,
       year: paper.year,
-      journal: paper.venue,
+      journal: paper.venue ?? paper.journal,
       doi: paper.doi,
       status: "ready",
       addedAt: Date.now(),

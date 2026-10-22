@@ -487,6 +487,43 @@ export function parseRisText(risContent: string): Partial<ScreeningCandidate>[] 
 }
 
 /**
+ * One row of a user-imported JSON file. Its shape is not ours, so every field
+ * is untrusted until proven otherwise.
+ */
+type ImportedRow = Record<string, unknown>;
+
+function isRecord(value: unknown): value is ImportedRow {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/** The first of these keys that holds a usable scalar, as trimmed text. */
+function readText(row: ImportedRow, ...keys: string[]): string {
+  for (const key of keys) {
+    const value = row[key];
+    if (typeof value === "string") return value.trim();
+    if (typeof value === "number") return String(value);
+  }
+  return "";
+}
+
+/** Authors arrive as an array, a delimited string, or not at all. */
+function readAuthors(value: unknown): string[] {
+  const raw = Array.isArray(value)
+    ? value.filter((v): v is string => typeof v === "string")
+    : typeof value === "string"
+      ? value.split(/[,;]/)
+      : [];
+  const names = raw.map((name) => name.trim()).filter(Boolean);
+  return names.length > 0 ? names : ["Unknown Author"];
+}
+
+function readYear(row: ImportedRow): number {
+  if (typeof row.year === "number" && Number.isFinite(row.year)) return row.year;
+  const parsed = Number.parseInt(readText(row, "year", "date"), 10);
+  return Number.isNaN(parsed) ? 2024 : parsed;
+}
+
+/**
  * Universal File Parser supporting CSV, TSV, RIS, BibTeX, and JSON files.
  */
 export function parseUniversalFile(content: string, fileName?: string): Partial<ScreeningCandidate>[] {
@@ -502,36 +539,26 @@ export function parseUniversalFile(content: string, fileName?: string): Partial<
     (trimmed.startsWith("{") && (trimmed.includes('"title"') || trimmed.includes('"papers"')))
   ) {
     try {
-      const data = JSON.parse(trimmed);
+      const data: unknown = JSON.parse(trimmed);
       const list = Array.isArray(data)
         ? data
-        : data.papers || data.items || data.results || data.data || [];
+        : isRecord(data)
+          ? (data.papers ?? data.items ?? data.results ?? data.data ?? [])
+          : [];
       if (Array.isArray(list) && list.length > 0) {
         return list
-          .filter((item) => item && (item.title || item.Title || item.name))
-          .map((item: any, idx: number) => ({
-            id: item.id || `json-${Date.now()}-${idx}`,
-            title: item.title || item.Title || item.name || "Untitled",
+          .filter(isRecord)
+          .filter((row) => readText(row, "title", "Title", "name") !== "")
+          .map((row, idx) => ({
+            id: readText(row, "id") || `json-${Date.now()}-${idx}`,
+            title: readText(row, "title", "Title", "name") || "Untitled",
             abstract:
-              item.abstract ||
-              item.Abstract ||
-              item.summary ||
-              item.description ||
+              readText(row, "abstract", "Abstract", "summary", "description") ||
               "No abstract provided.",
-            authors: Array.isArray(item.authors || item.Authors)
-              ? item.authors || item.Authors
-              : typeof (item.authors || item.author) === "string"
-              ? (item.authors || item.author)
-                  .split(/[,;]/)
-                  .map((a: string) => a.trim())
-                  .filter(Boolean)
-              : ["Unknown Author"],
-            year:
-              typeof item.year === "number"
-                ? item.year
-                : parseInt(item.year || item.date || "2024", 10) || 2024,
-            journal: item.journal || item.Journal || item.source || "",
-            doi: (item.doi || item.DOI || "").replace(/^https?:\/\/doi\.org\//i, ""),
+            authors: readAuthors(row.authors ?? row.Authors ?? row.author),
+            year: readYear(row),
+            journal: readText(row, "journal", "Journal", "source"),
+            doi: readText(row, "doi", "DOI").replace(/^https?:\/\/doi\.org\//i, ""),
             decision: "pending" as const,
           }));
       }

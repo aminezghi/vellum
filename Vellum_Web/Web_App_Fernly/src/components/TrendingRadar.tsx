@@ -33,13 +33,6 @@ export function TrendingRadar({
   const [activeDomain, setActiveDomain] = useState("ai");
   const [papers, setPapers] = useState<(AcademicPaperResult & { velocityBadge?: string })[]>([]);
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<"trends" | "connected">("trends");
-  const [seedDoi, setSeedDoi] = useState("");
-  const [connectedResults, setConnectedResults] = useState<{
-    seedTitle?: string;
-    related: AcademicPaperResult[];
-  } | null>(null);
-  const [connectedLoading, setConnectedLoading] = useState(false);
   const [downloadStates, setDownloadStates] = useState<
     Record<string, { status: string; message: string; landingUrl?: string }>
   >({});
@@ -92,24 +85,6 @@ export function TrendingRadar({
     loadTrends();
   }, [activeDomain]);
 
-  const handleConnectedSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!seedDoi.trim()) return;
-
-    setConnectedLoading(true);
-    try {
-      const res = await fetch(`/api/connected?doi=${encodeURIComponent(seedDoi.trim())}`);
-      if (!res.ok) throw new Error("Failed to map cluster");
-      const data = await res.json();
-      setConnectedResults(data);
-    } catch (err) {
-      console.error("Connected search error:", err);
-      setConnectedResults(null);
-    } finally {
-      setConnectedLoading(false);
-    }
-  };
-
   return (
     <div className="fernly-card p-6 sm:p-7 space-y-6">
       {/* Head / Mode Switcher */}
@@ -133,26 +108,20 @@ export function TrendingRadar({
           </div>
         </div>
 
-        {/* View Switch: Trends vs Connected Graph */}
+        {/* Current view, and a way into the citation graph */}
         <div className="flex items-center bg-[var(--panel)] p-1 rounded-full border border-[var(--hair)] self-start sm:self-auto">
-          <button
-            onClick={() => setViewMode("trends")}
-            className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-              viewMode === "trends"
-                ? "bg-[var(--card)] text-[var(--g-800)] shadow-xs"
-                : "text-[var(--muted)] hover:text-[var(--ink)]"
-            }`}
+          <span
+            aria-current="page"
+            className="px-3 py-1 rounded-full text-xs font-semibold bg-[var(--card)] text-[var(--g-800)] shadow-xs"
           >
             Velocity Feed
-          </button>
+          </span>
           <button
-            onClick={() => {
-              if (onOpenConnectedGraph) {
-                onOpenConnectedGraph(seedDoi || "DeepFruits: A Fruit Detection System Using Deep Neural Networks");
-              } else {
-                setViewMode("connected");
-              }
-            }}
+            onClick={() =>
+              onOpenConnectedGraph?.(
+                "DeepFruits: A Fruit Detection System Using Deep Neural Networks"
+              )
+            }
             className="px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer text-[var(--muted)] hover:text-[var(--ink)] flex items-center gap-1.5"
             title="Open Interactive Force-Directed Connected Papers Graph"
           >

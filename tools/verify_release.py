@@ -8,7 +8,7 @@ re-asserting what the source already claims.
     A  repository hygiene       - can the tree rebuild itself?
     B  desktop unit suite       - pytest over Desktop_App/tests
     C  desktop page smoke       - all 10 Streamlit pages import and render
-    D  web static analysis      - tsc --noEmit + production build present
+    D  web static analysis      - tsc --noEmit, eslint --max-warnings 0, build
     E  desktop installer        - silent install -> run -> health -> uninstall
     F  web share folder         - relocate -> launch -> health -> page -> APIs
     G  artefacts                - SHA-256 manifest + written release report
@@ -239,6 +239,14 @@ def check_web_build(rep: Report) -> None:
     code, out = run_cmd(["npx", "tsc", "--noEmit"], cwd=WEB_APP, timeout=900)
     rep.add("TypeScript type-check (tsc --noEmit)", code == 0,
             "0 errors" if code == 0 else out.strip()[:200], dt=time.time() - t)
+
+    # The lint gate is part of the release, not a suggestion: warnings count as
+    # failures, because a warning nobody has to fix is how the tree reached 46
+    # errors and 53 warnings before it was cleared.
+    t = time.time()
+    code, out = run_cmd(["npx", "eslint", ".", "--max-warnings", "0"], cwd=WEB_APP, timeout=900)
+    rep.add("ESLint (0 errors, 0 warnings)", code == 0,
+            "clean" if code == 0 else out.strip()[-200:], dt=time.time() - t)
 
     t = time.time()
     build_id = WEB_APP / ".next" / "BUILD_ID"

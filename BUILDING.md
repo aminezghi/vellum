@@ -61,6 +61,7 @@ cd ..\..
 
 # 4. web: production build
 cd Vellum_Web\Web_App_Fernly
+npm run lint
 npx tsc --noEmit
 npx next build
 cd ..\..
@@ -101,7 +102,7 @@ This writes `RELEASE_REPORT.md` (the full table of results) and
 | **A** | working tree clean · brand assets tracked · `.bat` files have CRLF endings |
 | **B** | `pytest Desktop_App/tests` |
 | **C** | all 10 Streamlit pages + the main app render (`smoke_app_pages.py`) |
-| **D** | `tsc --noEmit` · production build present |
+| **D** | `npm run lint` (0 errors, 0 warnings) · `tsc --noEmit` · production build present |
 | **E** | **silent install → boot the installed `Vellum.exe` → HTTP 200 → silent uninstall** |
 | **F** | **copy the web folder to a random path → launch it → HTTP 200 → live API calls → stop** |
 | **H** | **accessibility: dialog semantics, accessible names, live regions, visible focus, reduced motion, and that every modal goes through the shared primitive** |
@@ -152,8 +153,9 @@ malicious. The published SHA-256 is the way to make that claim checkable.
 
 - **desktop** — pytest, page smoke test, PyInstaller, Inno Setup, and an
   install → boot → health → uninstall smoke test of the produced installer
-- **web** — `npm ci`, `tsc --noEmit`, `eslint`, `next build`, then boots the
-  production build and calls the live search API
+- **web** — `npm ci`, `npm run lint` (0 errors, 0 warnings — a blocking gate),
+  `tsc --noEmit`, `next build`, then boots the production build and calls the
+  live search API
 - **release** — hashes the artefacts and publishes `SHA256SUMS.txt`
 - **release-notes** — drafts the notes with the hashes embedded
 

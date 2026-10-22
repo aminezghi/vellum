@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Header } from "@/components/Header";
 import { FeaturedCarousel } from "@/components/FeaturedCarousel";
 import { NotebookGrid } from "@/components/NotebookGrid";
@@ -16,13 +16,12 @@ import { ScreeningHub } from "@/components/ScreeningHub";
 import { ConnectedGraphHub } from "@/components/ConnectedGraphHub";
 import { Footer } from "@/components/Footer";
 import { db, Notebook, Source, initializeStorage } from "@/lib/db";
+import { AddablePaper } from "@/lib/paper";
 import { AcademicPaperResult } from "@/app/api/search/route";
 import {
   Plus,
-  BookOpen,
   Layers,
   Sparkles,
-  Flame,
   Search,
   Trash2,
   ArrowUpRight,
@@ -30,8 +29,22 @@ import {
   FileText,
   ShieldCheck,
   TrendingUp,
-  GitFork,
 } from "lucide-react";
+
+/** Everything the page shell needs to know about the notebook index. */
+interface NotebookSnapshot {
+  notebooks: Notebook[];
+  totalSources: number;
+}
+
+/** Read the notebook index out of IndexedDB. I/O only — touches no React state. */
+async function readNotebookSnapshot(): Promise<NotebookSnapshot> {
+  await initializeStorage();
+  const all = await db.notebooks.toArray();
+  all.sort((a, b) => b.updatedAt - a.updatedAt);
+  const totalSources = await db.sources.count();
+  return { notebooks: all, totalSources };
+}
 
 export default function Home() {
   const [notebooks, setNotebooks] = useState<Notebook[]>([]);
@@ -45,7 +58,7 @@ export default function Home() {
   const [totalSourcesCount, setTotalSourcesCount] = useState(0);
 
   // Modal for adding a paper to a notebook
-  const [paperForAddModal, setPaperForAddModal] = useState<AcademicPaperResult | null>(null);
+  const [paperForAddModal, setPaperForAddModal] = useState<AddablePaper | null>(null);
   const [connectedSeed, setConnectedSeed] = useState<string>("DeepFruits: A Fruit Detection System Using Deep Neural Networks");
 
   const handleOpenConnectedGraph = (seed: string) => {
@@ -53,21 +66,26 @@ export default function Home() {
     setActiveTab("connected");
   };
 
-  const fetchNotebooks = async () => {
-    await initializeStorage();
-    const all = await db.notebooks.toArray();
-    all.sort((a, b) => b.updatedAt - a.updatedAt);
-    setNotebooks(all);
-
-    const totalSources = await db.sources.count();
-    setTotalSourcesCount(totalSources);
-
+  const applySnapshot = useCallback((snapshot: NotebookSnapshot) => {
+    setNotebooks(snapshot.notebooks);
+    setTotalSourcesCount(snapshot.totalSources);
     setLoading(false);
-  };
+  }, []);
+
+  const fetchNotebooks = useCallback(async () => {
+    applySnapshot(await readNotebookSnapshot());
+  }, [applySnapshot]);
 
   useEffect(() => {
-    fetchNotebooks();
-  }, []);
+    let active = true;
+    readNotebookSnapshot().then((snapshot) => {
+      // Bail if the page unmounted while IndexedDB was answering.
+      if (active) applySnapshot(snapshot);
+    });
+    return () => {
+      active = false;
+    };
+  }, [applySnapshot]);
 
   const handleSelectNotebook = (nb: Notebook) => {
     setActiveNotebook(nb);
@@ -306,10 +324,8 @@ export default function Home() {
             {/* CONNECTED PAPERS HUB (Interactive Citation Network Force Graph) */}
             {activeTab === "connected" && (
               <ConnectedGraphHub
-                notebooks={notebooks}
                 initialSeed={connectedSeed}
                 onAddToNotebook={(p) => setPaperForAddModal(p)}
-                onInspectPaper={handleInspectPaper}
               />
             )}
 
@@ -323,18 +339,12 @@ export default function Home() {
 
             {/* BATCH DOWNLOADER HUB (Incorporated from Desktop Engine) */}
             {activeTab === "downloader" && (
-              <BatchDownloaderHub
-                notebooks={notebooks}
-                onAddToNotebook={(p) => setPaperForAddModal(p)}
-              />
+              <BatchDownloaderHub notebooks={notebooks} />
             )}
 
             {/* ASREVIEW ACTIVE LEARNING SCREENING HUB */}
             {activeTab === "screening" && (
-              <ScreeningHub
-                notebooks={notebooks}
-                onAddToNotebook={(p) => setPaperForAddModal(p)}
-              />
+              <ScreeningHub notebooks={notebooks} />
             )}
 
             {/* BOTTOM ZONE: Research Notebooks & Collections */}

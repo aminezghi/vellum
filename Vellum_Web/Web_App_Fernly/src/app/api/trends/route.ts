@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AcademicPaperResult } from "../search/route";
+import { OpenAlexPage, authorNames, bareDoi, reconstructAbstract, workTopics } from "@/lib/openalex";
 
 export interface TrendingDomainFeed {
   domainId: string;
@@ -41,18 +42,6 @@ const DOMAIN_QUERIES: Record<string, { name: string; icon: string; conceptId: st
   },
 };
 
-function reconstructAbstract(invertedIndex?: Record<string, number[]>): string | undefined {
-  if (!invertedIndex || Object.keys(invertedIndex).length === 0) return undefined;
-  const positions: [number, string][] = [];
-  for (const [word, indices] of Object.entries(invertedIndex)) {
-    for (const idx of indices) {
-      positions.push([idx, word]);
-    }
-  }
-  positions.sort((a, b) => a[0] - b[0]);
-  return positions.map((p) => p[1]).join(" ");
-}
-
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const domain = searchParams.get("domain") || "ai";
@@ -82,13 +71,11 @@ export async function GET(req: NextRequest) {
       throw new Error(`OpenAlex Trends API error: ${response.status}`);
     }
 
-    const data = await response.json();
-    const works = data.results || [];
+    const data = (await response.json()) as OpenAlexPage;
+    const works = data.results ?? [];
 
-    const papers = works.map((w: any, idx: number) => {
-      const authors = (w.authorships || [])
-        .map((a: any) => a.author?.display_name)
-        .filter(Boolean);
+    const papers = works.map((w, idx) => {
+      const authors = authorNames(w);
 
       const venue =
         w.primary_location?.source?.display_name ||
@@ -101,7 +88,7 @@ export async function GET(req: NextRequest) {
         (w.best_oa_location?.pdf_url ?? undefined);
 
       const abstract = reconstructAbstract(w.abstract_inverted_index);
-      const doiClean = w.doi ? w.doi.replace(/^https?:\/\/doi\.org\//i, "") : undefined;
+      const doiClean = bareDoi(w.doi);
 
       const cites = w.cited_by_count || 0;
       let badge = "📈 Rising";
@@ -125,7 +112,7 @@ export async function GET(req: NextRequest) {
         pdfUrl: pdfUrl || undefined,
         abstract,
         source: "OpenAlex" as const,
-        topics: (w.topics || w.concepts || []).slice(0, 3).map((c: any) => c.display_name),
+        topics: workTopics(w),
         velocityScore: `${cites} citations`,
         velocityBadge: badge,
       };
@@ -137,10 +124,10 @@ export async function GET(req: NextRequest) {
       icon: domainConfig.icon,
       papers,
     });
-  } catch (err: any) {
+  } catch (err) {
     console.error("Trends fetch error:", err);
     return NextResponse.json(
-      { error: err.message || "Failed to fetch trending literature", papers: [] },
+      { error: err instanceof Error ? err.message : "Failed to fetch trending literature", papers: [] },
       { status: 500 }
     );
   }

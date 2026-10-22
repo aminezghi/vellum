@@ -96,6 +96,49 @@ classes and seven dialogs.
   had no way of telling where they were.
 - Form fields are now associated with their labels via `htmlFor`/`id`.
 
+### Fixed — the web studio's lint gate
+
+`npm run lint` failed on 46 errors and 53 warnings, all of them in code that
+2.1 had not written. CI ran it as `continue-on-error`, which kept the debt
+visible but meant nothing was ever fixed. Both are gone: the tree is at
+**0 errors, 0 warnings**, and the lint step is a blocking gate again
+(`eslint . --max-warnings 0`).
+
+None of it was silenced with `eslint-disable`. The substantive fixes:
+
+- **27 `no-explicit-any`.** Three routes each declared their own OpenAlex
+  types and their own copy of `reconstructAbstract`; they now share
+  `src/lib/openalex.ts`. The other registries (Crossref, Unpaywall, Semantic
+  Scholar) got the same treatment: the fields we read, described, and nothing
+  else. Typing the "add to notebook" flow — `src/lib/paper.ts` — exposed a real
+  bug: screening results carry their title under `journal`, but the modal read
+  `venue`, so a paper added from screening was saved with **no journal name**.
+- **9 `react-hooks/purity`.** `Date.now()` and `Math.random()` were being called
+  from render-scope functions to mint ids and timestamps. That work moved to
+  module-level functions (`addPaperToNotebook`) and into effect bodies, where
+  it belongs.
+- **5 `react-hooks/set-state-in-effect`.** Each was a mount-time copy of
+  external state into React. They are now lazy initialisers, a child dialog
+  that mounts only while open (so its fields are seeded from storage on every
+  open with no effect at all), or a promise callback with a cancellation flag.
+- **The theme.** Light/dark was held in component state in two places, each
+  with its own copy of the same read-localStorage-then-set-three-attributes
+  effect. The two copies only ran on mount, so they could disagree — toggling
+  in the notebook workspace left the header's switch showing the old value.
+  It is now one `useSyncExternalStore` store (`src/lib/theme.ts`) shared by
+  both, and the accent picker uses the same store.
+- **Dead props and 49 unused imports.** `onAddToNotebook` was declared on the
+  Screening and Batch Downloader hubs and never called; the citation graph
+  demanded `notebooks` and `onInspectPaper` and used neither. Props that imply
+  a capability the UI does not have are worse than no props.
+
+Verified afterwards: `npm run lint` (0/0), `npx tsc --noEmit`, `next build`,
+and in the browser — theme and accent shared between header and workspace,
+persisted across a reload; tokens saved, cleared and re-seeded; a screening
+decision and its undo written to IndexedDB and restored after a tab switch;
+a paper added from the in-workspace search with its journal intact; the
+Trends → Connected Graph hand-off; and a live `/api/download-pdf` call.
+
 ### Changed — the accent picker is one control, not four
 
 The header showed four colour swatches side by side — four extra targets in
@@ -143,8 +186,6 @@ source drop is `Vellum_Desktop_V2.1_Botanical_Bento.zip`.
 
 - The installer is not code-signed, so SmartScreen warns on first run. The
   published SHA-256 is the way to verify the file.
-- The web package carries pre-existing lint debt (mostly `any` in the API
-  routes). The CI lint step reports it but does not gate the release.
 
 ---
 

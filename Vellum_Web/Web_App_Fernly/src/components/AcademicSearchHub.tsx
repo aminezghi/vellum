@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { AcademicPaperResult } from "@/app/api/search/route";
 import { fetchAndStorePaperPdf, triggerBrowserFileDownload } from "@/lib/pdfDownloader";
 import { STORAGE_KEYS } from "@/lib/storageNamespace";
@@ -8,7 +8,6 @@ import { TokensModal } from "./TokensModal";
 import {
   Search,
   SlidersHorizontal,
-  Download,
   BookmarkPlus,
   BookOpen,
   Sparkles,
@@ -19,7 +18,6 @@ import {
   Key,
   Database,
   Filter,
-  Check,
   RotateCcw,
   ArrowUpRight,
   GraduationCap,
@@ -124,6 +122,36 @@ const AVAILABLE_SOURCES = [
   { id: "crossref", label: "Crossref", badge: "Publishers" },
 ];
 
+/**
+ * True when at least one provider token has been saved in this browser.
+ *
+ * Read as the initial value of `hasCustomTokens` rather than in a mount effect:
+ * the studio only mounts after the notebook index has loaded, so there is no
+ * server-rendered HTML to disagree with, and no second render is needed.
+ */
+function hasStoredTokens(): boolean {
+  if (typeof window === "undefined") return false;
+  const stored = localStorage.getItem(STORAGE_KEYS.tokens);
+  if (!stored) return false;
+  try {
+    const parsed: unknown = JSON.parse(stored);
+    if (typeof parsed !== "object" || parsed === null) return false;
+    return Object.values(parsed).some(
+      (value) => typeof value === "string" && value.trim().length > 0
+    );
+  } catch {
+    return false;
+  }
+}
+
+/** The research field last chosen, or the first one if none was stored. */
+function readResearcherField(): string {
+  const fallback = RESEARCH_FIELDS[0].id;
+  if (typeof window === "undefined") return fallback;
+  const saved = localStorage.getItem(STORAGE_KEYS.researcherField);
+  return saved && RESEARCH_FIELDS.some((field) => field.id === saved) ? saved : fallback;
+}
+
 export function AcademicSearchHub({
   onAddToNotebook,
   onInspectPaper,
@@ -140,8 +168,8 @@ export function AcademicSearchHub({
   const [showAdvancedBuilder, setShowAdvancedBuilder] = useState(false);
   const [builderTab, setBuilderTab] = useState<"visual" | "raw">("visual");
   const [showTokensModal, setShowTokensModal] = useState(false);
-  const [hasCustomTokens, setHasCustomTokens] = useState(false);
-  const [selectedField, setSelectedField] = useState("biomedicine");
+  const [hasCustomTokens, setHasCustomTokens] = useState(hasStoredTokens);
+  const [selectedField, setSelectedField] = useState(readResearcherField);
 
   // Desktop Style Visual Boolean Clauses
   const [clauses, setClauses] = useState<BooleanClause[]>([
@@ -173,7 +201,7 @@ export function AcademicSearchHub({
   // Compile clauses into Desktop-style boolean query string
   const compileClauses = (clauseList: BooleanClause[]): string => {
     const parts: string[] = [];
-    clauseList.forEach((c, i) => {
+    clauseList.forEach((c) => {
       const term = (c.term || "").trim();
       if (!term) return;
 
@@ -234,24 +262,8 @@ export function AcademicSearchHub({
     }
   };
 
-  // Check custom tokens & saved researcher field on mount
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem(STORAGE_KEYS.tokens);
-      if (stored) {
-        try {
-          const parsed = JSON.parse(stored);
-          const hasAny = Object.values(parsed).some((v) => !!v && (v as string).trim().length > 0);
-          setHasCustomTokens(hasAny);
-        } catch {}
-      }
-
-      const savedField = localStorage.getItem(STORAGE_KEYS.researcherField);
-      if (savedField && RESEARCH_FIELDS.some((f) => f.id === savedField)) {
-        setSelectedField(savedField);
-      }
-    }
-  }, []);
+  // Saved tokens and research field are read as initial state (see the
+  // module-level readers above); nothing needs to run on mount.
 
   const handleFieldChange = (fieldId: string) => {
     setSelectedField(fieldId);

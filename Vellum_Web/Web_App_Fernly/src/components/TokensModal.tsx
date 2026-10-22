@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Key, ShieldCheck, Check, ExternalLink } from "lucide-react";
 import { STORAGE_KEYS } from "@/lib/storageNamespace";
 import { Modal } from "@/components/Modal";
@@ -18,29 +18,36 @@ interface TokensModalProps {
   onSave?: (tokens: CustomTokens) => void;
 }
 
-export function TokensModal({ isOpen, onClose, onSave }: TokensModalProps) {
-  const [tokens, setTokens] = useState<CustomTokens>({
+/** Read saved provider tokens. Safe on the server, where there is no storage. */
+function readStoredTokens(): CustomTokens {
+  const empty: CustomTokens = {
     openAlexToken: "",
     semanticScholarKey: "",
     crossrefEmail: "",
     ncbiApiKey: "",
-  });
-  const [savedSuccess, setSavedSuccess] = useState(false);
+  };
+  if (typeof window === "undefined") return empty;
+  const stored = localStorage.getItem(STORAGE_KEYS.tokens);
+  if (!stored) return empty;
+  try {
+    return { ...empty, ...(JSON.parse(stored) as Partial<CustomTokens>) };
+  } catch (e) {
+    console.error("Failed to parse tokens from storage", e);
+    return empty;
+  }
+}
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem(STORAGE_KEYS.tokens);
-      if (stored) {
-        try {
-          setTokens(JSON.parse(stored));
-        } catch (e) {
-          console.error("Failed to parse tokens from storage", e);
-        }
-      }
-    }
-  }, [isOpen]);
-
+export function TokensModal({ isOpen, onClose, onSave }: TokensModalProps) {
+  // The dialog is mounted only while it is open, so its fields are seeded from
+  // storage on every open without an effect. Previously an effect re-read
+  // localStorage and called setState, which re-rendered the whole form.
   if (!isOpen) return null;
+  return <TokensDialog onClose={onClose} onSave={onSave} />;
+}
+
+function TokensDialog({ onClose, onSave }: Omit<TokensModalProps, "isOpen">) {
+  const [tokens, setTokens] = useState<CustomTokens>(readStoredTokens);
+  const [savedSuccess, setSavedSuccess] = useState(false);
 
   const handleSave = () => {
     if (typeof window !== "undefined") {
@@ -70,7 +77,7 @@ export function TokensModal({ isOpen, onClose, onSave }: TokensModalProps) {
 
   return (
     <Modal
-      isOpen={isOpen}
+      isOpen={true}
       onClose={onClose}
       title="API Keys & Provider Tokens"
       subtitle="Increase rate limits & unlock fast-lane queries"

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   Sparkles,
   BookOpen,
@@ -17,7 +17,13 @@ import {
   CheckCircle2,
   GitFork,
 } from "lucide-react";
-import { STORAGE_KEYS } from "@/lib/storageNamespace";
+import {
+  initializeAppearance,
+  setAccent,
+  setTheme,
+  useAccent,
+  useTheme,
+} from "@/lib/theme";
 import { AccentPicker, type FernlyAccent } from "@/components/AccentPicker";
 
 export type { FernlyAccent };
@@ -45,58 +51,24 @@ export function Header({
   viewMode,
   setViewMode,
 }: HeaderProps) {
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [activeAccent, setActiveAccent] = useState<FernlyAccent>("emerald");
+  // Theme and accent live in one place (see lib/theme); the DOM is the source
+  // of truth, so neither needs to be mirrored into component state.
+  const theme = useTheme();
+  const activeAccent = useAccent();
+  const isDarkMode = theme === "dark";
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // Hydrate theme & accent from storage on mount
+  // Apply the saved theme and accent once, on mount.
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const savedTheme = localStorage.getItem(STORAGE_KEYS.theme);
-      const shouldBeDark =
-        savedTheme === "dark" ||
-        (!savedTheme && window.matchMedia("(prefers-color-scheme: dark)").matches);
-
-      if (shouldBeDark) {
-        setIsDarkMode(true);
-        document.documentElement.classList.add("dark");
-        document.documentElement.setAttribute("data-theme", "dark");
-      } else {
-        setIsDarkMode(false);
-        document.documentElement.classList.remove("dark");
-        document.documentElement.setAttribute("data-theme", "light");
-      }
-
-      const savedAccent = (localStorage.getItem(STORAGE_KEYS.accent) as FernlyAccent) || "emerald";
-      setActiveAccent(savedAccent);
-      document.documentElement.setAttribute("data-accent", savedAccent);
-    }
+    initializeAppearance();
   }, []);
 
   const toggleTheme = () => {
-    const nextDark = !isDarkMode;
-    setIsDarkMode(nextDark);
-    if (typeof window !== "undefined") {
-      if (nextDark) {
-        document.documentElement.classList.add("dark");
-        document.body.classList.add("dark");
-        document.documentElement.setAttribute("data-theme", "dark");
-        localStorage.setItem(STORAGE_KEYS.theme, "dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-        document.body.classList.remove("dark");
-        document.documentElement.setAttribute("data-theme", "light");
-        localStorage.setItem(STORAGE_KEYS.theme, "light");
-      }
-    }
+    setTheme(isDarkMode ? "light" : "dark");
   };
 
   const handleAccentChange = (accent: FernlyAccent) => {
-    setActiveAccent(accent);
-    if (typeof window !== "undefined") {
-      localStorage.setItem(STORAGE_KEYS.accent, accent);
-      document.documentElement.setAttribute("data-accent", accent);
-    }
+    setAccent(accent);
   };
 
   const tabs = [

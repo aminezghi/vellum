@@ -1,4 +1,10 @@
-import { db, Source } from "./db";
+import { db } from "./db";
+
+/** The JSON body /api/download-pdf returns when it cannot resolve a PDF. */
+interface DownloadRefusal {
+  message?: string;
+  landingUrl?: string;
+}
 
 export interface DownloadProgressCallback {
   (status: "starting" | "resolving" | "saving" | "success" | "paywalled" | "error", details?: string): void;
@@ -44,13 +50,13 @@ export async function fetchAndStorePaperPdf(
       onProgress?.("success", `Retrieved via ${resolvedSource} (${(blob.size / 1024 / 1024).toFixed(2)} MB)`);
       return { success: true, blob, sourceName: resolvedSource };
     } else {
-      const data = await response.json();
+      const data = (await response.json()) as DownloadRefusal;
       onProgress?.("paywalled", data.message || "Paywalled by publisher");
       return { success: false, landingUrl: data.landingUrl };
     }
-  } catch (err: any) {
+  } catch (err) {
     console.error("PDF download client error:", err);
-    onProgress?.("error", err.message || "Network error");
+    onProgress?.("error", err instanceof Error ? err.message : "Network error");
     return { success: false };
   }
 }

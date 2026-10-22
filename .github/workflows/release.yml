@@ -113,16 +113,12 @@ jobs:
         working-directory: Vellum_Web/Web_App_Fernly
         run: npx tsc --noEmit
 
-      - name: Lint (reports only)
+      - name: Lint
         working-directory: Vellum_Web/Web_App_Fernly
-        # The web app carries pre-existing lint debt (mostly `any` in the API
-        # routes and React-Compiler rules in the older components). This step
-        # reports it so it stays visible, but it does not gate the release -
-        # a permanently red check teaches everyone to ignore CI. The blocking
-        # gates are the type-check, the production build and the runtime
-        # verification below.
-        continue-on-error: true
-        run: npx eslint src
+        # Zero errors and zero warnings, enforced. --max-warnings 0 keeps the
+        # gate from decaying: a warning that nobody has to fix is how the tree
+        # drifted to 46 errors / 53 warnings in the first place.
+        run: npx eslint . --max-warnings 0
 
       - name: Production build
         working-directory: Vellum_Web/Web_App_Fernly

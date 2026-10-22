@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Notebook, Source, Note, db } from "@/lib/db";
-import { STORAGE_KEYS } from "@/lib/storageNamespace";
+import { Notebook, Source, db } from "@/lib/db";
+import { initializeAppearance, setTheme, useTheme } from "@/lib/theme";
 import { Modal } from "@/components/Modal";
 import { fetchAndStorePaperPdf } from "@/lib/pdfDownloader";
 import { AcademicPaperResult } from "@/app/api/search/route";
@@ -13,22 +13,18 @@ import {
   Search,
   Download,
   BookOpen,
-  Share2,
   ZoomIn,
   ZoomOut,
   Quote,
   CheckCircle2,
   Sparkles,
   Layers,
-  ChevronLeft,
-  ChevronRight,
   ExternalLink,
   Zap,
   AlertCircle,
   Trash2,
   Sun,
   Moon,
-  ArrowUpRight,
   BookmarkPlus,
 } from "lucide-react";
 
@@ -36,6 +32,37 @@ interface NotebookWorkspaceProps {
   notebook: Notebook;
   onBack: () => void;
   onUpdate: () => void;
+}
+
+/**
+ * Store a paper as a source of a notebook and keep the notebook's counters in
+ * step, in one transaction-ish sequence.
+ *
+ * This lives outside the component because it mints an id and reads the clock:
+ * work that is not idempotent must not run during a render, and a module-level
+ * function makes that impossible to accidentally reintroduce.
+ */
+async function addPaperToNotebook(
+  paper: AcademicPaperResult,
+  notebookId: string
+): Promise<Source> {
+  const now = Date.now();
+  const source: Source = {
+    id: `src-${now}-${Math.random().toString(36).substring(2, 6)}`,
+    notebookId,
+    title: paper.title,
+    authors: paper.authors,
+    year: paper.year,
+    journal: paper.venue,
+    doi: paper.doi,
+    status: "ready",
+    addedAt: now,
+  };
+
+  await db.sources.put(source);
+  const count = await db.sources.where("notebookId").equals(notebookId).count();
+  await db.notebooks.update(notebookId, { sourcesCount: count, updatedAt: now });
+  return source;
 }
 
 export function NotebookWorkspace({ notebook, onBack, onUpdate }: NotebookWorkspaceProps) {
@@ -54,7 +81,6 @@ export function NotebookWorkspace({ notebook, onBack, onUpdate }: NotebookWorksp
     message: string;
     landingUrl?: string;
   } | null>(null);
-  const [isDarkMode, setIsDarkMode] = useState(false);
 
   // In-Workspace Academic Search & Add Modal
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
@@ -64,31 +90,17 @@ export function NotebookWorkspace({ notebook, onBack, onUpdate }: NotebookWorksp
   const [searchModalOA, setSearchModalOA] = useState(true);
   const [addedIds, setAddedIds] = useState<Record<string, boolean>>({});
 
+  const theme = useTheme();
+  const isDarkMode = theme === "dark";
+
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const isDark =
-        document.documentElement.classList.contains("dark") ||
-        document.documentElement.getAttribute("data-theme") === "dark";
-      setIsDarkMode(isDark);
-    }
+    // The workspace can be the first thing rendered after a reload, so make
+    // sure the saved theme is applied before anything paints.
+    initializeAppearance();
   }, []);
 
   const toggleTheme = () => {
-    const nextDark = !isDarkMode;
-    setIsDarkMode(nextDark);
-    if (typeof window !== "undefined") {
-      if (nextDark) {
-        document.documentElement.classList.add("dark");
-        document.body.classList.add("dark");
-        document.documentElement.setAttribute("data-theme", "dark");
-        localStorage.setItem(STORAGE_KEYS.theme, "dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-        document.body.classList.remove("dark");
-        document.documentElement.setAttribute("data-theme", "light");
-        localStorage.setItem(STORAGE_KEYS.theme, "light");
-      }
-    }
+    setTheme(isDarkMode ? "light" : "dark");
   };
 
   const handleFetchPdfForSource = async () => {
@@ -263,22 +275,8 @@ export function NotebookWorkspace({ notebook, onBack, onUpdate }: NotebookWorksp
   };
 
   const handleAddPaperFromSearch = async (paper: AcademicPaperResult, fetchPdfNow = false) => {
-    const newSource: Source = {
-      id: `src-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
-      notebookId: notebook.id,
-      title: paper.title,
-      authors: paper.authors,
-      year: paper.year,
-      journal: paper.venue,
-      doi: paper.doi,
-      status: "ready",
-      addedAt: Date.now(),
-    };
+    const newSource = await addPaperToNotebook(paper, notebook.id);
 
-    await db.sources.put(newSource);
-    const count = await db.sources.where("notebookId").equals(notebook.id).count();
-    await db.notebooks.update(notebook.id, { sourcesCount: count, updatedAt: Date.now() });
-    
     setAddedIds((prev) => ({ ...prev, [paper.id]: true }));
     await reloadSources();
     setSelectedSource(newSource);
