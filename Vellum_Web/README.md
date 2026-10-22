@@ -102,6 +102,21 @@ the old copy untouched.
 
 ---
 
+## ♿ Accessibility
+
+The studio is built to be usable without a mouse and with a screen reader.
+
+| Area | What it does |
+| :--- | :--- |
+| **Dialogs** | All seven dialogs are real `role="dialog"` elements with `aria-modal`, an accessible name and description. Focus moves into the dialog when it opens and returns to the trigger when it closes. Tab and Shift+Tab cycle inside the dialog instead of escaping into the page behind it. Escape dismisses it |
+| **Live regions** | Search results, the trending feed and the loading states are announced, so a screen-reader user is told when results arrive instead of having to go looking |
+| **Focus** | Every focusable element shows a visible focus ring. The app had no `:focus-visible` rule before, which left keyboard users with no way of telling where they were |
+| **Reduced motion** | `prefers-reduced-motion` is honoured. The interface uses a lot of movement — hover lifts, fades, a pulsing spinner — which is a problem for people with vestibular sensitivity |
+| **Forms** | Every field is associated with its label, and the emoji picker, the destination toggle and the cleaning-scope picker are exposed as radio groups rather than a row of unlabelled buttons |
+| **Colour** | The accent colourway is chosen from a listbox whose options have names, not four anonymous colour swatches |
+
+---
+
 ## 🧪 Testing & Verification
 
 Run from `Web_App_Fernly\`:

@@ -20,10 +20,10 @@ PROBES = {
         "certutil",
         "portable Node",
     ],
-    REPO / "Vellum_Desktop" / "README_VELLUM_DESKTOP_V2.0.pdf": [
+    REPO / "Vellum_Desktop" / "README_VELLUM_DESKTOP_V2.1.pdf": [
         "SmartScreen",
         "certutil",
-        "Vellum-Desktop-V2.0-Setup-x64.exe",
+        "Vellum-Desktop-V2.1-Setup-x64.exe",
         "Run anyway",
     ],
 }

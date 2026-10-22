@@ -42,7 +42,7 @@ DESKTOP_APP = DESKTOP / "Desktop_App"
 WEB = REPO_ROOT / "Vellum_Web"
 WEB_APP = WEB / "Web_App_Fernly"
 WEB_SHARE = WEB / "Vellum_Web_Fernly_SHARE"
-INSTALLER = DESKTOP / "Vellum-Desktop-V2.0-Setup-x64.exe"
+INSTALLER = DESKTOP / "Vellum-Desktop-V2.1-Setup-x64.exe"
 
 WORK = Path(os.environ.get("TEMP", "/tmp")) / "vellum_verify"
 
@@ -507,6 +507,110 @@ def check_web_share(rep: Report, relocate: bool = True) -> None:
 
 
 # ==========================================================================
+# H. web accessibility
+# ==========================================================================
+def check_web_accessibility(rep: Report) -> None:
+    """Check that the accessibility work is actually in the shipped build.
+
+    These are machine-checkable claims: they assert on the production build
+    that colleagues receive, not on the intention.
+    """
+    head("H. Web accessibility")
+
+    static = WEB_APP / ".next" / "static"
+    if not static.is_dir():
+        rep.add("production build available for accessibility scan", False,
+                "no .next/static")
+        return
+
+    blobs = []
+    for p in list(static.rglob("*.js")) + list(static.rglob("*.css")):
+        try:
+            blobs.append(p.read_text(encoding="utf-8", errors="replace"))
+        except OSError:
+            pass
+    corpus = "\n".join(blobs)
+
+    def has(*markers: str) -> bool:
+        return all(m in corpus for m in markers)
+
+    t = time.time()
+    rep.add("dialogs expose dialog semantics",
+            has('role:"dialog"', "aria-modal"),
+            'role="dialog" + aria-modal in the shipped bundle', dt=time.time() - t)
+
+    t = time.time()
+    rep.add("dialogs carry an accessible name",
+            has("aria-labelledby", "aria-describedby"),
+            "aria-labelledby + aria-describedby", dt=time.time() - t)
+
+    t = time.time()
+    rep.add("asynchronous results are announced",
+            "aria-live" in corpus,
+            "aria-live live regions", dt=time.time() - t)
+
+    t = time.time()
+    rep.add("keyboard focus is visible",
+            ":focus-visible" in corpus,
+            ":focus-visible rule", dt=time.time() - t)
+
+    t = time.time()
+    rep.add("reduced motion is honoured",
+            "prefers-reduced-motion" in corpus,
+            "prefers-reduced-motion block", dt=time.time() - t)
+
+    t = time.time()
+    rep.add("the accent picker is a named listbox",
+            has("aria-haspopup", "listbox"),
+            "aria-haspopup=listbox + role=listbox", dt=time.time() - t)
+
+    # Every modal must go through the shared primitive. A bare
+    # "fixed inset-0" overlay outside Modal.tsx is a dialog that is not a
+    # dialog.
+    t = time.time()
+    offenders = []
+    for p in (WEB_APP / "src" / "components").glob("*.tsx"):
+        if p.name == "Modal.tsx":
+            continue
+        if "fixed inset-0" in p.read_text(encoding="utf-8", errors="replace"):
+            offenders.append(p.name)
+    rep.add("every modal uses the shared accessible primitive", not offenders,
+            "" if not offenders else f"hand-rolled overlays: {offenders}",
+            dt=time.time() - t)
+
+    # Focus must not depend on requestAnimationFrame alone. Browsers throttle
+    # it in a background or occluded tab, and then the dialog is announced to
+    # a screen reader while focus stays on <body>.
+    t = time.time()
+    modal_src = (WEB_APP / "src" / "components" / "Modal.tsx").read_text(
+        encoding="utf-8", errors="replace")
+    sync_focus = "focusFirst();" in [ln.strip() for ln in modal_src.splitlines()]
+    rep.add("dialog focus is not animation-frame-only", sync_focus,
+            "focusFirst() also runs synchronously"
+            if sync_focus else
+            "focus moves only inside requestAnimationFrame - it will not run "
+            "in a background tab",
+            dt=time.time() - t)
+
+    # The desktop must not advertise a shortcut it does not implement.
+    t = time.time()
+    desktop_app = DESKTOP_APP
+    py_files = [p for p in desktop_app.rglob("*.py")
+                if not any(x in p.parts for x in (".venv", "tests", "build", "dist"))]
+    js_files = [p for p in desktop_app.rglob("*.html")
+                if "keyboard_component" in p.parts]
+    has_handler = any(
+        any(k in p.read_text(encoding="utf-8", errors="replace")
+            for k in ("addEventListener", "onkeydown", "keydown"))
+        for p in js_files
+    ) if js_files else False
+    rep.add("the desktop keyboard shortcut is actually implemented", has_handler,
+            "a keydown listener exists in keyboard_component/"
+            if has_handler else "no keydown listener found - the buttons lie",
+            dt=time.time() - t)
+
+
+# ==========================================================================
 # G. artefacts
 # ==========================================================================
 def write_artifacts(rep: Report) -> None:
@@ -518,7 +622,7 @@ def write_artifacts(rep: Report) -> None:
     targets = [
         INSTALLER,
         DESKTOP / "Vellum_Standalone_Windows_x64.zip",
-        DESKTOP / "Vellum_Desktop_V2.0_Botanical_Bento.zip",
+        DESKTOP / "Vellum_Desktop_V2.1_Botanical_Bento.zip",
         WEB / "Vellum_Web_Fernly_Latest_Export.zip",
         WEB / "Vellum_Web_Fernly_SHARE.zip",
     ]
@@ -563,7 +667,7 @@ def write_artifacts(rep: Report) -> None:
         "",
         "```powershell",
         "# checksum of a received file (no tooling needed beyond Windows)",
-        "certutil -hashfile Vellum-Desktop-V2.0-Setup-x64.exe SHA256",
+        "certutil -hashfile Vellum-Desktop-V2.1-Setup-x64.exe SHA256",
         "",
         "# full harness on this machine",
         "python tools/verify_release.py",
@@ -605,6 +709,8 @@ def main() -> int:
         check_installer(rep, do_install=not args.skip_install)
     if want("F"):
         check_web_share(rep, relocate=not args.no_relocate)
+    if want("H"):
+        check_web_accessibility(rep)
     if want("G"):
         write_artifacts(rep)
 

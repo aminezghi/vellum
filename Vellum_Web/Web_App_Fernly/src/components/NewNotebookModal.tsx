@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import { db, Notebook } from "@/lib/db";
-import { X, Sparkles, Upload } from "lucide-react";
+import { Sparkles, Upload } from "lucide-react";
+import { Modal } from "@/components/Modal";
 
 interface NewNotebookModalProps {
   isOpen: boolean;
@@ -74,73 +75,77 @@ export function NewNotebookModal({ isOpen, onClose, onCreated }: NewNotebookModa
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="fernly-card w-full max-w-lg p-7 relative">
-        <button
-          onClick={onClose}
-          className="absolute right-5 top-5 p-2 rounded-full text-[var(--faint)] hover:text-[var(--ink)] hover:bg-[var(--panel)] transition-colors cursor-pointer"
-        >
-          <X className="h-4 w-4" />
-        </button>
-
-        <div className="flex items-center gap-2.5 mb-5">
-          <div className="p-2.5 rounded-2xl bg-[var(--g-100)] text-[var(--g-700)] border border-[var(--g-400)]/30">
-            <Sparkles className="h-5 w-5" />
-          </div>
-          <div>
-            <h2 className="text-lg font-bold tracking-tight text-[var(--ink)]">Create Research Project Vault</h2>
-            <p className="text-xs text-[var(--muted)]">Initialize a dedicated systematic review corpus</p>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Create Research Project Vault"
+      subtitle="Initialize a dedicated systematic review corpus"
+      icon={<Sparkles className="h-5 w-5" />}
+    >
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Emoji & Title */}
+        <div>
+          <label htmlFor="nb-title" className="block text-xs font-semibold text-[var(--muted)] mb-1.5">
+            Project Icon &amp; Title
+          </label>
+          <div className="flex items-center gap-2">
+            <div
+              className="flex gap-1 overflow-x-auto pb-1 max-w-[170px] no-scrollbar"
+              role="radiogroup"
+              aria-label="Project icon"
+            >
+              {EMOJI_OPTIONS.map((em) => (
+                <button
+                  type="button"
+                  key={em}
+                  role="radio"
+                  aria-checked={selectedEmoji === em}
+                  aria-label={`Use ${em} as the project icon`}
+                  onClick={() => setSelectedEmoji(em)}
+                  className={`h-9 w-9 flex-shrink-0 flex items-center justify-center rounded-xl text-base transition-all cursor-pointer ${
+                    selectedEmoji === em
+                      ? "bg-[var(--g-100)] border-2 border-[var(--g-700)] scale-105"
+                      : "bg-[var(--panel)] border border-[var(--hair)] hover:bg-[var(--card)]"
+                  }`}
+                >
+                  {em}
+                </button>
+              ))}
+            </div>
+            <input
+              id="nb-title"
+              type="text"
+              required
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="e.g. Cognitive Biases in Consumer Choice"
+              className="fernly-input flex-1"
+            />
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Emoji & Title */}
-          <div>
-            <label className="block text-xs font-semibold text-[var(--muted)] mb-1.5">Project Icon &amp; Title</label>
-            <div className="flex items-center gap-2">
-              <div className="flex gap-1 overflow-x-auto pb-1 max-w-[170px] no-scrollbar">
-                {EMOJI_OPTIONS.map((em) => (
-                  <button
-                    type="button"
-                    key={em}
-                    onClick={() => setSelectedEmoji(em)}
-                    className={`h-9 w-9 flex-shrink-0 flex items-center justify-center rounded-xl text-base transition-all cursor-pointer ${
-                      selectedEmoji === em
-                        ? "bg-[var(--g-100)] border-2 border-[var(--g-700)] scale-105"
-                        : "bg-[var(--panel)] border border-[var(--hair)] hover:bg-[var(--card)]"
-                    }`}
-                  >
-                    {em}
-                  </button>
-                ))}
-              </div>
-              <input
-                type="text"
-                required
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g. Cognitive Biases in Consumer Choice"
-                className="fernly-input flex-1"
-              />
-            </div>
-          </div>
-
-          {/* Description */}
-          <div>
-            <label className="block text-xs font-semibold text-[var(--muted)] mb-1.5">Description &amp; Research Scope</label>
-            <textarea
-              rows={2}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="e.g. Exploring heuristics, framing effects, and purchase decisions across retail formats..."
-              className="fernly-input w-full resize-none"
-            />
-          </div>
+        {/* Description */}
+        <div>
+          <label htmlFor="nb-desc" className="block text-xs font-semibold text-[var(--muted)] mb-1.5">
+            Description &amp; Research Scope
+          </label>
+          <textarea
+            id="nb-desc"
+            rows={2}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="e.g. Exploring heuristics, framing effects, and purchase decisions across retail formats..."
+            className="fernly-input w-full resize-none"
+          />
+        </div>
 
           {/* Category */}
           <div>
-            <label className="block text-xs font-semibold text-[var(--muted)] mb-1.5">Discipline / Category</label>
+            <label htmlFor="nb-category" className="block text-xs font-semibold text-[var(--muted)] mb-1.5">
+              Discipline / Category
+            </label>
             <input
+              id="nb-category"
               type="text"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
@@ -151,14 +156,23 @@ export function NewNotebookModal({ isOpen, onClose, onCreated }: NewNotebookModa
 
           {/* Initial PDF Files Upload */}
           <div>
-            <label className="block text-xs font-semibold text-[var(--muted)] mb-1.5">Initial Paper PDFs (Optional)</label>
-            <label className="flex flex-col items-center justify-center p-5 border-2 border-dashed border-[var(--hair)] hover:border-[var(--g-400)] rounded-2xl bg-[var(--panel)] cursor-pointer transition-colors">
-              <Upload className="h-6 w-6 text-[var(--g-700)] mb-1.5" />
+            <label
+              htmlFor="nb-files"
+              className="block text-xs font-semibold text-[var(--muted)] mb-1.5"
+            >
+              Initial Paper PDFs (Optional)
+            </label>
+            <label
+              htmlFor="nb-files"
+              className="flex flex-col items-center justify-center p-5 border-2 border-dashed border-[var(--hair)] hover:border-[var(--g-400)] rounded-2xl bg-[var(--panel)] cursor-pointer transition-colors"
+            >
+              <Upload className="h-6 w-6 text-[var(--g-700)] mb-1.5" aria-hidden="true" />
               <span className="text-xs font-semibold text-[var(--ink)]">
                 {files.length > 0 ? `${files.length} paper(s) selected` : "Drop PDF files or browse"}
               </span>
               <span className="text-[11px] text-[var(--faint)] mt-0.5">Will be indexed into local-first IndexedDB</span>
               <input
+                id="nb-files"
                 type="file"
                 multiple
                 accept=".pdf"
@@ -186,7 +200,6 @@ export function NewNotebookModal({ isOpen, onClose, onCreated }: NewNotebookModa
             </button>
           </div>
         </form>
-      </div>
-    </div>
+    </Modal>
   );
 }

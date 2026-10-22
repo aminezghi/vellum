@@ -22,6 +22,7 @@ import vellum_workspace as VW
 import vellum_paper_pool as VPP
 import vellum_direct_download as VDD
 import vellum_citation_export as VCE
+import vellum_pages
 
 SEMINAL_FALLBACKS: List[Dict[str, Any]] = [
     {
@@ -175,9 +176,7 @@ def render() -> None:
     lp1, lp2, lp3, lp4 = st.columns(4)
     with lp1:
         if st.button("🔍 Search Literature", width="stretch", help="Run multi-source queries across OpenAlex, PubMed, Crossref"):
-            st.session_state["_active_tab"] = "discover"
-            st.session_state["_discover_subview"] = "🔍 Literature Search"
-            st.rerun()
+            vellum_pages.go("discover_literature")
     with lp2:
         if st.button("🕸️ Citation Lineage", width="stretch", help="Explore upstream references & downstream citations"):
             if not st.session_state.get("_cg_pending_target"):
@@ -190,19 +189,13 @@ def render() -> None:
                     sug_idx = st.session_state.get("_suggested_idx", 0)
                     p_sug = sug_list[sug_idx % len(sug_list)]
                     st.session_state["_cg_pending_target"] = p_sug.get("doi") or p_sug.get("title")
-            st.session_state["_active_tab"] = "discover"
-            st.session_state["_discover_subview"] = "🕸️ Citation Network"
-            st.rerun()
+            vellum_pages.go("discover_citation")
     with lp3:
         if st.button("📚 Unified Paper Pool", width="stretch", help="Screen and manage all papers"):
-            st.session_state["_active_tab"] = "library"
-            st.session_state["_library_subview"] = "📚 Unified Paper Pool"
-            st.rerun()
+            vellum_pages.go("library_pool")
     with lp4:
         if st.button("📥 PDF Downloader", width="stretch", help="Batch download queue and folder management"):
-            st.session_state["_active_tab"] = "library"
-            st.session_state["_library_subview"] = "📥 PDF Downloader"
-            st.rerun()
+            vellum_pages.go("library_downloader")
 
     # 4. Advanced Scope & Criteria Drawer (Collapsed by default for a clean single-focus interface)
     with st.expander("⚙️ Advanced Project Scope & Inclusion Criteria", expanded=False):
@@ -274,9 +267,7 @@ def render() -> None:
 
         if len(papers) > 6:
             if st.button(f"View all {len(papers)} papers in Paper Pool ➔", width="stretch"):
-                st.session_state["_active_tab"] = "library"
-                st.session_state["_library_subview"] = "📚 Unified Paper Pool"
-                st.rerun()
+                vellum_pages.go("library_pool")
 
     else:
         # Project is Empty -> Show Clean Single-Paper Spotlight Feed
@@ -412,9 +403,7 @@ def render() -> None:
             with act_c4:
                 if st.button("🕸️ Citation Lineage", key="_sug_spotlight_lineage", width="stretch"):
                     st.session_state["_cg_pending_target"] = s_doi or s_title
-                    st.session_state["_active_tab"] = "discover"
-                    st.session_state["_discover_subview"] = "🕸️ Citation Network"
-                    st.rerun()
+                    vellum_pages.go("discover_citation")
 
 
 

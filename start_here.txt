@@ -1,7 +1,7 @@
 =====================================================================
     VELLUM - ACADEMIC RESEARCH SUITE (WINDOWS EDITION)
     Author & Lead Architect: Amine Zouaghi
-    Desktop V2.0 (Fernly Botanical Bento) + Web (Fernly Botanical Bento)
+    Desktop V2.1 (Fernly Botanical Bento) + Web (Fernly Botanical Bento)
 =====================================================================
 
 Welcome! This pack contains 2 applications, in 2 separate folders.
@@ -13,15 +13,15 @@ no telemetry.
 
 Neither folder depends on the other - use either one on its own.
 
-1. TO INSTALL VELLUM DESKTOP V2.0 (RECOMMENDED):
-   -> Double-click: Vellum_Desktop\Vellum-Desktop-V2.0-Setup-x64.exe
+1. TO INSTALL VELLUM DESKTOP V2.1 (RECOMMENDED):
+   -> Double-click: Vellum_Desktop\Vellum-Desktop-V2.1-Setup-x64.exe
    (Standard Windows installer. No admin rights needed. Adds a Start
     Menu entry and a proper uninstaller. No Python required.)
 
    NOTE: Windows may say "Windows protected your PC" on first run because
    the installer is not code-signed. Click: More info -> Run anyway.
    To check the file is the one that was built, run
-     certutil -hashfile Vellum-Desktop-V2.0-Setup-x64.exe SHA256
+     certutil -hashfile Vellum-Desktop-V2.1-Setup-x64.exe SHA256
    and compare it with DISTRIBUTABLES\SHA256SUMS.txt.
 
 2. TO TRY THE DESKTOP WORKBENCH WITHOUT INSTALLING:

@@ -104,6 +104,7 @@ This writes `RELEASE_REPORT.md` (the full table of results) and
 | **D** | `tsc --noEmit` · production build present |
 | **E** | **silent install → boot the installed `Vellum.exe` → HTTP 200 → silent uninstall** |
 | **F** | **copy the web folder to a random path → launch it → HTTP 200 → live API calls → stop** |
+| **H** | **accessibility: dialog semantics, accessible names, live regions, visible focus, reduced motion, and that every modal goes through the shared primitive** |
 | **G** | SHA-256 manifest of every distributable |
 
 Section F is deliberately paranoid. The launcher deliberately exits early when
@@ -111,6 +112,11 @@ it finds a session already listening on the port, so a naive health check
 would happily measure *someone else's* server. The harness therefore asserts
 the port is free before the launch, captures the launcher's console output,
 and confirms the running process's command line points at the relocated copy.
+
+Section H exists because accessibility work decays silently. It asserts on the
+**production build** that colleagues actually receive, not on the intention:
+if someone reintroduces a hand-rolled modal overlay, or drops the
+`prefers-reduced-motion` block, the check fails.
 
 ### Why section E matters
 
@@ -123,7 +129,7 @@ Section E is the only thing that closes that gap.
 ## 4. How a colleague can verify without trusting us
 
 ```powershell
-certutil -hashfile Vellum-Desktop-V2.0-Setup-x64.exe SHA256
+certutil -hashfile Vellum-Desktop-V2.1-Setup-x64.exe SHA256
 ```
 
 Compare with `DISTRIBUTABLES\SHA256SUMS.txt` (or the `SHA256SUMS.txt` inside
@@ -159,9 +165,9 @@ Nothing is trusted from a developer's machine.
 
 | Artefact | Audience | Notes |
 | :--- | :--- | :--- |
-| `Vellum_Desktop\Vellum-Desktop-V2.0-Setup-x64.exe` | colleagues | per-user install, no admin, no Python |
+| `Vellum_Desktop\Vellum-Desktop-V2.1-Setup-x64.exe` | colleagues | per-user install, no admin, no Python |
 | `Vellum_Desktop\Vellum_Standalone_Windows_x64.zip` | colleagues | portable bundle, unzip and run `Vellum.exe` |
-| `Vellum_Desktop\Vellum_Desktop_V2.0_Botanical_Bento.zip` | developers | source drop (no venv, no binaries) |
+| `Vellum_Desktop\Vellum_Desktop_V2.1_Botanical_Bento.zip` | developers | source drop (no venv, no binaries) |
 | `Vellum_Web\Vellum_Web_Fernly_Latest_Export.zip` | developers | web source export |
 | `Vellum_Web\Vellum_Web_Fernly_SHARE.zip` | colleagues | **one-click** — portable Node bundled |
 

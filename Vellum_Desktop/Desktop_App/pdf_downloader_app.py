@@ -3362,131 +3362,32 @@ def render_citation_graph():
 import vellum_workspace as VW
 import vellum_theme as VT
 import vellum_paper_pool as VPP
-
-# Handovers between features
-if st.session_state.pop("_go_download", False):
-    st.session_state["_active_tab"] = "library"
-    st.session_state["_library_subview"] = "PDF Downloader"
-if st.session_state.pop("_go_graph", False):
-    st.session_state["_active_tab"] = "discover"
-    st.session_state["_discover_subview"] = "Citation Network"
-if st.session_state.pop("_go_analysis", False):
-    st.session_state["_active_tab"] = "evidence"
-    st.session_state["_evidence_subview"] = "Methodology & Evidence"
-if st.session_state.pop("_go_literature", False):
-    st.session_state["_active_tab"] = "discover"
-    st.session_state["_discover_subview"] = "Literature Search"
+import vellum_pages as VP
 
 # Clear session support
 VB.maybe_clear()
+
+# Every screen is a real Streamlit page with its own URL. That is what makes
+# the address bar follow the user, the browser's Back button work, and a
+# screen linkable. The navigation widget itself is hidden because the app
+# draws its own glass navigation bar; the URL is the part that matters.
+_pages = VP.build({"library_downloader": lambda: render_downloader()})
+_page = st.navigation(_pages, position="hidden")
 
 if not VW.is_vault_initialized() or st.session_state.get("_show_welcome_hub", False):
     from app_pages import welcome_hub
     welcome_hub.render()
 else:
-    active_tab = st.session_state.get("_active_tab", "overview")
-    VT.render_top_nav(active_tab)
+    # Handovers between features: a screen can ask to open another one.
+    if st.session_state.pop("_go_download", False):
+        VP.go("library_downloader")
+    if st.session_state.pop("_go_graph", False):
+        VP.go("discover_citation")
+    if st.session_state.pop("_go_analysis", False):
+        VP.go("evidence_methodology")
+    if st.session_state.pop("_go_literature", False):
+        VP.go("discover_literature")
 
-    if active_tab == "overview":
-        from app_pages import project_overview
-        project_overview.render()
-
-    elif active_tab == "discover":
-        disco_options = ["🔍 Literature Search", "🕸️ Citation Network"]
-        raw_disc = st.session_state.get("_discover_subview", disco_options[0])
-        cur_disc = disco_options[0]
-        if "Citation" in raw_disc:
-            cur_disc = disco_options[1]
-        elif "Literature" in raw_disc:
-            cur_disc = disco_options[0]
-        elif raw_disc in disco_options:
-            cur_disc = raw_disc
-
-        if st.session_state.get("_last_disc_subview") != cur_disc:
-            st.session_state["_discover_pills"] = cur_disc
-            st.session_state["_last_disc_subview"] = cur_disc
-
-        subview = st.pills(
-            "Discover Section",
-            disco_options,
-            default=cur_disc,
-            label_visibility="collapsed",
-            key="_discover_pills",
-        ) or cur_disc
-        st.session_state["_discover_subview"] = subview
-        st.session_state["_last_disc_subview"] = subview
-
-        if "Literature" in subview:
-            render_literature()
-        elif "Citation" in subview:
-            render_citation_graph()
-
-    elif active_tab == "screening":
-        from app_pages import screening
-        screening.render()
-
-    elif active_tab == "library":
-        lib_options = ["📚 Unified Paper Pool", "📥 PDF Downloader"]
-        raw_lib = st.session_state.get("_library_subview", lib_options[0])
-        cur_lib = lib_options[0]
-        if "Downloader" in raw_lib or "PDF" in raw_lib:
-            cur_lib = lib_options[1]
-        elif "Pool" in raw_lib or raw_lib in lib_options:
-            cur_lib = lib_options[0]
-
-        if st.session_state.get("_last_lib_subview") != cur_lib:
-            st.session_state["_library_pills"] = cur_lib
-            st.session_state["_last_lib_subview"] = cur_lib
-
-        subview = st.pills(
-            "Library Section",
-            lib_options,
-            default=cur_lib,
-            label_visibility="collapsed",
-            key="_library_pills",
-        ) or cur_lib
-        st.session_state["_library_subview"] = subview
-        st.session_state["_last_lib_subview"] = subview
-
-        if "Pool" in subview:
-            data = VW.load_project_data()
-            VPP.render_paper_pool(data.get("search_records", []))
-        elif "Downloader" in subview:
-            render_downloader()
-
-    elif active_tab == "evidence":
-        ev_options = ["🔬 Methodology & Appraisal", "📦 Export Center"]
-        raw_ev = st.session_state.get("_evidence_subview", ev_options[0])
-        cur_ev = ev_options[0]
-        if "Export" in raw_ev:
-            cur_ev = ev_options[1]
-        elif "Methodology" in raw_ev or raw_ev in ev_options:
-            cur_ev = ev_options[0]
-
-        if st.session_state.get("_last_ev_subview") != cur_ev:
-            st.session_state["_evidence_pills"] = cur_ev
-            st.session_state["_last_ev_subview"] = cur_ev
-
-        subview = st.pills(
-            "Evidence Section",
-            ev_options,
-            default=cur_ev,
-            label_visibility="collapsed",
-            key="_evidence_pills",
-        ) or cur_ev
-        st.session_state["_evidence_subview"] = subview
-        st.session_state["_last_ev_subview"] = subview
-
-        if "Methodology" in subview:
-            render_analysis()
-        elif "Export" in subview:
-            render_export()
-
-    elif active_tab == "notes":
-        from app_pages import notes as AP_Notes
-        AP_Notes.render()
-
-    elif active_tab in ("guide", "help"):
-        render_help()
+    _page.run()
 
 

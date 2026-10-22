@@ -1634,13 +1634,19 @@ def show_about_dialog() -> None:
     )
 
 
-def render_top_nav(active_tab: str = "overview") -> None:
+def render_top_nav(active_url: str = "overview") -> None:
     """
     Renders the Top Horizontal Glass Navigation Bar.
     Includes active project/notebook selector on the left, section tabs in center,
     quick controls (Vault, Theme, About, Reset), and live metrics pill on the right.
+
+    ``active_url`` is the url_path of the screen being shown. Selecting a
+    different section navigates to that section's landing screen, and a section
+    that holds more than one screen gets a secondary row of pills.
     """
     inject_theme()
+
+    import vellum_pages as VP
 
     vault = VW.get_vault_dir()
     projects = VW.list_projects()
@@ -1668,38 +1674,48 @@ def render_top_nav(active_tab: str = "overview") -> None:
 
     with c_nav:
         # Botanical Bento Native Segmented Control Bar
-        nav_items = ["🏠 Overview", "🔍 Discover", "🧪 Screening", "📚 Library", "🔬 Evidence", "📝 Notes", "📖 Guide & FAQ"]
-        nav_keys = {
-            "🏠 Overview": "overview",
-            "🔍 Discover": "discover",
-            "🧪 Screening": "screening",
-            "📚 Library": "library",
-            "🔬 Evidence": "evidence",
-            "📝 Notes": "notes",
-            "📖 Guide & FAQ": "guide",
-        }
-        rev_keys = {v: k for k, v in nav_keys.items()}
-        cur_label = rev_keys.get(active_tab, "🏠 Overview")
-        if active_tab == "help":
-            cur_label = "📖 Guide & FAQ"
+        section_labels = [s["label"] for s in VP.SECTIONS]
+        active_section = VP.section_of(active_url) or section_labels[0]
 
-        # Ensure widget key is synchronized whenever active_tab changes programmatically:
+        # Ensure widget key is synchronized whenever the section changes programmatically:
         last_tab = st.session_state.get("_last_synced_tab")
-        if active_tab != last_tab:
-            st.session_state["_main_nav_segments"] = cur_label
-            st.session_state["_last_synced_tab"] = active_tab
+        if active_section != last_tab:
+            st.session_state["_main_nav_segments"] = active_section
+            st.session_state["_last_synced_tab"] = active_section
 
         sel_nav = st.segmented_control(
             "Navigation",
-            nav_items,
-            default=cur_label,
+            section_labels,
+            default=active_section,
             label_visibility="collapsed",
             key="_main_nav_segments",
         )
-        if sel_nav and nav_keys.get(sel_nav) and nav_keys[sel_nav] != active_tab:
-            st.session_state["_active_tab"] = nav_keys[sel_nav]
-            st.session_state["_last_synced_tab"] = nav_keys[sel_nav]
-            st.rerun()
+        if sel_nav and sel_nav != active_section:
+            # Navigating for real means the URL follows, the browser's Back
+            # button works, and the screen can be linked to directly.
+            VP.go(VP.DEFAULT_PAGE[sel_nav])
+
+    # ── Secondary navigation for sections that hold more than one screen ──
+    section = next((s for s in VP.SECTIONS if s["label"] == active_section), None)
+    if section and len(section["pages"]) > 1:
+        sub_options = [f"{p[2]} {p[1]}" for p in section["pages"]]
+        sub_paths = {f"{p[2]} {p[1]}": p[0] for p in section["pages"]}
+        cur_sub = next(
+            (f"{p[2]} {p[1]}" for p in section["pages"] if p[0] == active_url),
+            sub_options[0],
+        )
+        sub_key = f"_subnav_{active_section}"
+        if st.session_state.get(sub_key) != cur_sub:
+            st.session_state[sub_key] = cur_sub
+        sel_sub = st.pills(
+            f"{active_section} Section",
+            sub_options,
+            default=cur_sub,
+            label_visibility="collapsed",
+            key=sub_key,
+        )
+        if sel_sub and sub_paths.get(sel_sub) != active_url:
+            VP.go(sub_paths[sel_sub])
 
     with c_tools:
         # Matching Pill Capsules with Icon + Short Label

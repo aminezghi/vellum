@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Vellum keyboard shortcuts</title>
+  </head>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      height: 1px;
+      width: 1px;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+    "
+  >
+    <script>
+      /*
+       * Global key listener for the Vellum desktop app.
+       *
+       * The iframe is served from the same origin as the Streamlit app, so it
+       * can attach a listener to the *parent* document and observe keystrokes
+       * that land anywhere in the app - no focus tricks required.
+       */
+
+      function send(value) {
+        try {
+          window.parent.postMessage(
+            {
+              isStreamlitMessage: true,
+              type: "streamlit:setComponentValue",
+              value: value,
+              dataType: "json",
+            },
+            "*"
+          );
+        } catch (e) {
+          /* the parent is gone - nothing to do */
+        }
+      }
+
+      function ready() {
+        try {
+          window.parent.postMessage(
+            {
+              isStreamlitMessage: true,
+              type: "streamlit:componentReady",
+              apiVersion: 1,
+            },
+            "*"
+          );
+        } catch (e) {
+          /* ignore */
+        }
+      }
+
+      function isEditable(el) {
+        if (!el) return false;
+        var tag = (el.tagName || "").toUpperCase();
+        if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return true;
+        if (el.isContentEditable) return true;
+        // Streamlit renders some controls as role=textbox.
+        if (el.getAttribute && el.getAttribute("role") === "textbox") return true;
+        return false;
+      }
+
+      function describe(el) {
+        try {
+          return {
+            tag: (el && el.tagName ? el.tagName : "").toUpperCase(),
+            role: (el && el.getAttribute ? el.getAttribute("role") : null) || null,
+            ariaModal: !!(el && el.getAttribute && el.getAttribute("aria-modal") === "true"),
+            roleDialog: !!(el && el.getAttribute && el.getAttribute("role") === "dialog"),
+          };
+        } catch (e) {
+          return {};
+        }
+      }
+
+      function onKeyDown(event) {
+        var cfg = window.__vellumConfig || { map: {}, disabled: false };
+        if (cfg.disabled) return;
+
+        // Never steal browser or OS shortcuts.
+        if (event.ctrlKey || event.metaKey || event.altKey) return;
+        if (event.defaultPrevented) return;
+
+        // A modal dialog owns the keyboard while it is open.
+        var desc = describe(event.target);
+        if (desc.ariaModal || desc.roleDialog) return;
+
+        // While the user is typing, every key belongs to the field.
+        if (isEditable(event.target)) return;
+
+        var key = (event.key || "").toLowerCase();
+        if (!key || key.length !== 1) return;
+
+        var action = cfg.map && cfg.map[key] ? cfg.map[key] : null;
+        if (!action) return;
+
+        event.preventDefault();
+        send({ action: action, key: key, ts: Date.now() });
+      }
+
+      function attach() {
+        try {
+          if (window.__vellumAttached) return;
+          var parentDoc = window.parent && window.parent.document;
+          if (!parentDoc) return false;
+          parentDoc.addEventListener("keydown", onKeyDown, true);
+          window.__vellumAttached = true;
+          return true;
+        } catch (e) {
+          return false;
+        }
+      }
+
+      // Streamlit delivers the component's keyword arguments through a
+      // "streamlit:render" message after the component signals that it is
+      // ready. The kwargs arrive as event.data.args.
+      function applyArgs(args) {
+        try {
+          if (!args) return;
+          var raw = args.config;
+          window.__vellumConfig = raw
+            ? JSON.parse(raw)
+            : { map: {}, disabled: false };
+        } catch (e) {
+          window.__vellumConfig = { map: {}, disabled: false };
+        }
+      }
+
+      function init() {
+        window.addEventListener("message", function (event) {
+          var data = event && event.data;
+          if (!data || !data.type) return;
+          if (data.type === "streamlit:render") {
+            applyArgs(data.args);
+          }
+        });
+
+        ready();
+
+        if (!attach()) {
+          // The parent document was not reachable yet; retry on the next tick.
+          var tries = 0;
+          var timer = setInterval(function () {
+            tries += 1;
+            if (attach() || tries > 40) clearInterval(timer);
+          }, 100);
+        }
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+      } else {
+        init();
+      }
+    </script>
+  </body>
+</html>

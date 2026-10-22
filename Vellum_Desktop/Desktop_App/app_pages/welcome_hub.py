@@ -14,6 +14,7 @@ from pathlib import Path
 import streamlit as st
 
 import vellum_paths as VP
+import vellum_pages
 import vellum_theme as VT
 import vellum_workspace as VW
 
@@ -202,9 +203,8 @@ def render() -> None:
                 VW.set_active_project(p_name)
 
                 st.session_state["_show_welcome_hub"] = False
-                st.session_state["_active_tab"] = "overview"
                 st.toast(f"Welcome to Vellum, {u_name.strip()}!", icon="🎉")
-                st.rerun()
+                vellum_pages.go("overview")
 
     with tab2:
         st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)

@@ -10,7 +10,7 @@ This script rebuilds all of them from one source of truth - the files git
 actually tracks - so the archives can never drift from the tree again.
 
     Vellum_Standalone_Windows_x64.zip     frozen desktop bundle (portable)
-    Vellum_Desktop_V2.0_Botanical_Bento.zip  desktop source drop
+    Vellum_Desktop_V2.1_Botanical_Bento.zip  desktop source drop
     Vellum_Web_Fernly_Latest_Export.zip   web source export
     Vellum_Web_Fernly_SHARE.zip           web one-click share folder
 
@@ -39,10 +39,10 @@ FIXED_DATE = (1980, 1, 1, 0, 0, 0)
 
 # Paths under Vellum_Desktop/ that never belong in the source drop.
 DESKTOP_SOURCE_EXCLUDE = {
-    "Vellum_Desktop/Vellum_Desktop_V2.0_Botanical_Bento",  # nested duplicate
+    "Vellum_Desktop/Vellum_Desktop_V2.1_Botanical_Bento",  # nested duplicate
     "Vellum_Desktop/Vellum_Standalone_Windows_x64.zip",
-    "Vellum_Desktop/Vellum_Desktop_V2.0_Botanical_Bento.zip",
-    "Vellum_Desktop/Vellum-Desktop-V2.0-Setup-x64.exe",
+    "Vellum_Desktop/Vellum_Desktop_V2.1_Botanical_Bento.zip",
+    "Vellum_Desktop/Vellum-Desktop-V2.1-Setup-x64.exe",
 }
 
 # The source drop ships only what runs from source. The standalone launcher
@@ -138,7 +138,7 @@ def main() -> int:
             if src.is_file():
                 entries.append((rel[len("Vellum_Desktop/"):], src))
     print("Desktop source drop:")
-    build_source_zip(REPO_ROOT / "Vellum_Desktop" / "Vellum_Desktop_V2.0_Botanical_Bento.zip",
+    build_source_zip(REPO_ROOT / "Vellum_Desktop" / "Vellum_Desktop_V2.1_Botanical_Bento.zip",
                      entries)
 
     # ---- web source export --------------------------------------------------

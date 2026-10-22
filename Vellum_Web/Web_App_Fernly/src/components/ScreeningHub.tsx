@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Notebook, db, ScreeningSession, ScreeningItem } from "@/lib/db";
 import { STORAGE_KEYS } from "@/lib/storageNamespace";
+import { Modal } from "@/components/Modal";
 import {
   ActiveLearningClassifier,
   ScreeningCandidate,
@@ -42,7 +43,6 @@ import {
   Filter,
   AlertCircle,
   FileSpreadsheet,
-  X,
 } from "lucide-react";
 
 interface ScreeningHubProps {
@@ -1320,25 +1320,13 @@ export function ScreeningHub({ notebooks, onAddToNotebook }: ScreeningHubProps) 
           MODAL 1: SESSIONS HUB (Switch / Manage Multiple Screening Sessions)
       ========================================================================= */}
       {showSessionsModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-fade-in">
-          <div className="fernly-card w-full max-w-xl p-6 sm:p-7 rounded-[2rem] space-y-5 border border-[var(--card-bdr)] shadow-2xl">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-bold text-[var(--ink)]">
-                  Screening Sessions Studio
-                </h3>
-                <p className="text-xs text-[var(--ink-muted)]">
-                  Switch between saved review projects or launch a new screening.
-                </p>
-              </div>
-              <button
-                onClick={() => setShowSessionsModal(false)}
-                className="h-8 w-8 rounded-full flex items-center justify-center text-[var(--ink-muted)] hover:bg-[var(--panel)] cursor-pointer"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-
+        <Modal
+          isOpen={showSessionsModal}
+          onClose={() => setShowSessionsModal(false)}
+          title="Screening Sessions Studio"
+          subtitle="Switch between saved review projects or launch a new screening."
+          panelClassName="max-w-xl space-y-5"
+        >
             {/* List of Sessions */}
             <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
               {sessions.map((s) => {
@@ -1355,12 +1343,12 @@ export function ScreeningHub({ notebooks, onAddToNotebook }: ScreeningHubProps) 
                         : "border-[var(--card-bdr)] bg-[var(--panel)] hover:border-[var(--g-500)]/60"
                     }`}
                   >
-                    <div
+                    <button
                       onClick={() => {
                         activateSession(s);
                         setShowSessionsModal(false);
                       }}
-                      className="cursor-pointer space-y-1 flex-1"
+                      className="cursor-pointer space-y-1 flex-1 text-left"
                     >
                       <div className="flex items-center gap-2">
                         <span className="font-bold text-sm text-[var(--ink)]">{s.name}</span>
@@ -1379,7 +1367,7 @@ export function ScreeningHub({ notebooks, onAddToNotebook }: ScreeningHubProps) 
                         <span>·</span>
                         <span className="text-emerald-600 font-semibold">{s.includedCount} inc</span>
                       </div>
-                    </div>
+                    </button>
 
                     <div className="flex items-center gap-2 flex-shrink-0">
                       <button
@@ -1394,9 +1382,10 @@ export function ScreeningHub({ notebooks, onAddToNotebook }: ScreeningHubProps) 
                       <button
                         onClick={() => handleDeleteSession(s.id)}
                         className="text-[var(--ink-muted)] hover:text-rose-600 p-2 rounded-xl hover:bg-[var(--card)] cursor-pointer"
-                        title="Delete session"
+                        title={`Delete session ${s.name}`}
+                        aria-label={`Delete session ${s.name}`}
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-4 w-4" aria-hidden="true" />
                       </button>
                     </div>
                   </div>
@@ -1410,7 +1399,7 @@ export function ScreeningHub({ notebooks, onAddToNotebook }: ScreeningHubProps) 
                 onClick={() => handleCreateNewSession()}
                 className="btn-fernly-primary px-5 py-2.5 rounded-full text-xs font-semibold flex items-center gap-2"
               >
-                <Plus className="h-4 w-4" />
+                <Plus className="h-4 w-4" aria-hidden="true" />
                 <span>Start New Screening Session</span>
               </button>
 
@@ -1421,32 +1410,20 @@ export function ScreeningHub({ notebooks, onAddToNotebook }: ScreeningHubProps) 
                 Close
               </button>
             </div>
-          </div>
-        </div>
+        </Modal>
       )}
 
       {/* =========================================================================
           MODAL 2: INGEST MORE SOURCES INTO ACTIVE SESSION
       ========================================================================= */}
       {showAddSourcesModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-fade-in">
-          <div className="fernly-card w-full max-w-lg p-6 rounded-[2rem] space-y-5 border border-[var(--card-bdr)] shadow-2xl">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-base font-bold text-[var(--ink)]">
-                  Add Additional Sources to &quot;{activeSession?.name}&quot;
-                </h3>
-                <p className="text-xs text-[var(--ink-muted)]">
-                  New records will be deduplicated automatically against existing candidates.
-                </p>
-              </div>
-              <button
-                onClick={() => setShowAddSourcesModal(false)}
-                className="h-8 w-8 rounded-full flex items-center justify-center text-[var(--ink-muted)] hover:bg-[var(--panel)] cursor-pointer"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
+        <Modal
+          isOpen={showAddSourcesModal}
+          onClose={() => setShowAddSourcesModal(false)}
+          title={`Add Additional Sources to "${activeSession?.name ?? ""}"`}
+          subtitle="New records will be deduplicated automatically against existing candidates."
+          panelClassName="max-w-lg space-y-5"
+        >
 
             <div className="space-y-4 pt-1">
               {/* File Upload Option */}
@@ -1458,12 +1435,13 @@ export function ScreeningHub({ notebooks, onAddToNotebook }: ScreeningHubProps) 
                   Select a CSV, TSV, RIS, BibTeX, or JSON file to merge into this review.
                 </p>
                 <label className="btn-fernly-primary px-4 py-2.5 rounded-full text-xs font-semibold cursor-pointer shadow-xs flex items-center justify-center gap-2 w-full">
-                  <Upload className="h-4 w-4" />
+                  <Upload className="h-4 w-4" aria-hidden="true" />
                   <span>Choose Additional File</span>
                   <input
                     ref={addMoreFileInputRef}
                     type="file"
                     accept=".ris,.txt,.bib,.csv,.tsv,.json"
+                    aria-label="Choose an additional bibliographic file"
                     onChange={async (e) => {
                       const file = e.target.files?.[0];
                       if (!file) return;
@@ -1490,10 +1468,14 @@ export function ScreeningHub({ notebooks, onAddToNotebook }: ScreeningHubProps) 
               {/* Notebook Option */}
               {notebooks.length > 0 && (
                 <div className="p-4 rounded-2xl bg-[var(--panel)] border border-[var(--card-bdr)] space-y-2">
-                  <span className="text-xs font-bold text-[var(--ink)] block">
+                  <label
+                    htmlFor="screening-import-notebook"
+                    className="text-xs font-bold text-[var(--ink)] block"
+                  >
                     Import from a Notebook
-                  </span>
+                  </label>
                   <select
+                    id="screening-import-notebook"
                     defaultValue=""
                     onChange={async (e) => {
                       const nbId = e.target.value;
@@ -1529,34 +1511,21 @@ export function ScreeningHub({ notebooks, onAddToNotebook }: ScreeningHubProps) 
                 </div>
               )}
             </div>
-          </div>
-        </div>
+        </Modal>
       )}
 
       {/* =========================================================================
           MODAL 3: DUPLICATE RECORDS INSPECTION
       ========================================================================= */}
       {showDuplicateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-fade-in">
-          <div className="fernly-card w-full max-w-2xl p-6 sm:p-7 rounded-[2rem] space-y-4 border border-[var(--card-bdr)] shadow-2xl">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-base font-bold text-[var(--ink)] flex items-center gap-2">
-                  <ShieldCheck className="h-5 w-5 text-emerald-600" />
-                  <span>Deduplication Audit Report</span>
-                </h3>
-                <p className="text-xs text-[var(--ink-muted)]">
-                  {duplicatesRemoved.length} duplicate citations detected and merged across sources.
-                </p>
-              </div>
-              <button
-                onClick={() => setShowDuplicateModal(false)}
-                className="h-8 w-8 rounded-full flex items-center justify-center text-[var(--ink-muted)] hover:bg-[var(--panel)] cursor-pointer"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-
+        <Modal
+          isOpen={showDuplicateModal}
+          onClose={() => setShowDuplicateModal(false)}
+          title="Deduplication Audit Report"
+          subtitle={`${duplicatesRemoved.length} duplicate citations detected and merged across sources.`}
+          icon={<ShieldCheck className="h-5 w-5 text-emerald-600" />}
+          panelClassName="max-w-2xl space-y-4"
+        >
             <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
               {duplicatesRemoved.length === 0 ? (
                 <p className="text-xs text-[var(--ink-muted)] py-4 text-center">
@@ -1607,8 +1576,7 @@ export function ScreeningHub({ notebooks, onAddToNotebook }: ScreeningHubProps) 
                 Done
               </button>
             </div>
-          </div>
-        </div>
+        </Modal>
       )}
     </div>
   );

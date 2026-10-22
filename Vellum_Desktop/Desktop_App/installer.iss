@@ -1,5 +1,5 @@
 ; ---------------------------------------------------------------------------
-;  Vellum Desktop V2.0 - Fernly Botanical Bento Edition
+;  Vellum Desktop V2.1 - Fernly Botanical Bento Edition
 ;  Inno Setup script -> Windows installer (.exe)
 ;
 ;  Builds a standard installer around the PyInstaller onedir bundle produced by
@@ -16,8 +16,8 @@
 ; ---------------------------------------------------------------------------
 
 #define AppName "Vellum Desktop"
-#define AppNameFull "Vellum Desktop V2.0"
-#define AppVersion "2.0.0"
+#define AppNameFull "Vellum Desktop V2.1"
+#define AppVersion "2.1.0"
 #define AppPublisher "Amine Zouaghi"
 #define AppExeName "Vellum.exe"
 #define AppId "{{9C1B5A74-6D2E-4C3A-9E51-7F2D8A4B6C10}"
@@ -47,7 +47,7 @@ DisableProgramGroupPage=yes
 DisableDirPage=no
 AllowNoIcons=yes
 OutputDir=..
-OutputBaseFilename=Vellum-Desktop-V2.0-Setup-x64
+OutputBaseFilename=Vellum-Desktop-V2.1-Setup-x64
 ; This script lives in Desktop_App\, and so does the application icon.
 ; (It used to point at "..\downloader.ico", which broke when Desktop_App\ was
 ; moved under Vellum_Desktop\ - the icon did not move with it.)
@@ -80,12 +80,12 @@ Name: "launchapp";  Description: "Launch {#AppNameFull} after installation"; Gro
 ; The frozen application bundle produced by PyInstaller.
 Source: "dist\Vellum\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; The printed manual, shipped alongside the app so the Start Menu link works.
-Source: "..\README_VELLUM_DESKTOP_V2.0.pdf"; DestDir: "{app}\docs"; DestName: "Vellum-Desktop-V2.0-Guide.pdf"; Flags: ignoreversion
+Source: "..\README_VELLUM_DESKTOP_V2.1.pdf"; DestDir: "{app}\docs"; DestName: "Vellum-Desktop-V2.1-Guide.pdf"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#AppNameFull}";        Filename: "{app}\{#AppExeName}"
 Name: "{group}\Uninstall {#AppNameFull}"; Filename: "{uninstallexe}"
-Name: "{group}\User Guide (PDF)";      Filename: "{app}\docs\Vellum-Desktop-V2.0-Guide.pdf"; Comment: "Open the Vellum Desktop user manual"; WorkingDir: "{app}"
+Name: "{group}\User Guide (PDF)";      Filename: "{app}\docs\Vellum-Desktop-V2.1-Guide.pdf"; Comment: "Open the Vellum Desktop user manual"; WorkingDir: "{app}"
 
 [Run]
 Filename: "{app}\{#AppExeName}"; Description: "{cm:LaunchProgram,{#AppNameFull}}"; WorkingDir: "{app}"; Flags: nowait postinstall skipifsilent runascurrentuser; Tasks: launchapp

@@ -16,6 +16,7 @@ import streamlit as st
 
 import vellum_workspace as VW
 import vellum_citation_export as VCE
+import vellum_pages
 
 
 def _clean_html(html_str: str) -> str:
@@ -313,9 +314,7 @@ def render() -> None:
                         st.link_button("🌐 Open Link in Browser", s["pdf_url"], width="stretch")
                 with l_c2:
                     if st.button("🔬 Inspect Evidence", key=f"_insp_from_notes_{idx}", width="stretch"):
-                        st.session_state["_active_tab"] = "evidence"
-                        st.session_state["_evidence_subview"] = "🔬 Methodology & Appraisal"
-                        st.rerun()
+                        vellum_pages.go("evidence_methodology")
 
         # Export All Notes Bar
         st.markdown("<div style='height: 16px;'></div>", unsafe_allow_html=True)

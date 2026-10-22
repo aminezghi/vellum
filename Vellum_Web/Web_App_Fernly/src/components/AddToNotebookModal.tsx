@@ -3,7 +3,8 @@
 import React, { useState } from "react";
 import { db, Notebook, Source } from "@/lib/db";
 import { AcademicPaperResult } from "@/app/api/search/route";
-import { X, Plus, CheckCircle2, BookmarkPlus } from "lucide-react";
+import { CheckCircle2, BookmarkPlus } from "lucide-react";
+import { Modal } from "@/components/Modal";
 
 interface AddToNotebookModalProps {
   paper: AcademicPaperResult | null;
@@ -88,25 +89,14 @@ export function AddToNotebookModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="fernly-card relative w-full max-w-md p-6 sm:p-7 space-y-4">
-        <button
-          onClick={onClose}
-          className="absolute right-5 top-5 p-2 rounded-full text-[var(--faint)] hover:text-[var(--ink)] hover:bg-[var(--panel)] transition-colors cursor-pointer"
-        >
-          <X className="h-4 w-4" />
-        </button>
-
-        <div className="flex items-center gap-2.5 mb-2">
-          <div className="p-2.5 rounded-2xl bg-[var(--g-100)] text-[var(--g-700)] border border-[var(--g-400)]/30">
-            <BookmarkPlus className="h-5 w-5" />
-          </div>
-          <div>
-            <h2 className="text-base font-bold text-[var(--ink)] tracking-tight">Save to Research Project</h2>
-            <p className="text-xs text-[var(--muted)]">Add reference &amp; verbatim evidence to local vault</p>
-          </div>
-        </div>
-
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Save to Research Project"
+      subtitle="Add reference & verbatim evidence to local vault"
+      icon={<BookmarkPlus className="h-5 w-5" />}
+      panelClassName="max-w-md space-y-4"
+    >
         {/* Paper Mini Preview Card */}
         <div className="p-3.5 rounded-2xl bg-[var(--panel)] border border-[var(--hair)] space-y-1">
           <h4 className="text-xs font-semibold text-[var(--ink)] line-clamp-2 leading-snug">
@@ -120,9 +110,15 @@ export function AddToNotebookModal({
         {/* Existing vs New Toggle */}
         <div className="space-y-3 pt-1">
           {notebooks.length > 0 && (
-            <div className="flex items-center bg-[var(--panel)] p-1 rounded-full border border-[var(--hair)]">
+            <div
+              className="flex items-center bg-[var(--panel)] p-1 rounded-full border border-[var(--hair)]"
+              role="radiogroup"
+              aria-label="Destination"
+            >
               <button
                 type="button"
+                role="radio"
+                aria-checked={!isCreatingNew}
                 onClick={() => setIsCreatingNew(false)}
                 className={`flex-1 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                   !isCreatingNew
@@ -134,6 +130,8 @@ export function AddToNotebookModal({
               </button>
               <button
                 type="button"
+                role="radio"
+                aria-checked={isCreatingNew}
                 onClick={() => setIsCreatingNew(true)}
                 className={`flex-1 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                   isCreatingNew
@@ -148,8 +146,11 @@ export function AddToNotebookModal({
 
           {!isCreatingNew && notebooks.length > 0 ? (
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-[var(--muted)]">Choose Destination Project:</label>
+              <label htmlFor="addto-existing" className="text-xs font-semibold text-[var(--muted)]">
+                Choose Destination Project:
+              </label>
               <select
+                id="addto-existing"
                 value={selectedNotebookId}
                 onChange={(e) => setSelectedNotebookId(e.target.value)}
                 className="fernly-input w-full cursor-pointer"
@@ -163,8 +164,11 @@ export function AddToNotebookModal({
             </div>
           ) : (
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-[var(--muted)]">New Project Title:</label>
+              <label htmlFor="addto-new" className="text-xs font-semibold text-[var(--muted)]">
+                New Project Title:
+              </label>
               <input
+                id="addto-new"
                 type="text"
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
@@ -191,7 +195,7 @@ export function AddToNotebookModal({
           >
             {success ? (
               <>
-                <CheckCircle2 className="h-4 w-4 text-[#5dbd8b]" />
+                <CheckCircle2 className="h-4 w-4 text-[#5dbd8b]" aria-hidden="true" />
                 <span>Saved!</span>
               </>
             ) : isSaving ? (
@@ -201,7 +205,6 @@ export function AddToNotebookModal({
             )}
           </button>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }

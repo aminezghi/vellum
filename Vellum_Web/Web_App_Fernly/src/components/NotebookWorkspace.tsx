@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Notebook, Source, Note, db } from "@/lib/db";
 import { STORAGE_KEYS } from "@/lib/storageNamespace";
+import { Modal } from "@/components/Modal";
 import { fetchAndStorePaperPdf } from "@/lib/pdfDownloader";
 import { AcademicPaperResult } from "@/app/api/search/route";
 import {
@@ -28,7 +29,6 @@ import {
   Sun,
   Moon,
   ArrowUpRight,
-  X,
   BookmarkPlus,
 } from "lucide-react";
 
@@ -966,41 +966,25 @@ export function NotebookWorkspace({ notebook, onBack, onUpdate }: NotebookWorksp
 
       {/* MODAL: Search & Add Literature Directly to Active Notebook */}
       {isSearchModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="fernly-card w-full max-w-3xl rounded-[2rem] p-6 max-h-[85vh] flex flex-col space-y-4 shadow-2xl animate-fade-in-up">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-[var(--card-bdr)]">
-              <div className="flex items-center gap-2.5">
-                <div className="h-9 w-9 rounded-xl bg-[var(--g-100)] text-[var(--g-700)] flex items-center justify-center">
-                  <Search className="h-4 w-4" />
-                </div>
-                <div>
-                  <h3 className="text-base font-bold text-[var(--ink)]">
-                    Search &amp; Add Papers to &quot;{notebook.title}&quot;
-                  </h3>
-                  <p className="text-xs text-[var(--ink-muted)]">
-                    Search across 250M+ global literature records and attach them with 1 click
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => setIsSearchModalOpen(false)}
-                className="p-1.5 rounded-full hover:bg-[var(--panel)] text-[var(--ink-muted)] hover:text-[var(--ink)] cursor-pointer"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
+        <Modal
+          isOpen={isSearchModalOpen}
+          onClose={() => setIsSearchModalOpen(false)}
+          title={`Search & Add Papers to "${notebook.title}"`}
+          subtitle="Search across 250M+ global literature records and attach them with 1 click"
+          icon={<Search className="h-4 w-4" />}
+          panelClassName="max-w-3xl max-h-[85vh] flex flex-col space-y-4"
+        >
             {/* Search Input Bar with OA Toggle */}
             <form onSubmit={handleWorkspaceSearch} className="space-y-3">
               <div className="flex items-center gap-2">
                 <div className="relative flex-1">
-                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)] pointer-events-none" />
+                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)] pointer-events-none" aria-hidden="true" />
                   <input
                     type="text"
                     value={searchModalQuery}
                     onChange={(e) => setSearchModalQuery(e.target.value)}
                     placeholder="Search keywords, topics, authors, or paste a DOI..."
+                    aria-label="Search the academic literature"
                     className="fernly-input fernly-input-search w-full !pl-10 !pr-4 py-2.5 text-xs sm:text-sm rounded-full"
                     autoFocus
                   />
@@ -1121,8 +1105,7 @@ export function NotebookWorkspace({ notebook, onBack, onUpdate }: NotebookWorksp
                 Close
               </button>
             </div>
-          </div>
-        </div>
+        </Modal>
       )}
     </div>
   );

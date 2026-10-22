@@ -1,4 +1,4 @@
-# VELLUM DESKTOP V2.0 — FERNLY BOTANICAL BENTO EDITION
+# VELLUM DESKTOP V2.1 — FERNLY BOTANICAL BENTO EDITION
 **Academic Literature Suite & Systematic Review Workbench**
 *Author: Amine Zouaghi (amine.zouaghi@unipr.it) | University of Parma*
 *Local-First • Zero Telemetry • 100% Privacy-Preserving*
@@ -16,10 +16,10 @@ in it depends on the web app or on any other folder in the pack.
 | `1_launch_desktop_app.bat` | Runs the workbench from source (Streamlit) |
 | `CLICK_TO_RUN_VELLUM_DESKTOP.bat` | Same, with dependency auto-configuration |
 | `CLICK_TO_RUN_STANDALONE_EXE.bat` | Runs the compiled `Vellum.exe` (native WebView2 window) |
-| `Vellum-Desktop-V2.0-Setup-x64.exe` | Windows installer (no admin rights, no Python needed) |
+| `Vellum-Desktop-V2.1-Setup-x64.exe` | Windows installer (no admin rights, no Python needed) |
 | `Vellum_Standalone_Windows_x64.zip` | The portable compiled bundle, ready to unzip anywhere |
-| `Vellum_Desktop_V2.0_Botanical_Bento.zip` | Lightweight source drop for colleagues (no venv, no binary) |
-| `README_VELLUM_DESKTOP_V2.0.pdf` | The full publication-grade manual |
+| `Vellum_Desktop_V2.1_Botanical_Bento.zip` | Lightweight source drop for colleagues (no venv, no binary) |
+| `README_VELLUM_DESKTOP_V2.1.pdf` | The full publication-grade manual |
 
 ---
 
@@ -27,7 +27,7 @@ in it depends on the web app or on any other folder in the pack.
 
 ### Option A — Install it (recommended)
 
-Double-click **`Vellum-Desktop-V2.0-Setup-x64.exe`**.
+Double-click **`Vellum-Desktop-V2.1-Setup-x64.exe`**.
 
 - Standard Windows installer, **no administrator rights required**
 - Installs to `%LOCALAPPDATA%\Programs\Vellum Desktop`
@@ -38,7 +38,7 @@ Double-click **`Vellum-Desktop-V2.0-Setup-x64.exe`**.
 > **⚠️ "Windows protected your PC" on first run.** The installer is not
 > code-signed, so SmartScreen warns. Click **More info → Run anyway**.
 > To confirm the file you received is the one that was built, run
-> `certutil -hashfile Vellum-Desktop-V2.0-Setup-x64.exe SHA256` and compare it
+> `certutil -hashfile Vellum-Desktop-V2.1-Setup-x64.exe SHA256` and compare it
 > with the hash in `..\DISTRIBUTABLES\SHA256SUMS.txt`.
 
 ### Option B — Run from source
@@ -61,7 +61,7 @@ falls back to the portable build in `Desktop_App\dist\Vellum\Vellum.exe`.
 ## 📄 Complete Documentation
 
 Please open the included publication-grade PDF manual:
-👉 **`README_VELLUM_DESKTOP_V2.0.pdf`**
+👉 **`README_VELLUM_DESKTOP_V2.1.pdf`**
 
 The PDF contains comprehensive documentation covering:
 - **🧪 Module 1: ASReview-Powered Active Learning Screening Hub**
@@ -120,6 +120,48 @@ directory is gone. The results are written to `..\RELEASE_REPORT.md`.
 
 ---
 
+## ⌨️ Keyboard shortcuts
+
+Screening is a high-frequency task, so the decision keys work without
+touching the mouse:
+
+| Key | Action |
+| :--- | :--- |
+| `I` | Include the current candidate |
+| `E` | Exclude the current candidate |
+| `U` | Undo the last decision |
+| `S` | Skip the candidate (send it to the back of the queue) |
+
+They fire anywhere on the Screening page. They stand down while you are
+typing in a text field and while a dialog is open, and `Ctrl`/`Cmd`/`Alt`
+combinations are left alone so browser shortcuts keep working.
+
+The shortcut and the button call the same function, so they can never
+disagree about what a decision means.
+
+---
+
+## 🔗 Screens and their addresses
+
+Every screen has its own URL, so the address bar follows you, the browser's
+Back button works, and a screen can be linked to directly:
+
+| Screen | URL |
+| :--- | :--- |
+| Project Overview | `/` |
+| Literature Search | `/discover_literature` |
+| Citation Network | `/discover_citation` |
+| Screening | `/screening` |
+| Unified Paper Pool | `/library_pool` |
+| PDF Downloader | `/library_downloader` |
+| Methodology & Appraisal | `/evidence_methodology` |
+| Export Center | `/evidence_export` |
+| Notes | `/notes` |
+| Researchers | `/researchers` |
+| Guide & FAQ | `/guide` |
+
+---
+
 ## 🏗️ Rebuilding
 
 ```powershell
@@ -131,7 +173,7 @@ cd Desktop_App
 & "$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe" installer.iss
 ```
 
-The installer lands in `Vellum-Desktop-V2.0-Setup-x64.exe`, next to this file.
+The installer lands in `Vellum-Desktop-V2.1-Setup-x64.exe`, next to this file.
 
 > The `.iss` script resolves `downloader.ico` and `dist\Vellum\` **relative to
 > `Desktop_App\`**. If you move this folder, keep those two paths intact or

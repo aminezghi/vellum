@@ -74,6 +74,7 @@ hiddenimports = [
     "vellum_entry", "citation_core", "vellum_workspace", "vellum_paper_actions",
     "vellum_theme", "vellum_paper_pool", "vellum_citation_export", "vellum_direct_download",
     "vellum_import", "vellum_pdf_viewer", "vellum_pdf_server",
+    "vellum_keyboard",
     "webview", "clr_loader", "pythonnet", "clr",
 ] + hiddenimports_collected
 

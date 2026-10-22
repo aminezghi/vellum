@@ -170,7 +170,7 @@ export default function Home() {
                         Systematic Literature Intelligence
                       </span>
                       <span className="text-[11px] text-[var(--ink-muted)] font-medium">
-                        v2.0 · Local-First Architecture
+                        v2.1 · Local-First Architecture
                       </span>
                     </div>
                     <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--ink)] mt-1">

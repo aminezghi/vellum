@@ -7,8 +7,6 @@ import {
   Flame,
   Share2,
   BookmarkPlus,
-  BookOpen,
-  Search,
   Zap,
   ArrowUpRight,
 } from "lucide-react";
@@ -186,11 +184,13 @@ export function TrendingRadar({
         {/* Papers Bento Grid */}
         {loading ? (
           <div className="py-16 flex flex-col items-center justify-center space-y-2 text-[var(--muted)]">
-            <div className="h-6 w-6 border-2 border-[var(--g-700)] border-t-transparent rounded-full animate-spin" />
-            <span className="text-xs font-medium animate-pulse">Scanning academic velocity engines...</span>
+            <div className="h-6 w-6 border-2 border-[var(--g-700)] border-t-transparent rounded-full animate-spin" aria-hidden="true" />
+            <span className="text-xs font-medium animate-pulse" role="status" aria-live="polite">
+              Scanning academic velocity engines...
+            </span>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" role="status" aria-live="polite" aria-label={`${papers.length} trending papers`}>
             {papers.map((p) => (
               <div
                 key={p.id}

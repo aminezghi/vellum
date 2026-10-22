@@ -28,12 +28,16 @@ MODULES = [
     "vellum_citation_export.py",
     "vellum_direct_download.py",
     "vellum_import.py",
+    "vellum_keyboard.py",
     "vellum_pdf_viewer.py",
     "vellum_pdf_server.py",
 ]
 
 # Directories whose contents are needed at runtime.
-TREES = ["app_pages", "assets"]
+# keyboard_component/ holds the frontend of the global keyboard-shortcut
+# component. It is a runtime asset, not source, so it has to travel with the
+# bundle or the shortcuts silently stop working in the installed app.
+TREES = ["app_pages", "assets", "keyboard_component"]
 
 # Streamlit reads project config from <cwd>/.streamlit/, and the server child
 # process starts in the bundle directory – so ship the theme with it.

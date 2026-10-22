@@ -4,7 +4,7 @@
 > **Document Version:** 4.0 (Consolidated Two-Edition Release)
 > **Author & Lead System Architect:** Amine Zouaghi
 > **Target OS:** Windows 10 / Windows 11 (64-bit)
-> **Distribution Architecture:** Vellum Desktop V2.0 + Vellum Web, Fernly Botanical Bento Edition
+> **Distribution Architecture:** Vellum Desktop V2.1 + Vellum Web, Fernly Botanical Bento Edition
 > **License:** Free & Open-Access Academic Tool (MIT)
 
 ---
@@ -20,7 +20,7 @@ systematic workflows).
 The package is partitioned into **two synchronized applications**, each in its own
 self-contained folder:
 
-1. **Vellum Desktop V2.0 — Fernly Botanical Bento (`Vellum_Desktop\`)**
+1. **Vellum Desktop V2.1 — Fernly Botanical Bento (`Vellum_Desktop\`)**
    Python 3.13 / Streamlit / PyInstaller native desktop workbench for heavy batch downloads
    (10 000+ DOIs), multi-format import (Scopus, WoS, PubMed, RIS, BibTeX), local vault
    indexing, and PRISMA flow export. Its source lives in `Vellum_Desktop\Desktop_App\`.
@@ -69,7 +69,7 @@ accounts, no cloud sync, no telemetry, no telemetry endpoints.
 - **SmartScreen:** the desktop installer is not code-signed, so Windows shows
   *"Windows protected your PC"* on first run. Choose **More info → Run anyway**.
   To confirm the file you received is the one that was built, run
-  `certutil -hashfile Vellum-Desktop-V2.0-Setup-x64.exe SHA256` and compare it
+  `certutil -hashfile Vellum-Desktop-V2.1-Setup-x64.exe SHA256` and compare it
   with `DISTRIBUTABLES\SHA256SUMS.txt`.
 
 #### 3. Network & Firewall
@@ -101,7 +101,7 @@ None of these are touched by the uninstaller.
 
 | Launcher Script | Target Application | Host & Port | Primary Purpose |
 | :--- | :--- | :--- | :--- |
-| **`Vellum_Desktop\Vellum-Desktop-V2.0-Setup-x64.exe`** | Vellum Desktop installer | — | Installs the desktop app per-user, no admin required |
+| **`Vellum_Desktop\Vellum-Desktop-V2.1-Setup-x64.exe`** | Vellum Desktop installer | — | Installs the desktop app per-user, no admin required |
 | **`Vellum_Desktop\1_launch_desktop_app.bat`** | Vellum Desktop Workbench | `http://localhost:8501` | High-volume PDF downloads, RIS/BibTeX import, vault indexing |
 | **`Vellum_Web\Vellum_Web_Fernly_SHARE\START_VELLUM_WEB.bat`** | Vellum Web Studio | `http://localhost:3002` | **The package to send to a colleague.** Nothing to install — Node.js is bundled |
 | **`Vellum_Web\2_launch_fernly_web_app.bat`** | Vellum Web Studio (from source) | `http://localhost:3002` | Citation graph, AI screening, visual boolean search, notebooks |

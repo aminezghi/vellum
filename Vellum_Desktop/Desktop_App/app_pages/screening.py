@@ -26,6 +26,7 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 import pandas as pd
 import streamlit as st
 
+import vellum_keyboard
 import vellum_theme as VT
 import vellum_workspace as VW
 
@@ -509,6 +510,76 @@ def get_active_session(sessions: List[Dict[str, Any]]) -> Dict[str, Any]:
 # 4. Main Rendering Interface (Fernly Botanical Bento Edition)
 # ─────────────────────────────────────────────────────────────────────────────
 
+# The keyboard shortcuts and the on-screen buttons deliberately call the same
+# function. When they were separate code paths the button and the shortcut
+# could disagree about what "include" means, and the label on the button
+# would advertise a shortcut that did not work.
+SCREENING_SHORTCUTS = {
+    "i": "include",
+    "e": "exclude",
+    "u": "undo",
+    "s": "skip",
+}
+
+
+def apply_screening_action(action, session, candidates, history, sessions):
+    """Apply one screening decision to the session and persist it.
+
+    Parameters
+    ----------
+    action:
+        One of ``include``, ``exclude``, ``undo``, ``skip``.
+    session, candidates, history, sessions:
+        The live screening state, mutated in place.
+
+    Returns
+    -------
+    list
+        The (possibly re-ranked) candidate list.
+    """
+    current_item = next((c for c in candidates if c.get("decision") == "pending"), None)
+    if current_item is None:
+        return candidates
+
+    if action == "include":
+        current_item["decision"] = "included"
+        current_item["screened_at"] = datetime.now().isoformat()
+        history.append({"id": current_item.get("id"), "decision": "included"})
+        session["consecutive_excludes"] = 0
+        model = ASReviewActiveLearningModel()
+        candidates = model.fit_and_rerank(candidates)
+
+    elif action == "exclude":
+        current_item["decision"] = "excluded"
+        current_item["screened_at"] = datetime.now().isoformat()
+        history.append({"id": current_item.get("id"), "decision": "excluded"})
+        session["consecutive_excludes"] = session.get("consecutive_excludes", 0) + 1
+        model = ASReviewActiveLearningModel()
+        candidates = model.fit_and_rerank(candidates)
+
+    elif action == "undo":
+        if not history:
+            return candidates
+        last_act = history.pop()
+        for c in candidates:
+            if c.get("id") == last_act.get("id"):
+                c["decision"] = "pending"
+                break
+
+    elif action == "skip":
+        skipped = candidates.pop(candidates.index(current_item))
+        candidates.append(skipped)
+
+    else:
+        return candidates
+
+    session["candidates"] = candidates
+    session["history"] = history
+    session["last_modified"] = datetime.now().isoformat()
+    save_screening_sessions(sessions)
+    return candidates
+
+
 def render():
     """Main rendering entry point for the ASReview Screening page."""
     sessions = load_screening_sessions()
@@ -814,7 +885,6 @@ def render():
         current_item = pending[0]
         score = current_item.get("relevance_score", 0.50)
         score_pct = int(score * 100)
-
         # Badge color based on ML confidence
         badge_color = "#10b981" if score_pct >= 70 else ("#f59e0b" if score_pct >= 40 else "#6b7280")
 
@@ -855,56 +925,42 @@ def render():
         # Screening Action Controls
         c_inc, c_exc, c_undo, c_skip = st.columns([2.5, 2.5, 1.5, 1.5])
 
+        # Discoverability: nobody reads the manual, so the shortcut has to be
+        # visible where the decision is made.
+        st.caption(
+            "⌨️ **Keyboard:** `I` include · `E` exclude · `U` undo · `S` skip — "
+            "active anywhere on this page except while you are typing in a field."
+        )
+
+        # The shortcut in brackets is real: it is handled by the same function
+        # as the button it sits next to.
+        action = None
         with c_inc:
             if st.button("⭐ Include (I)", key="_btn_act_inc", type="primary", use_container_width=True):
-                current_item["decision"] = "included"
-                current_item["screened_at"] = datetime.now().isoformat()
-                history.append({"id": current_item.get("id"), "decision": "included"})
-                session["consecutive_excludes"] = 0
-                
-                # Active learning re-ranking
-                model = ASReviewActiveLearningModel()
-                session["candidates"] = model.fit_and_rerank(candidates)
-                session["history"] = history
-                session["last_modified"] = datetime.now().isoformat()
-                save_screening_sessions(sessions)
-                st.rerun()
+                action = "include"
 
         with c_exc:
             if st.button("❌ Exclude (E)", key="_btn_act_exc", use_container_width=True):
-                current_item["decision"] = "excluded"
-                current_item["screened_at"] = datetime.now().isoformat()
-                history.append({"id": current_item.get("id"), "decision": "excluded"})
-                session["consecutive_excludes"] = consecutive_ex + 1
-                
-                # Active learning re-ranking
-                model = ASReviewActiveLearningModel()
-                session["candidates"] = model.fit_and_rerank(candidates)
-                session["history"] = history
-                session["last_modified"] = datetime.now().isoformat()
-                save_screening_sessions(sessions)
-                st.rerun()
+                action = "exclude"
 
         with c_undo:
             if st.button("↩️ Undo (U)", key="_btn_act_undo", use_container_width=True, disabled=(len(history) == 0)):
-                last_act = history.pop()
-                for c in candidates:
-                    if c.get("id") == last_act.get("id"):
-                        c["decision"] = "pending"
-                        break
-                session["history"] = history
-                session["last_modified"] = datetime.now().isoformat()
-                save_screening_sessions(sessions)
-                st.rerun()
+                action = "undo"
 
         with c_skip:
-            if st.button("⏭️ Skip", key="_btn_act_skip", use_container_width=True):
-                # Move to back of pending queue
-                skipped = candidates.pop(candidates.index(current_item))
-                candidates.append(skipped)
-                session["candidates"] = candidates
-                save_screening_sessions(sessions)
-                st.rerun()
+            if st.button("⏭️ Skip (S)", key="_btn_act_skip", use_container_width=True):
+                action = "skip"
+
+        # Global keyboard shortcut (I / E / U / S). The component listens on
+        # the parent document, so the shortcut works wherever focus happens
+        # to be - but it stays out of the way while the user is typing in a
+        # text field or while a dialog is open.
+        if action is None:
+            action = vellum_keyboard.capture(SCREENING_SHORTCUTS)
+
+        if action:
+            candidates = apply_screening_action(action, session, candidates, history, sessions)
+            st.rerun()
 
     # ── Included Papers Drawer & Export Hub ──
     st.markdown("<div style='height: 16px;'></div>", unsafe_allow_html=True)
@@ -964,7 +1020,7 @@ def render():
                 # Export PRISMA Flow Summary
                 prisma_summary = (
                     f"PRISMA 2020 Flow Diagram Data Summary\n"
-                    f"Generated by Vellum Desktop App V2.0\n"
+                    f"Generated by Vellum Desktop App V2.1\n"
                     f"Session: {session.get('name')}\n"
                     f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M')}\n\n"
                     f"Identification:\n"

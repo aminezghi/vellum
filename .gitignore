@@ -124,7 +124,7 @@ dist/
 # through git would add its full weight to every clone and every future
 # commit, for a file that is rebuilt from source anyway. It stays on disk so
 # it can be sent to colleagues directly.
-Vellum_Desktop/Vellum-Desktop-V2.0-Setup-x64.exe
+Vellum_Desktop/Vellum-Desktop-V2.1-Setup-x64.exe
 # The generated one-click web package (bundles a portable Node.js runtime).
 Vellum_Web/Vellum_Web_Fernly_SHARE/
 # Open Science Desktop session marker
@@ -197,10 +197,10 @@ Vellum_Web/Vellum_Web_Fernly_SHARE/
 !Vellum_Desktop/Desktop_App/downloader.png
 !Vellum_Desktop/Desktop_App/assets/
 !Vellum_Desktop/Desktop_App/assets/**
-!Vellum_Desktop/Vellum_Desktop_V2.0_Botanical_Bento/Desktop_App/downloader.ico
-!Vellum_Desktop/Vellum_Desktop_V2.0_Botanical_Bento/Desktop_App/downloader.png
-!Vellum_Desktop/Vellum_Desktop_V2.0_Botanical_Bento/Desktop_App/assets/
-!Vellum_Desktop/Vellum_Desktop_V2.0_Botanical_Bento/Desktop_App/assets/**
+!Vellum_Desktop/Vellum_Desktop_V2.1_Botanical_Bento/Desktop_App/downloader.ico
+!Vellum_Desktop/Vellum_Desktop_V2.1_Botanical_Bento/Desktop_App/downloader.png
+!Vellum_Desktop/Vellum_Desktop_V2.1_Botanical_Bento/Desktop_App/assets/
+!Vellum_Desktop/Vellum_Desktop_V2.1_Botanical_Bento/Desktop_App/assets/**
 !Vellum_Web/Web_App_Fernly/downloader.ico
 !Vellum_Web/Web_App_Fernly/downloader.png
 !Vellum_Web/Web_App_Fernly/src/app/favicon.ico

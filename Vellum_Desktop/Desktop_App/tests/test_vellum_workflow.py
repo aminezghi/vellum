@@ -162,11 +162,13 @@ class TestVellumWorkflow(unittest.TestCase):
         self.assertIn(backend, ["Windows dialog", "macOS chooser", "Tk dialog", "zenity", "kdialog", "none"])
 
     def test_evidence_subviews_exclude_user_guide(self):
-        # Verify in pdf_downloader_app.py that evidence options contain exactly Methodology and Export Center
-        with open(BASE_DIR / "pdf_downloader_app.py", "r", encoding="utf-8") as f:
-            content = f.read()
-        self.assertIn('ev_options = ["🔬 Methodology & Appraisal", "📦 Export Center"]', content)
-        self.assertNotIn('User Guide & FAQ', content[content.find('ev_options'):content.find('ev_options') + 100])
+        # The page registry is the single source of truth for the navigation,
+        # so assert against it rather than against a string in a source file.
+        import vellum_pages as VP
+        evidence = next(s for s in VP.SECTIONS if s["label"] == "🔬 Evidence")
+        titles = [p[1] for p in evidence["pages"]]
+        self.assertEqual(titles, ["Methodology & Appraisal", "Export Center"])
+        self.assertNotIn("User Guide & FAQ", titles)
 
     def test_developer_credits_dialog_clean(self):
         import inspect
@@ -177,10 +179,35 @@ class TestVellumWorkflow(unittest.TestCase):
         self.assertNotIn("Profile & Vaults", src)
 
     def test_discover_subviews_exclude_researchers(self):
-        with open(BASE_DIR / "pdf_downloader_app.py", "r", encoding="utf-8") as f:
-            content = f.read()
-        self.assertIn('disco_options = ["🔍 Literature Search", "🕸️ Citation Network"]', content)
-        self.assertNotIn('👥 Researchers', content[content.find('disco_options'):content.find('disco_options') + 80])
+        import vellum_pages as VP
+        discover = next(s for s in VP.SECTIONS if s["label"] == "🔍 Discover")
+        titles = [p[1] for p in discover["pages"]]
+        self.assertEqual(titles, ["Literature Search", "Citation Network"])
+        self.assertNotIn("Researchers", titles)
+
+        # Researchers is a section of its own, and it is reachable.
+        owners = [s for s in VP.SECTIONS if any(p[1] == "Researchers" for p in s["pages"])]
+        self.assertEqual(len(owners), 1)
+        self.assertEqual(owners[0]["label"], "🔖 Researchers")
+        self.assertIn("researchers", VP.PAGES or VP.SECTION_OF)
+
+    def test_every_registered_screen_has_a_unique_url_path(self):
+        import vellum_pages as VP
+        paths = [p[0] for s in VP.SECTIONS for p in s["pages"]]
+        self.assertEqual(len(paths), len(set(paths)), "duplicate url_path in the registry")
+        # Streamlit does not support nested URL path segments.
+        for p in paths:
+            self.assertNotIn("/", p, f"url_path {p!r} must be a single path segment")
+
+    def test_registry_covers_the_documented_screens(self):
+        import vellum_pages as VP
+        documented = {
+            "overview", "discover_literature", "discover_citation", "screening",
+            "library_pool", "library_downloader", "evidence_methodology",
+            "evidence_export", "notes", "researchers", "guide",
+        }
+        registered = {p[0] for s in VP.SECTIONS for p in s["pages"]}
+        self.assertEqual(registered, documented)
 
     def test_export_center_datasets_exclude_researchers(self):
         from app_pages import export_center

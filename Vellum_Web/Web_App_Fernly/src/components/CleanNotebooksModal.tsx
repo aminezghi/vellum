@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import { db } from "@/lib/db";
-import { AlertTriangle, Trash2, X } from "lucide-react";
+import { AlertTriangle, Trash2 } from "lucide-react";
+import { Modal } from "@/components/Modal";
 
 interface CleanNotebooksModalProps {
   isOpen: boolean;
@@ -50,39 +51,24 @@ export function CleanNotebooksModal({
   const isConfirmed = cleanMode === "empty" || confirmText.toLowerCase() === "delete";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="fernly-card relative w-full max-w-md p-6 sm:p-7 space-y-5">
-        {/* Header */}
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--rose-bg)] text-[var(--rose)] border border-[var(--rose)]/30">
-              <AlertTriangle className="h-5 w-5" />
-            </div>
-            <div>
-              <h3 className="text-base font-bold text-[var(--ink)] tracking-tight">
-                Clean Research Workspace
-              </h3>
-              <p className="text-xs text-[var(--muted)] font-medium">
-                Manage and reset local IndexedDB storage
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-full text-[var(--faint)] hover:text-[var(--ink)] hover:bg-[var(--panel)] transition-colors cursor-pointer"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Clean Research Workspace"
+      subtitle="Manage and reset local IndexedDB storage"
+      icon={<AlertTriangle className="h-5 w-5" />}
+      panelClassName="max-w-md space-y-5"
+    >
         {/* Clean Mode Selector */}
         <div className="space-y-2.5">
-          <label className="text-xs font-semibold text-[var(--muted)]">
+          <span className="block text-xs font-semibold text-[var(--muted)]">
             Select Cleaning Scope:
-          </label>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+          </span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs" role="radiogroup" aria-label="Cleaning scope">
             <button
               type="button"
+              role="radio"
+              aria-checked={cleanMode === "all"}
               onClick={() => setCleanMode("all")}
               className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
                 cleanMode === "all"
@@ -92,7 +78,7 @@ export function CleanNotebooksModal({
             >
               <div className="flex items-center justify-between mb-1">
                 <span>Wipe All ({totalNotebooks})</span>
-                <Trash2 className="h-3.5 w-3.5 text-[var(--rose)]" />
+                <Trash2 className="h-3.5 w-3.5 text-[var(--rose)]" aria-hidden="true" />
               </div>
               <p className="text-[10px] text-[var(--faint)] font-normal">
                 Reset entire local database to fresh state.
@@ -101,6 +87,8 @@ export function CleanNotebooksModal({
 
             <button
               type="button"
+              role="radio"
+              aria-checked={cleanMode === "empty"}
               onClick={() => setCleanMode("empty")}
               className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
                 cleanMode === "empty"
@@ -110,7 +98,7 @@ export function CleanNotebooksModal({
             >
               <div className="flex items-center justify-between mb-1">
                 <span>Empty Vaults Only</span>
-                <Trash2 className="h-3.5 w-3.5 text-[var(--g-700)]" />
+                <Trash2 className="h-3.5 w-3.5 text-[var(--g-700)]" aria-hidden="true" />
               </div>
               <p className="text-[10px] text-[var(--faint)] font-normal">
                 Prune projects with 0 saved papers.
@@ -122,11 +110,12 @@ export function CleanNotebooksModal({
         {/* Confirmation Input for "Wipe All" */}
         {cleanMode === "all" && (
           <div className="space-y-1.5 p-3.5 rounded-2xl bg-[var(--rose-bg)] border border-[var(--rose)]/30">
-            <label className="text-xs font-semibold text-[var(--rose)] flex items-center justify-between">
-              <span>Type "delete" to confirm:</span>
+            <label htmlFor="clean-confirm" className="text-xs font-semibold text-[var(--rose)] flex items-center justify-between">
+              <span>Type &quot;delete&quot; to confirm:</span>
               <span className="text-[10px] font-normal text-[var(--rose)]/80">Irreversible local action</span>
             </label>
             <input
+              id="clean-confirm"
               type="text"
               value={confirmText}
               onChange={(e) => setConfirmText(e.target.value)}
@@ -154,7 +143,6 @@ export function CleanNotebooksModal({
             {cleaning ? "Purging..." : "Confirm & Clean"}
           </button>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }

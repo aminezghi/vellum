@@ -328,6 +328,61 @@ html.dark ::selection {
   border-color: rgba(31, 111, 168, 0.2);
 }
 
+/* ---------------------------------------------------------------------------
+   Accessibility
+   --------------------------------------------------------------------------- */
+
+/* A visible focus ring on everything that can take focus.
+   The app has no :focus-visible rule of its own, so a keyboard user had no
+   way of telling where they were. */
+:focus-visible {
+  outline: 2px solid var(--g-600);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Inputs draw their own ring, so the generic outline would double up. */
+.fernly-input:focus,
+.fernly-input:focus-visible {
+  outline: none;
+  border-color: var(--g-600);
+  box-shadow: 0 0 0 3px rgba(39, 134, 90, 0.18);
+}
+
+/* Respect the operating system's "reduce motion" setting. The interface uses
+   a lot of movement - hover lifts, fades, pulses - which is a problem for
+   people with vestibular sensitivity. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* A pulsing loading indicator would otherwise keep pulsing forever. */
+  .animate-pulse {
+    animation: none !important;
+    opacity: 0.7;
+  }
+}
+
+/* Screen-reader-only helper for content that should be announced but not
+   shown. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
 /* Fernly Inputs */
 .fernly-input {
   background: var(--panel);

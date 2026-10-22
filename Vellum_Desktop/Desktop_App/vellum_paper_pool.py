@@ -20,6 +20,7 @@ import streamlit as st
 import vellum_workspace as VW
 import vellum_direct_download as VDD
 import vellum_citation_export as VCE
+import vellum_pages
 
 
 def _clean_html(html_str: str) -> str:
@@ -183,9 +184,7 @@ def render_paper_card(
         with c_act3:
             if st.button("🕸️ Lineage", key=f"{key_prefix}_cg_{index}", width="stretch", help="Explore upstream references & downstream citations"):
                 st.session_state["_cg_pending_target"] = doi or title
-                st.session_state["_active_tab"] = "discover"
-                st.session_state["_discover_subview"] = "🕸️ Citation Network"
-                st.rerun()
+                vellum_pages.go("discover_citation")
 
         # 4. Single Paper Citation Export
         with c_act4:

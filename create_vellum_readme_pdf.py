@@ -1,6 +1,6 @@
 """
 create_vellum_readme_pdf.py — Generates a comprehensive, publication-grade README PDF
-for Vellum Desktop V2.0 (Fernly Botanical Bento Edition).
+for Vellum Desktop V2.1 (Fernly Botanical Bento Edition).
 """
 
 from pathlib import Path
@@ -20,7 +20,7 @@ from reportlab.platypus import (
 )
 from reportlab.pdfgen import canvas
 
-PDF_PATH = Path(__file__).resolve().parent / "Vellum_Desktop" / "README_VELLUM_DESKTOP_V2.0.pdf"
+PDF_PATH = Path(__file__).resolve().parent / "Vellum_Desktop" / "README_VELLUM_DESKTOP_V2.1.pdf"
 
 # Fernly Botanical Bento Palette
 COLOR_PINE = colors.HexColor("#1b4332")
@@ -59,7 +59,7 @@ class NumberedCanvas(canvas.Canvas):
         if self._pageNumber > 1:
             self.setFont("Helvetica-Bold", 8)
             self.setFillColor(COLOR_SAGE)
-            self.drawString(54, 750, "VELLUM DESKTOP V2.0")
+            self.drawString(54, 750, "VELLUM DESKTOP V2.1")
             self.setFont("Helvetica", 8)
             self.setFillColor(COLOR_TEXT_MUTED)
             self.drawString(160, 750, "|   Academic Literature Suite — Fernly Botanical Bento Edition")
@@ -174,8 +174,8 @@ def build_pdf():
     # ── HERO / HEADER BANNER ──────────────────────────────────────────────────
     hero_data = [
         [
-            Paragraph("<b>VELLUM DESKTOP V2.0</b>", title_style),
-            Paragraph("<b>RELEASE</b><br/>v2.0-STABLE", ParagraphStyle("Badge", fontName="Helvetica-Bold", fontSize=9, leading=12, textColor=colors.white, alignment=1)),
+            Paragraph("<b>VELLUM DESKTOP V2.1</b>", title_style),
+            Paragraph("<b>RELEASE</b><br/>v2.1-STABLE", ParagraphStyle("Badge", fontName="Helvetica-Bold", fontSize=9, leading=12, textColor=colors.white, alignment=1)),
         ],
         [
             Paragraph("Academic Literature Discovery, Systematic Review Screening & Citation Analysis Workbench<br/><b>Fernly Botanical Bento Edition</b>", subtitle_style),
@@ -201,7 +201,7 @@ def build_pdf():
     # ── 1. EXECUTIVE SUMMARY & ARCHITECTURE ───────────────────────────────────
     story.append(Paragraph("1. Executive Summary & Core Philosophy", h1_style))
     story.append(Paragraph(
-        "<b>Vellum Desktop V2.0</b> is a self-contained, privacy-first academic research suite designed for researchers, clinicians, and literature synthesis methodologists. "
+        "<b>Vellum Desktop V2.1</b> is a self-contained, privacy-first academic research suite designed for researchers, clinicians, and literature synthesis methodologists. "
         "Unlike commercial web platforms that lock bibliographies into proprietary clouds, Vellum operates <b>100% locally on your machine</b>. "
         "Your research vaults, screening decisions, and PDF libraries never leave your local filesystem.",
         body_style,
@@ -245,12 +245,12 @@ def build_pdf():
     story.append(Paragraph("<b>Step 3:</b> Your default browser will launch automatically to the interface:", bullet_style))
     story.append(Paragraph("<code>http://localhost:8501</code>", code_style))
 
-    story.append(Paragraph("<b>Prefer the installer?</b> Double-click <code>Vellum-Desktop-V2.0-Setup-x64.exe</code> — it installs per-user, needs no administrator rights and no Python.", bullet_style))
+    story.append(Paragraph("<b>Prefer the installer?</b> Double-click <code>Vellum-Desktop-V2.1-Setup-x64.exe</code> — it installs per-user, needs no administrator rights and no Python.", bullet_style))
     story.append(Paragraph(
         "<b>First run:</b> the installer is not code-signed, so Windows SmartScreen shows "
         "\u201cWindows protected your PC\u201d. Choose <b>More info \u2192 Run anyway</b>. To confirm the "
         "file you received is the one that was built, run "
-        "<code>certutil -hashfile Vellum-Desktop-V2.0-Setup-x64.exe SHA256</code> and compare it with "
+        "<code>certutil -hashfile Vellum-Desktop-V2.1-Setup-x64.exe SHA256</code> and compare it with "
         "<code>DISTRIBUTABLES\\SHA256SUMS.txt</code>.",
         bullet_style,
     ))
@@ -342,7 +342,7 @@ def build_pdf():
     # ── 6. DIRECTORY STRUCTURE & COLLABORATION GUIDELINES ────────────────────
     story.append(Paragraph("6. Project Directory Structure & Collaboration", h1_style))
     story.append(Paragraph(
-        "When sharing Vellum Desktop V2.0 with colleagues, simply provide the standalone archive. "
+        "When sharing Vellum Desktop V2.1 with colleagues, simply provide the standalone archive. "
         "The project structure is organized as follows:",
         body_style,
     ))
@@ -350,10 +350,10 @@ def build_pdf():
     tree_text = (
         "PDF_Downloader_Dual_Pack/\n"
         "  ├── Vellum_Desktop/                 <-- Application 1, self-contained\n"
-        "  │     ├── Vellum-Desktop-V2.0-Setup-x64.exe  <-- Windows installer\n"
+        "  │     ├── Vellum-Desktop-V2.1-Setup-x64.exe  <-- Windows installer\n"
         "  │     ├── CLICK_TO_RUN_VELLUM_DESKTOP.bat   <-- 1-Click main launcher\n"
         "  │     ├── 1_launch_desktop_app.bat          <-- Alternative launcher\n"
-        "  │     ├── README_VELLUM_DESKTOP_V2.0.pdf    <-- This documentation\n"
+        "  │     ├── README_VELLUM_DESKTOP_V2.1.pdf    <-- This documentation\n"
         "  │     └── Desktop_App/\n"
         "  │           ├── pdf_downloader_app.py       <-- Main application router\n"
         "  │           ├── vellum_theme.py             <-- Fernly Botanical Bento theme\n"
@@ -376,7 +376,7 @@ def build_pdf():
     # ── 7. VERIFICATION & QUALITY ASSURANCE ──────────────────────────────────
     story.append(Paragraph("7. Quality Assurance & Test Verification", h1_style))
     story.append(Paragraph(
-        "Vellum Desktop V2.0 is rigorously tested with automated unit and regression suites:",
+        "Vellum Desktop V2.1 is rigorously tested with automated unit and regression suites:",
         body_style,
     ))
     story.append(Paragraph("• <b>Test Command:</b> <code>Desktop_App\\.venv\\Scripts\\python.exe -m pytest -o pythonpath=Desktop_App Desktop_App\\tests -v</code>", bullet_style))

@@ -1,7 +1,7 @@
 # 🍃 Vellum — Academic Research Suite (Windows)
 
 > **Author & Lead Architect:** Amine Zouaghi
-> **Edition:** Vellum Desktop V2.0 + Vellum Web — Fernly Botanical Bento
+> **Edition:** Vellum Desktop V2.1 + Vellum Web — Fernly Botanical Bento
 > **Platform:** Windows 10 / Windows 11 (64-bit)
 > **License:** Free & Open-Access Academic Tool (MIT)
 
@@ -22,7 +22,7 @@ interactive exploration.
 Run the installer in the **`Vellum_Desktop\`** folder:
 
 ```
-Vellum_Desktop\Vellum-Desktop-V2.0-Setup-x64.exe
+Vellum_Desktop\Vellum-Desktop-V2.1-Setup-x64.exe
 ```
 
 It installs to `%LOCALAPPDATA%\Programs\Vellum Desktop` — **no administrator rights required**.
@@ -32,7 +32,7 @@ uninstaller. The installed app needs **no Python**.
 > **First run:** the installer is not code-signed, so Windows SmartScreen shows
 > *"Windows protected your PC"*. Click **More info → Run anyway**. To confirm the
 > file you received is the one that was built, compare
-> `certutil -hashfile Vellum-Desktop-V2.0-Setup-x64.exe SHA256` with the hash in
+> `certutil -hashfile Vellum-Desktop-V2.1-Setup-x64.exe SHA256` with the hash in
 > `DISTRIBUTABLES\SHA256SUMS.txt`.
 
 ### Option B — Run straight from source
@@ -71,7 +71,7 @@ and `Vellum_Web\` — and neither depends on the other.
 
 ---
 
-## 🖥️ Application 1 — Vellum Desktop V2.0 (Fernly Botanical Bento)
+## 🖥️ Application 1 — Vellum Desktop V2.1 (Fernly Botanical Bento)
 
 **Port:** `http://localhost:8501` · **Engine:** Python 3.13 + Streamlit + PyInstaller
 
@@ -79,7 +79,7 @@ A native single-window workbench (WebView2, no browser chrome) for the heavy lif
 
 | Module | What it does |
 | :--- | :--- |
-| 🧪 **Active-Learning Screening** | ASReview-style ranking (TF-IDF + Naive Bayes), 3-tier deduplication (DOI / Title / token Jaccard > 0.88), stopping heuristics at ≥95 % estimated recall, keyboard shortcuts (`I` / `E` / `U` / `Skip`) |
+| 🧪 **Active-Learning Screening** | ASReview-style ranking (TF-IDF + Naive Bayes), 3-tier deduplication (DOI / Title / token Jaccard > 0.88), stopping heuristics at ≥95 % estimated recall, and **working keyboard shortcuts** (`I` include · `E` exclude · `U` undo · `S` skip) that fire anywhere on the page and stand down while you are typing |
 | 🕸️ **Citation Force Graph** | D3 force-directed network with origin halo, year-gradient colouring, prior/derivative works, direct Connected Papers links |
 | 🔍 **LitCheck Multi-Source Search** | Parallel queries across OpenAlex, arXiv, PubMed, Crossref with full boolean syntax; 3 000+ records deduplicated in ~1.6 s |
 | 📥 **Batch PDF Harvester** | Multi-tier open-access retrieval (Unpaywall, PubMed Central, arXiv) with paywall-HTML rejection and normalised naming |
@@ -90,8 +90,12 @@ A native single-window workbench (WebView2, no browser chrome) for the heavy lif
 Your work lives in `~\Vellum_Research_Vault\` — outside the install directory, so uninstalling
 never touches your data.
 
-**10 pages:** Welcome Hub · Project Overview · Screening · Analysis · Citation Graph ·
-Researchers · Library · Notes · Export Center · Help
+**11 screens, each with its own address.** The address bar follows you, the
+browser's Back button works, and any screen can be linked to directly:
+
+`/` · `/discover_literature` · `/discover_citation` · `/screening` ·
+`/library_pool` · `/library_downloader` · `/evidence_methodology` ·
+`/evidence_export` · `/notes` · `/researchers` · `/guide`
 
 ---
 
@@ -108,6 +112,7 @@ The browser studio for visual, interactive research:
 - **Tri-pane grounded workspace** — corpus, document reader (grounded + native PDF), synthesis notes
 - **Notebooks** — persisted locally in IndexedDB; no account, no cloud, no telemetry
 - **Design switcher** — Apple Fluid ↔ Wispr Flow, plus dark/light modes
+- **Accessible by construction** — every dialog is a real `role="dialog"` with focus trapping and Escape to dismiss; search results are announced to screen readers; the interface honours `prefers-reduced-motion`; every focusable element has a visible focus ring
 
 > **Why port 3002?** It is the original Fernly origin. Keeping it means any notebooks and
 > screening sessions already saved in your browser stay exactly where they are.
@@ -121,6 +126,9 @@ PDF_Downloader_Dual_Pack/
 ├── Vellum_Desktop/                        ← APPLICATION 1 (self-contained)
 │   ├── Desktop_App/                       ←   source + bundled venv + compiled bundle
 │   │   ├── pdf_downloader_app.py          ←   main application
+│   │   ├── vellum_pages.py                ←   the page registry (every screen has a URL)
+│   │   ├── vellum_keyboard.py             ←   global keyboard shortcuts
+│   │   ├── keyboard_component/             ←   the shortcut listener's frontend
 │   │   ├── app_pages/                     ←   the 10 Streamlit pages
 │   │   ├── vellum_*.py                    ←   feature modules
 │   │   ├── tests/                         ←   pytest suite + page smoke test
@@ -128,14 +136,14 @@ PDF_Downloader_Dual_Pack/
 │   │   ├── build_vellum_windows.spec      ←   PyInstaller spec
 │   │   ├── installer.iss                  ←   Inno Setup script
 │   │   └── dist/Vellum/                   ←   compiled portable bundle
-│   ├── Vellum-Desktop-V2.0-Setup-x64.exe  ←   the installer
+│   ├── Vellum-Desktop-V2.1-Setup-x64.exe  ←   the installer
 │   ├── Vellum_Standalone_Windows_x64.zip  ←   portable compiled bundle
-│   ├── Vellum_Desktop_V2.0_Botanical_Bento.zip ← source drop for colleagues
+│   ├── Vellum_Desktop_V2.1_Botanical_Bento.zip ← source drop for colleagues
 │   ├── 1_launch_desktop_app.bat           ←   desktop (from source)
 │   ├── CLICK_TO_RUN_VELLUM_DESKTOP.bat    ←   desktop, auto-configuring launcher
 │   ├── CLICK_TO_RUN_STANDALONE_EXE.bat    ←   desktop, compiled binary
 │   ├── README.md                          ←   desktop manual (this app)
-│   └── README_VELLUM_DESKTOP_V2.0.pdf     ←   printable manual
+│   └── README_VELLUM_DESKTOP_V2.1.pdf     ←   printable manual
 ├── Vellum_Web/                            ← APPLICATION 2 (self-contained)
 │   ├── Web_App_Fernly/                    ←   source (port 3002)
 │   │   ├── src/app, src/components, src/lib
@@ -149,6 +157,7 @@ PDF_Downloader_Dual_Pack/
 ├── 3_launch_both_apps.bat                 ← launches both together
 ├── tools/                                 ← build + verification scripts
 ├── BUILDING.md                            ← how the artefacts are built and proved
+├── CHANGELOG.md                           ← what changed in each version
 ├── RELEASE_REPORT.md                      ← latest verification results
 ├── DISTRIBUTABLES/SHA256SUMS.txt           ← hashes of everything shipped
 ├── readme.md                              ← this file
@@ -198,7 +207,7 @@ on the author's machine. See **`BUILDING.md`** for the full release procedure.
 ## 🔐 Verifying what you received
 
 ```powershell
-certutil -hashfile Vellum-Desktop-V2.0-Setup-x64.exe SHA256
+certutil -hashfile Vellum-Desktop-V2.1-Setup-x64.exe SHA256
 ```
 
 Compare with `DISTRIBUTABLES\SHA256SUMS.txt`. The web share folder carries its

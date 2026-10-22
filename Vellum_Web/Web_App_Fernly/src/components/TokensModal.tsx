@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Key, ShieldCheck, Check, X, Sparkles, ExternalLink } from "lucide-react";
+import { Key, ShieldCheck, Check, ExternalLink } from "lucide-react";
 import { STORAGE_KEYS } from "@/lib/storageNamespace";
+import { Modal } from "@/components/Modal";
 
 export interface CustomTokens {
   openAlexToken: string;
@@ -68,34 +69,17 @@ export function TokensModal({ isOpen, onClose, onSave }: TokensModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="fernly-card relative w-full max-w-lg p-6 sm:p-7 space-y-5 max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--g-100)] text-[var(--g-700)] border border-[var(--g-400)]/30 shadow-xs">
-              <Key className="h-5 w-5" />
-            </div>
-            <div>
-              <h3 className="text-base font-bold text-[var(--ink)] tracking-tight">
-                API Keys &amp; Provider Tokens
-              </h3>
-              <p className="text-xs text-[var(--muted)] font-medium">
-                Increase rate limits &amp; unlock fast-lane queries
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-full text-[var(--faint)] hover:text-[var(--ink)] hover:bg-[var(--panel)] transition-colors cursor-pointer"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="API Keys & Provider Tokens"
+      subtitle="Increase rate limits & unlock fast-lane queries"
+      icon={<Key className="h-5 w-5" />}
+      panelClassName="max-w-lg space-y-5 max-h-[90vh] overflow-y-auto"
+    >
         {/* Privacy Note */}
         <div className="p-3.5 rounded-2xl bg-[var(--g-100)] border border-[var(--g-400)]/30 flex items-start gap-2.5">
-          <ShieldCheck className="h-4 w-4 text-[var(--g-700)] flex-shrink-0 mt-0.5" />
+          <ShieldCheck className="h-4 w-4 text-[var(--g-700)] flex-shrink-0 mt-0.5" aria-hidden="true" />
           <div className="text-[11px] text-[var(--g-800)] leading-relaxed font-medium">
             <p>
               <strong>100% Client-Side Privacy:</strong> Your keys are saved only in your local browser and sent directly to academic providers.
@@ -108,7 +92,7 @@ export function TokensModal({ isOpen, onClose, onSave }: TokensModalProps) {
           {/* OpenAlex Token */}
           <div className="space-y-1">
             <div className="flex items-center justify-between">
-              <label className="font-semibold text-[var(--muted)] flex items-center gap-1.5">
+              <label htmlFor="tok-openalex" className="font-semibold text-[var(--muted)] flex items-center gap-1.5">
                 <span>OpenAlex Premium Token</span>
                 <span className="text-[10px] text-[var(--faint)] font-normal">(Optional)</span>
               </label>
@@ -119,10 +103,11 @@ export function TokensModal({ isOpen, onClose, onSave }: TokensModalProps) {
                 className="text-[10px] text-[var(--g-700)] hover:underline inline-flex items-center gap-0.5"
               >
                 <span>openalex.org</span>
-                <ExternalLink className="h-2.5 w-2.5" />
+                <ExternalLink className="h-2.5 w-2.5" aria-hidden="true" />
               </a>
             </div>
             <input
+              id="tok-openalex"
               type="password"
               value={tokens.openAlexToken}
               onChange={(e) => setTokens({ ...tokens, openAlexToken: e.target.value })}
@@ -134,7 +119,7 @@ export function TokensModal({ isOpen, onClose, onSave }: TokensModalProps) {
           {/* Semantic Scholar API Key */}
           <div className="space-y-1">
             <div className="flex items-center justify-between">
-              <label className="font-semibold text-[var(--muted)] flex items-center gap-1.5">
+              <label htmlFor="tok-s2" className="font-semibold text-[var(--muted)] flex items-center gap-1.5">
                 <span>Semantic Scholar API Key</span>
                 <span className="text-[10px] text-[var(--faint)] font-normal">(Optional)</span>
               </label>
@@ -145,10 +130,11 @@ export function TokensModal({ isOpen, onClose, onSave }: TokensModalProps) {
                 className="text-[10px] text-[var(--g-700)] hover:underline inline-flex items-center gap-0.5"
               >
                 <span>semanticscholar.org</span>
-                <ExternalLink className="h-2.5 w-2.5" />
+                <ExternalLink className="h-2.5 w-2.5" aria-hidden="true" />
               </a>
             </div>
             <input
+              id="tok-s2"
               type="password"
               value={tokens.semanticScholarKey}
               onChange={(e) => setTokens({ ...tokens, semanticScholarKey: e.target.value })}
@@ -160,13 +146,14 @@ export function TokensModal({ isOpen, onClose, onSave }: TokensModalProps) {
           {/* Crossref Polite Email */}
           <div className="space-y-1">
             <div className="flex items-center justify-between">
-              <label className="font-semibold text-[var(--muted)] flex items-center gap-1.5">
-                <span>Crossref "Polite Pool" Email</span>
+              <label htmlFor="tok-crossref" className="font-semibold text-[var(--muted)] flex items-center gap-1.5">
+                <span>Crossref &quot;Polite Pool&quot; Email</span>
                 <span className="text-[10px] text-[var(--faint)] font-normal">(Recommended)</span>
               </label>
               <span className="text-[10px] text-[var(--faint)] font-mono">10x rate boost</span>
             </div>
             <input
+              id="tok-crossref"
               type="email"
               value={tokens.crossrefEmail}
               onChange={(e) => setTokens({ ...tokens, crossrefEmail: e.target.value })}
@@ -178,13 +165,14 @@ export function TokensModal({ isOpen, onClose, onSave }: TokensModalProps) {
           {/* NCBI / PubMed API Key */}
           <div className="space-y-1">
             <div className="flex items-center justify-between">
-              <label className="font-semibold text-[var(--muted)] flex items-center gap-1.5">
+              <label htmlFor="tok-ncbi" className="font-semibold text-[var(--muted)] flex items-center gap-1.5">
                 <span>NCBI / PubMed API Key</span>
                 <span className="text-[10px] text-[var(--faint)] font-normal">(Optional)</span>
               </label>
-              <span className="text-[10px] text-[var(--faint)] font-mono">3 req/s → 10 req/s</span>
+              <span className="text-[10px] text-[var(--faint)] font-mono">3 req/s &rarr; 10 req/s</span>
             </div>
             <input
+              id="tok-ncbi"
               type="password"
               value={tokens.ncbiApiKey}
               onChange={(e) => setTokens({ ...tokens, ncbiApiKey: e.target.value })}
@@ -219,7 +207,7 @@ export function TokensModal({ isOpen, onClose, onSave }: TokensModalProps) {
             >
               {savedSuccess ? (
                 <>
-                  <Check className="h-3.5 w-3.5 text-[#5dbd8b]" />
+                  <Check className="h-3.5 w-3.5 text-[#5dbd8b]" aria-hidden="true" />
                   <span>Saved!</span>
                 </>
               ) : (
@@ -228,7 +216,6 @@ export function TokensModal({ isOpen, onClose, onSave }: TokensModalProps) {
             </button>
           </div>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }

@@ -8,7 +8,6 @@ import { TokensModal } from "./TokensModal";
 import {
   Search,
   SlidersHorizontal,
-  FileText,
   Download,
   BookmarkPlus,
   BookOpen,
@@ -16,10 +15,7 @@ import {
   ChevronDown,
   ChevronUp,
   ExternalLink,
-  Layers,
   Zap,
-  CheckCircle2,
-  AlertCircle,
   Key,
   Database,
   Filter,
@@ -29,7 +25,6 @@ import {
   GraduationCap,
   X,
   Plus,
-  Trash2,
   GitFork,
   Code2,
 } from "lucide-react";
@@ -556,7 +551,9 @@ export function AcademicSearchHub({
           className="btn-fernly-primary px-6 py-3 rounded-full text-xs sm:text-sm font-semibold shadow-xs disabled:opacity-50 transition-all cursor-pointer flex-shrink-0 flex items-center gap-2"
         >
           {loading ? (
-            <span className="animate-pulse">Searching...</span>
+            <span className="animate-pulse" role="status" aria-live="polite">
+              Searching academic sources...
+            </span>
           ) : (
             <>
               <span>Search</span>
@@ -929,10 +926,16 @@ export function AcademicSearchHub({
         </div>
       )}
 
-      {/* Results Header */}
+      {/* Results Header
+          The count is inside a live region: without it, a screen-reader user
+          who starts a search is told nothing when the results arrive. */}
       {totalCount !== null && (
         <div className="mt-6 pt-4 border-t border-[var(--card-bdr)] flex items-center justify-between">
-          <span className="text-xs font-semibold text-[var(--ink)]">
+          <span
+            className="text-xs font-semibold text-[var(--ink)]"
+            role="status"
+            aria-live="polite"
+          >
             {results.length} papers retrieved across {selectedSources.length} sources
             {openAccessOnly && " (Open Access prioritized)"}
           </span>

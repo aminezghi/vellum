@@ -203,7 +203,7 @@ def build_pdf(filename="README_FOR_COLLEAGUES.pdf"):
     ))
 
     editions = [
-        "<b>Vellum Desktop V2.0 — Fernly Botanical Bento (Port 8501):</b> Native Python/Streamlit workbench capable of parallel downloading 10,000+ DOIs, deduplicating Scopus/WoS/PubMed exports, active-learning screening, citation-force-graph exploration, and local PDF vault management.",
+        "<b>Vellum Desktop V2.1 — Fernly Botanical Bento (Port 8501):</b> Native Python/Streamlit workbench capable of parallel downloading 10,000+ DOIs, deduplicating Scopus/WoS/PubMed exports, active-learning screening, citation-force-graph exploration, and local PDF vault management.",
         "<b>Vellum Web — Fernly Botanical Bento (Port 3002):</b> Flagship web workspace featuring the Connected Papers interactive network canvas, ASReview active-learning screening, visual clause-by-clause boolean search, batch multi-tier PDF downloader, and tri-pane systematic notebooks.",
     ]
     for ed in editions:
@@ -272,7 +272,7 @@ def build_pdf(filename="README_FOR_COLLEAGUES.pdf"):
     launch_data = [
         [Paragraph("File to Double-Click", table_header_style), Paragraph("Target Application", table_header_style), Paragraph("Local URL & Action", table_header_style)],
         [
-            Paragraph("<b>Vellum_Desktop\\Vellum-Desktop-V2.0-Setup-x64.exe</b>", code_style),
+            Paragraph("<b>Vellum_Desktop\\Vellum-Desktop-V2.1-Setup-x64.exe</b>", code_style),
             Paragraph("Vellum Desktop Installer", table_cell_style),
             Paragraph("Installs per-user, no admin rights • Start Menu + uninstaller", table_cell_style),
         ],
@@ -288,7 +288,7 @@ def build_pdf(filename="README_FOR_COLLEAGUES.pdf"):
         ],
         [
             Paragraph("<b>Vellum_Desktop\\1_launch_desktop_app.bat</b>", code_style),
-            Paragraph("Vellum Desktop V2.0 Workbench", table_cell_style),
+            Paragraph("Vellum Desktop V2.1 Workbench", table_cell_style),
             Paragraph("<code>http://localhost:8501</code> • High-volume batch PDF extraction", table_cell_style),
         ],
         [
@@ -318,7 +318,7 @@ def build_pdf(filename="README_FOR_COLLEAGUES.pdf"):
         "<b>First run of the installer:</b> it is not code-signed, so Windows SmartScreen shows "
         "\u201cWindows protected your PC\u201d. Choose <b>More info \u2192 Run anyway</b>. To confirm "
         "the file you received is the one that was built, run "
-        "<code>certutil -hashfile Vellum-Desktop-V2.0-Setup-x64.exe SHA256</code> and compare it with "
+        "<code>certutil -hashfile Vellum-Desktop-V2.1-Setup-x64.exe SHA256</code> and compare it with "
         "<code>DISTRIBUTABLES\\SHA256SUMS.txt</code>.",
         body_style,
     ))

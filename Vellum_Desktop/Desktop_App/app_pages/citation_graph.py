@@ -17,6 +17,7 @@ import streamlit as st
 import citation_core as CC
 import vellum_brand as VB
 import vellum_theme as VT
+import vellum_pages
 
 
 def render():
@@ -366,7 +367,7 @@ def _render_inspector(paper: Dict[str, Any], graph_data: Dict[str, Any], dark: b
             AS.save_screening_sessions(sessions)
             st.session_state["_active_tab"] = "screening"
             st.toast("✅ Paper added to ASReview Screening queue!", icon="🧪")
-            st.rerun()
+            vellum_pages.go("screening")
 
     import vellum_paper_actions
     vellum_paper_actions.render_paper_action_bar(

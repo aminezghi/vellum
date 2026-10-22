@@ -18,8 +18,9 @@ import {
   GitFork,
 } from "lucide-react";
 import { STORAGE_KEYS } from "@/lib/storageNamespace";
+import { AccentPicker, type FernlyAccent } from "@/components/AccentPicker";
 
-export type FernlyAccent = "emerald" | "ocean" | "plum" | "ember";
+export type { FernlyAccent };
 
 interface HeaderProps {
   activeTab: string;
@@ -121,13 +122,6 @@ export function Header({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  const accentColors: { id: FernlyAccent; name: string; color: string }[] = [
-    { id: "emerald", name: "Fernly Emerald", color: "#1d7347" },
-    { id: "ocean", name: "Deep Ocean", color: "#1f4fa8" },
-    { id: "plum", name: "Royal Plum", color: "#6a3fb0" },
-    { id: "ember", name: "Warm Ember", color: "#b1491d" },
-  ];
-
   return (
     <header className="sticky top-0 z-40 w-full bg-[var(--panel)]/95 backdrop-blur-md border-b border-[var(--hair)] transition-all duration-200">
       <div className="w-full px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-between gap-2 sm:gap-4 overflow-hidden">
@@ -203,21 +197,9 @@ export function Header({
             </kbd>
           </div>
 
-          {/* Fernly 4-Accent Swatch Picker */}
-          <div className="hidden sm:flex items-center gap-1 p-1 bg-[var(--card)] rounded-full border border-[var(--hair)]" title="Choose Fernly Accent Colorway">
-            {accentColors.map((acc) => (
-              <button
-                key={acc.id}
-                onClick={() => handleAccentChange(acc.id)}
-                className={`w-4.5 h-4.5 rounded-full transition-transform cursor-pointer ${
-                  activeAccent === acc.id
-                    ? "ring-2 ring-[var(--ink)] scale-110 shadow-xs"
-                    : "opacity-75 hover:opacity-100 hover:scale-105"
-                }`}
-                style={{ backgroundColor: acc.color }}
-                title={acc.name}
-              />
-            ))}
+          {/* Fernly accent colourway - one control, four options */}
+          <div className="hidden sm:block">
+            <AccentPicker value={activeAccent} onChange={handleAccentChange} />
           </div>
 
           {/* Theme Mode Toggle (☀️ Day Sage / 🌙 Night Forest) */}
