@@ -166,7 +166,7 @@ source drop is `Vellum_Desktop_V2.1_Botanical_Bento.zip`.
 ### Changed — release engineering
 
 - Every artefact is now produced by a script in `tools/` and hashed.
-- `tools/verify_release.py` runs 26 checks, including a clean-room install of
+- `tools/verify_release.py` runs 36 checks, including a clean-room install of
   the installer (install → boot the installed binary → health check →
   uninstall) and a relocation test of the web package (copy to a random path
   → launch → live API calls → stop).
