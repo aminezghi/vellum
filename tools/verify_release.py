@@ -159,9 +159,18 @@ def check_hygiene(rep: Report) -> None:
 
     t = time.time()
     code, out = run_cmd(["git", "status", "--porcelain"], cwd=REPO_ROOT)
-    dirty = [ln for ln in out.splitlines() if ln.strip() and not ln.startswith("??")]
+    # This harness writes RELEASE_REPORT.md and DISTRIBUTABLES/SHA256SUMS.txt
+    # itself, so those two are expected to change between runs and must not
+    # count as a dirty tree.
+    generated = ("RELEASE_REPORT.md", "DISTRIBUTABLES/")
+    dirty = [
+        ln for ln in out.splitlines()
+        if ln.strip() and not ln.startswith("??")
+        and not any(g in ln for g in generated)
+    ]
     rep.add("git working tree is clean", code == 0 and not dirty,
-            "" if not dirty else f"{len(dirty)} modified file(s)", dt=time.time() - t)
+            "" if not dirty else f"{len(dirty)} modified file(s): {dirty[:3]}",
+            dt=time.time() - t)
 
     t = time.time()
     code, out = run_cmd(["git", "ls-files"], cwd=REPO_ROOT)
@@ -488,6 +497,7 @@ def write_artifacts(rep: Report) -> None:
         DESKTOP / "Vellum_Standalone_Windows_x64.zip",
         DESKTOP / "Vellum_Desktop_V2.0_Botanical_Bento.zip",
         WEB / "Vellum_Web_Fernly_Latest_Export.zip",
+        WEB / "Vellum_Web_Fernly_SHARE.zip",
     ]
     rows = []
     for t in targets:
