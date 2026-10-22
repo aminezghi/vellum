@@ -1,12 +1,12 @@
 # Vellum Release Verification Report
 
-- **Generated:** 2026-10-22 11:10:37
+- **Generated:** 2026-10-22 11:13:06
 - **Commit:** `unknown`
-- **Checks:** 34 passed, 1 failed, 0 skipped
+- **Checks:** 35 passed, 0 failed, 0 skipped
 
 | # | Check | Result | Detail |
 |---|---|---|---|
-| 1 | git working tree is clean | **FAIL** | 113 modified file(s): ['M  .github/workflows/release.yml', 'M  .gitignore', 'M  BUILDING.md'] |
+| 1 | git working tree is clean | **PASS** |  |
 | 2 | build-critical assets are tracked | **PASS** |  |
 | 3 | Windows launchers use CRLF endings | **PASS** |  |
 | 4 | pytest Desktop_App/tests | **PASS** | 84 passed |
@@ -24,7 +24,7 @@
 | 16 | SHA256SUMS.txt verifies every shipped file | **PASS** |  |
 | 17 | share folder copies to an arbitrary path | **PASS** | C:\Users\azoua\AppData\Local\Temp\vellum_verify\relocated\Vellum Web (copy) |
 | 18 | port 3002 is free before the launch | **PASS** |  |
-| 19 | launcher starts the studio (relocated) | **PASS** | HTTP 200 after 24.2s on port 3002 |
+| 19 | launcher starts the studio (relocated) | **PASS** | HTTP 200 after 15.5s on port 3002 |
 | 20 | launcher reported a real startup (not an early exit) | **PASS** | startup banner present |
 | 21 | the relocated copy is the one serving | **PASS** | process command line points at the relocated folder |
 | 22 | home page renders with the Vellum identity | **PASS** | HTTP 200, 28017 bytes |
