@@ -21,22 +21,54 @@ export function AddToNotebookModal({
   onClose,
   onAdded,
 }: AddToNotebookModalProps) {
-  const [selectedNotebookId, setSelectedNotebookId] = useState<string>(
-    notebooks.length > 0 ? notebooks[0].id : ""
+  // The dialog is mounted only while it is open, so its fields are seeded from
+  // the current paper and notebook list on every open. This component used to
+  // stay mounted for the app's lifetime, which meant its initialisers captured
+  // the props of the very first render — when `paper` was still null. The new
+  // project title therefore came up empty instead of prefilled, and the
+  // destination notebook could point at a project created after mount.
+  if (!isOpen || !paper) return null;
+  return (
+    <AddToNotebookDialog
+      paper={paper}
+      notebooks={notebooks}
+      onClose={onClose}
+      onAdded={onAdded}
+    />
   );
-  const [isCreatingNew, setIsCreatingNew] = useState(notebooks.length === 0);
-  const [newTitle, setNewTitle] = useState(paper ? `${paper.title.slice(0, 45)} Review` : "");
+}
+
+interface AddToNotebookDialogProps {
+  paper: AddablePaper;
+  notebooks: Notebook[];
+  onClose: () => void;
+  onAdded: (notebookId: string) => void;
+}
+
+function AddToNotebookDialog({
+  paper,
+  notebooks,
+  onClose,
+  onAdded,
+}: AddToNotebookDialogProps) {
+  const [selectedNotebookId, setSelectedNotebookId] = useState<string>(
+    () => notebooks[0]?.id ?? ""
+  );
+  const [isCreatingNew, setIsCreatingNew] = useState(() => notebooks.length === 0);
+  const [newTitle, setNewTitle] = useState(() => `${paper.title.slice(0, 45)} Review`);
   const [isSaving, setIsSaving] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  if (!isOpen || !paper) return null;
+  const canSave = !isCreatingNew || newTitle.trim().length > 0;
 
   const handleSave = async () => {
+    // Check before flipping `isSaving`, otherwise an empty title leaves the
+    // button stuck on "Saving..." forever with the dialog open.
+    if (!canSave) return;
     setIsSaving(true);
     let targetNotebookId = selectedNotebookId;
 
     if (isCreatingNew) {
-      if (!newTitle.trim()) return;
       const newNb: Notebook = {
         id: `nb-${Date.now()}`,
         title: newTitle.trim(),
@@ -90,7 +122,7 @@ export function AddToNotebookModal({
 
   return (
     <Modal
-      isOpen={isOpen}
+      isOpen={true}
       onClose={onClose}
       title="Save to Research Project"
       subtitle="Add reference & verbatim evidence to local vault"
@@ -190,7 +222,7 @@ export function AddToNotebookModal({
           </button>
           <button
             onClick={handleSave}
-            disabled={isSaving || success}
+            disabled={isSaving || success || !canSave}
             className="btn-fernly-primary !h-10 !px-5 !text-xs flex items-center gap-1.5"
           >
             {success ? (

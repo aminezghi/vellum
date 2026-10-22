@@ -139,6 +139,39 @@ decision and its undo written to IndexedDB and restored after a tab switch;
 a paper added from the in-workspace search with its journal intact; the
 Trends → Connected Graph hand-off; and a live `/api/download-pdf` call.
 
+### Fixed - three dialogs kept last time's answers
+
+The lint work asked why several dialogs copied external state into React in an
+effect. The answer, in three places, was that they were never unmounted: the
+dashboard renders them unconditionally and each one returned `null` *after* its
+hooks, so every field survived the close.
+
+- **Save to Research Project.** `newTitle` was seeded once, on the app's first
+  render, when `paper` was still `null` — so the new-project title box came up
+  **empty** instead of prefilled. Worse, `handleSave` set `isSaving` before
+  testing the empty title and then returned, leaving the button stuck on
+  "Saving..." with the dialog open and no way out but Cancel. The destination
+  notebook id was captured at the same first render, so a project created later
+  could leave the select pointing at an id that no longer existed, writing an
+  orphaned source. The dialog now mounts only while open (same pattern as the
+  tokens dialog), seeds its fields from the current paper and notebook list,
+  and disables Save — rather than soft-locking — when the title is blank.
+- **Create Research Project.** A cancelled or completed draft came back
+  pre-filled, files and emoji included, the next time the dialog opened. It now
+  starts blank every time, and a failed write reports itself instead of leaving
+  the button on "Creating..." forever.
+- **Clean Research Workspace.** After cancelling a wipe, reopening the dialog
+  still had `delete` typed into the confirmation box and "Wipe All" selected —
+  the destructive button was one stray click away, which defeats the point of
+  asking for the word. It now resets on every open.
+
+Checked in the browser: adding a search result created a project whose title was
+prefilled from the paper, kept its journal, closed cleanly; clearing the title
+left Save disabled with the label intact instead of "Saving..."; a second paper
+added to the existing vault landed in the same notebook and the count went
+1 → 2; a cancelled project draft reopened blank.
+
+
 ### Changed — the accent picker is one control, not four
 
 The header showed four colour swatches side by side — four extra targets in
@@ -186,6 +219,13 @@ source drop is `Vellum_Desktop_V2.1_Botanical_Bento.zip`.
 
 - The installer is not code-signed, so SmartScreen warns on first run. The
   published SHA-256 is the way to verify the file.
+- The web studio's "Clean Research Workspace" dialog is fully built and mounted
+  but nothing opens it: its `isOpen` state has no setter call anywhere. There is
+  therefore no in-app way to wipe the local IndexedDB vault; today it takes
+  devtools. Wiring a trigger is a product decision (it is a destructive action),
+  so it is left as a known gap rather than added unasked.
+- The screening hub's legacy-session migration branch (sessions saved before
+  `sessionId` existed) is present but no fixture exercises it.
 
 ---
 

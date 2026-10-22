@@ -18,11 +18,28 @@ export function CleanNotebooksModal({
   onCleaned,
   totalNotebooks,
 }: CleanNotebooksModalProps) {
+  // Mounted only while open. This dialog confirms an irreversible wipe, so
+  // keeping its state alive across open/close meant that cancelling after
+  // typing "delete" and reopening left the destructive button armed — one
+  // stray click away from erasing the whole local vault.
+  if (!isOpen) return null;
+  return (
+    <CleanNotebooksDialog
+      onClose={onClose}
+      onCleaned={onCleaned}
+      totalNotebooks={totalNotebooks}
+    />
+  );
+}
+
+function CleanNotebooksDialog({
+  onClose,
+  onCleaned,
+  totalNotebooks,
+}: Omit<CleanNotebooksModalProps, "isOpen">) {
   const [cleaning, setCleaning] = useState(false);
   const [cleanMode, setCleanMode] = useState<"all" | "empty">("all");
   const [confirmText, setConfirmText] = useState("");
-
-  if (!isOpen) return null;
 
   const handleExecuteClean = async () => {
     setCleaning(true);
@@ -52,7 +69,7 @@ export function CleanNotebooksModal({
 
   return (
     <Modal
-      isOpen={isOpen}
+      isOpen={true}
       onClose={onClose}
       title="Clean Research Workspace"
       subtitle="Manage and reset local IndexedDB storage"

@@ -14,14 +14,25 @@ interface NewNotebookModalProps {
 const EMOJI_OPTIONS = ["📚", "🔬", "🛒", "🌾", "🧠", "📈", "🧬", "🥗", "🦠", "💊", "🏛️", "🌍"];
 
 export function NewNotebookModal({ isOpen, onClose, onCreated }: NewNotebookModalProps) {
+  // Mounted only while open, so every open starts from a blank form. The
+  // component is rendered unconditionally by the dashboard, so keeping its
+  // state alive meant a cancelled or completed project came back pre-filled
+  // the next time the dialog was opened.
+  if (!isOpen) return null;
+  return <NewNotebookDialog onClose={onClose} onCreated={onCreated} />;
+}
+
+function NewNotebookDialog({
+  onClose,
+  onCreated,
+}: Omit<NewNotebookModalProps, "isOpen">) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [selectedEmoji, setSelectedEmoji] = useState("📚");
   const [category, setCategory] = useState("General");
   const [files, setFiles] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  if (!isOpen) return null;
+  const [error, setError] = useState("");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -31,9 +42,10 @@ export function NewNotebookModal({ isOpen, onClose, onCreated }: NewNotebookModa
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim()) return;
+    if (!title.trim() || isSubmitting) return;
 
     setIsSubmitting(true);
+    setError("");
     const newId = `nb-${Date.now()}`;
     const newNotebook: Notebook = {
       id: newId,
@@ -47,36 +59,43 @@ export function NewNotebookModal({ isOpen, onClose, onCreated }: NewNotebookModa
       isFeatured: false,
     };
 
-    await db.notebooks.put(newNotebook);
+    try {
+      await db.notebooks.put(newNotebook);
 
-    // Save initial files if provided
-    for (const f of files) {
-      const cleanTitle = f.name
-        .replace(/\.pdf$/i, "")
-        .replace(/^[a-zA-Z0-9_\-]+ - \d{4} - /, "")
-        .replace(/_/g, " ");
+      // Save initial files if provided
+      for (const f of files) {
+        const cleanTitle = f.name
+          .replace(/\.pdf$/i, "")
+          .replace(/^[a-zA-Z0-9_\-]+ - \d{4} - /, "")
+          .replace(/_/g, " ");
 
-      await db.sources.put({
-        id: `src-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
-        notebookId: newId,
-        title: cleanTitle,
-        authors: [f.name.includes(" - ") ? f.name.split(" - ")[0] : "Author"],
-        year: parseInt((f.name.match(/\b(19|20)\d{2}\b/) || ["2024"])[0], 10),
-        pdfBlob: f,
-        sizeBytes: f.size,
-        status: "ready",
-        addedAt: Date.now(),
-      });
+        await db.sources.put({
+          id: `src-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+          notebookId: newId,
+          title: cleanTitle,
+          authors: [f.name.includes(" - ") ? f.name.split(" - ")[0] : "Author"],
+          year: parseInt((f.name.match(/\b(19|20)\d{2}\b/) || ["2024"])[0], 10),
+          pdfBlob: f,
+          sizeBytes: f.size,
+          status: "ready",
+          addedAt: Date.now(),
+        });
+      }
+    } catch (err) {
+      console.error("Failed to create notebook:", err);
+      setError("Could not create the project. Check available browser storage and try again.");
+      return;
+    } finally {
+      setIsSubmitting(false);
     }
 
-    setIsSubmitting(false);
     onCreated(newNotebook);
     onClose();
   };
 
   return (
     <Modal
-      isOpen={isOpen}
+      isOpen={true}
       onClose={onClose}
       title="Create Research Project Vault"
       subtitle="Initialize a dedicated systematic review corpus"
@@ -183,6 +202,12 @@ export function NewNotebookModal({ isOpen, onClose, onCreated }: NewNotebookModa
           </div>
 
           {/* Actions */}
+          {error && (
+            <p role="alert" className="text-[11px] font-semibold text-[var(--rose)]">
+              {error}
+            </p>
+          )}
+
           <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-[var(--hair)]">
             <button
               type="button"
