@@ -1,6 +1,6 @@
 # Vellum Release Verification Report
 
-- **Generated:** 2026-10-22 12:25:38
+- **Generated:** 2026-10-22 12:44:11
 - **Commit:** `unknown`
 - **Checks:** 36 passed, 0 failed, 0 skipped
 
@@ -13,7 +13,7 @@
 | 5 | all 10 Streamlit pages + main app render | **PASS** | 11/11 clean |
 | 6 | TypeScript type-check (tsc --noEmit) | **PASS** | 0 errors |
 | 7 | ESLint (0 errors, 0 warnings) | **PASS** | clean |
-| 8 | production build present (.next) | **PASS** | BUILD_ID=6OfydxPRQ_hGl0teuQHeE |
+| 8 | production build present (.next) | **PASS** | BUILD_ID=MoOLZRnYzwPAJNgnPXvlx |
 | 9 | installer artefact exists | **PASS** | 129.2 MB  sha256=5503799908217350... |
 | 10 | installer Authenticode status | **PASS** | NotSigned (unsigned installers trigger SmartScreen on first run) |
 | 11 | silent install succeeds | **PASS** | exit=0 exe=present |
@@ -25,7 +25,7 @@
 | 17 | SHA256SUMS.txt verifies every shipped file | **PASS** |  |
 | 18 | share folder copies to an arbitrary path | **PASS** | C:\Users\azoua\AppData\Local\Temp\vellum_verify\relocated\Vellum Web (copy) |
 | 19 | port 3002 is free before the launch | **PASS** |  |
-| 20 | launcher starts the studio (relocated) | **PASS** | HTTP 200 after 21.7s on port 3002 |
+| 20 | launcher starts the studio (relocated) | **PASS** | HTTP 200 after 13.7s on port 3002 |
 | 21 | launcher reported a real startup (not an early exit) | **PASS** | startup banner present |
 | 22 | the relocated copy is the one serving | **PASS** | process command line points at the relocated folder |
 | 23 | home page renders with the Vellum identity | **PASS** | HTTP 200, 28017 bytes |
@@ -50,8 +50,8 @@
 | Vellum-Desktop-V2.1-Setup-x64.exe | 129.2 MB | `550379990821735050dfcff4b980743c54baf8a32cd7352b4a37b6d779af87c5` |
 | Vellum_Standalone_Windows_x64.zip | 177.6 MB | `1ab5995e0269f793c7bdd1f4b95cacdba67f1a9be9527cc98acabe60d3b3699e` |
 | Vellum_Desktop_V2.1_Botanical_Bento.zip | 1.6 MB | `23ae366666ba6cda1ef0274257d04cf2928f4fff9cec47e15012c47c734990f4` |
-| Vellum_Web_Fernly_Latest_Export.zip | 0.2 MB | `0c525d58ef8f834a599c7c734b471c2e0d68430cef4a1e34d8a520afb0ec4580` |
-| Vellum_Web_Fernly_SHARE.zip | 127.0 MB | `5f3ba0f59cff2c9f39dea16872f35bd863330cacaef5aa388330a0bf40f4ffa7` |
+| Vellum_Web_Fernly_Latest_Export.zip | 0.2 MB | `f7e8862f05f1d9d29af896c6b1ecf82c5babae8b6f0252292bf42d3bce4baffc` |
+| Vellum_Web_Fernly_SHARE.zip | 127.0 MB | `a3707e3951ab6f0b35e3e35897242b69115c201d9580825f4d202fc6de1549e7` |
 
 ## How to re-verify independently
 
