@@ -13,14 +13,38 @@ it depends on the desktop app or on any other folder in the pack.
 
 | Item | What it is |
 | :--- | :--- |
+| `Vellum_Web_Fernly_SHARE\` | **The one-click package.** Self-contained: portable Node.js bundled, production build ready. Unzip anywhere and double-click `START_VELLUM_WEB.bat` |
+| `Vellum_Web_Fernly_SHARE.zip` | The same folder, zipped — **this is what you send to a colleague** |
 | `Web_App_Fernly\` | The application: source, dependencies, and the production build output |
-| `2_launch_fernly_web_app.bat` | Starts the studio and opens your browser |
+| `2_launch_fernly_web_app.bat` | Starts the studio from source and opens your browser |
 | `Vellum_Web_Fernly_Latest_Export.zip` | Lightweight source export (no `node_modules`, no build output) |
 | `Web_App_Fernly\README_FOR_COLLEAGUES.md` | The full standalone manual (also as PDF) |
 
 ---
 
 ## 🚀 Quick Start
+
+### Option A — The one-click package (no installation required)
+
+Double-click **`Vellum_Web_Fernly_SHARE\START_VELLUM_WEB.bat`**.
+
+That folder carries its own portable Node.js runtime, so there is **nothing to
+install** — not Node.js, not Python, no admin rights. Extract the whole folder
+first (keep the files together), then double-click. The browser opens on:
+
+```
+http://localhost:3002
+```
+
+Keep the black server window open while you work; close it (or press `Ctrl+C`)
+to stop Vellum. `STOP_VELLUM_WEB.bat` stops it without hunting for processes.
+
+> The bundled Node.js runtime (v24 LTS) was verified against `nodejs.org`'s own
+> published `SHASUMS256.txt` before being packaged. The folder also contains a
+> `SHA256SUMS.txt` covering every file inside it, so a colleague can confirm
+> the package was not altered in transit.
+
+### Option B — From source (this repository)
 
 Double-click **`2_launch_fernly_web_app.bat`**.
 
@@ -35,7 +59,8 @@ http://localhost:3002
 > server treats `127.0.0.1` as a cross-origin dev host and blocks the client
 > bundle, which leaves the page stuck on its loading screen.
 
-**Requirements:** Node.js 18 or newer (LTS 20+ recommended).
+**Requirements:** Node.js 18 or newer (LTS 20+ recommended). The one-click
+package in Option A needs none of this.
 
 ---
 
@@ -90,15 +115,31 @@ npx next build
 | :--- | :--- |
 | TypeScript (`tsc --noEmit`) | **0 errors** |
 | Production build (`next build`) | **compiled, 0 errors** |
+| One-click package: relocated to an arbitrary path and launched | **HTTP 200** |
+| One-click package: live `/api/search` (OpenAlex) | **real records returned** |
+| One-click package: live `/api/trends` (OpenAlex) | **real records returned** |
+
+The last three rows are exercised against the *shipped folder*, not the source.
+Run the whole release verification from the repository root:
+
+```powershell
+& "..\Vellum_Desktop\Desktop_App\.venv\Scripts\python.exe" ..\tools\verify_release.py
+```
 
 ---
 
 ## 🏗️ Rebuilding
 
 ```powershell
+# source
 cd Web_App_Fernly
-npm install
+npm ci
 npx next build
+
+# one-click package (from the repository root)
+& "Vellum_Desktop\Desktop_App\.venv\Scripts\python.exe" tools\build_web_share.py `
+    --node-zip C:\path\to\node-v24.22.1-win-x64.zip
 ```
 
-A production server can then be started with `npx next start -p 3002`.
+A production server can then be started with `npx next start -p 3002`, which is
+exactly what the packaged `START_VELLUM_WEB.bat` does.

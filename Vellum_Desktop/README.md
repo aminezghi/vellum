@@ -35,6 +35,12 @@ Double-click **`Vellum-Desktop-V2.0-Setup-x64.exe`**.
   uninstaller
 - **Zero Python required** — the whole scientific stack is bundled
 
+> **⚠️ "Windows protected your PC" on first run.** The installer is not
+> code-signed, so SmartScreen warns. Click **More info → Run anyway**.
+> To confirm the file you received is the one that was built, run
+> `certutil -hashfile Vellum-Desktop-V2.0-Setup-x64.exe SHA256` and compare it
+> with the hash in `..\DISTRIBUTABLES\SHA256SUMS.txt`.
+
 ### Option B — Run from source
 
 Double-click **`1_launch_desktop_app.bat`** (or `CLICK_TO_RUN_VELLUM_DESKTOP.bat`).
@@ -98,7 +104,19 @@ Desktop_App\.venv\Scripts\python.exe Desktop_App\tests\smoke_app_pages.py
 | :--- | :--- |
 | Unit tests (`Desktop_App/tests`) | **64 passed** |
 | Page smoke test (main app + 10 pages) | **11 / 11 ran clean** |
-| Frozen `Vellum.exe` server health check | **HTTP 200** |
+| Installer: silent install → boot installed `Vellum.exe` → health check → silent uninstall | **passed** |
+
+The last row is the one that matters most: the unit suite and the smoke test
+both run against **source**, and say nothing about the frozen bundle a
+colleague actually installs. The full harness lives in the repository root:
+
+```powershell
+& "Desktop_App\.venv\Scripts\python.exe" ..\tools\verify_release.py
+```
+
+It installs the produced installer into a temporary directory, boots the
+installed binary, checks the health endpoint, then uninstalls and confirms the
+directory is gone. The results are written to `..\RELEASE_REPORT.md`.
 
 ---
 
@@ -114,6 +132,13 @@ cd Desktop_App
 ```
 
 The installer lands in `Vellum-Desktop-V2.0-Setup-x64.exe`, next to this file.
+
+> The `.iss` script resolves `downloader.ico` and `dist\Vellum\` **relative to
+> `Desktop_App\`**. If you move this folder, keep those two paths intact or
+> the installer will not compile.
+
+See `..\BUILDING.md` for the complete release procedure, including how the
+shareable web package is produced and how every artefact is hashed.
 
 ---
 

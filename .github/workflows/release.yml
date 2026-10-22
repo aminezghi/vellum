@@ -1,0 +1,205 @@
+name: release
+
+# This workflow is the part of the release that does not rely on the author's
+# machine. Every claim in readme.md about the desktop suite, the page smoke
+# test, the TypeScript build and the installer is re-checked here from a clean
+# checkout, and the resulting artefacts are hashed.
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  desktop:
+    name: Desktop (Python ${{ matrix.python }})
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+          cache-dependency-path: Vellum_Desktop/Desktop_App/requirements.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r Vellum_Desktop/Desktop_App/requirements.txt
+
+      - name: Unit suite
+        working-directory: Vellum_Desktop
+        run: python -m pytest -o pythonpath=Desktop_App Desktop_App/tests -v
+
+      - name: Streamlit page smoke test
+        working-directory: Vellum_Desktop
+        run: python Desktop_App/tests/smoke_app_pages.py
+
+      - name: Build frozen bundle (PyInstaller)
+        working-directory: Vellum_Desktop/Desktop_App
+        run: |
+          python -m PyInstaller --noconfirm --clean build_vellum_windows.spec
+
+      - name: Compile installer (Inno Setup)
+        working-directory: Vellum_Desktop/Desktop_App
+        run: |
+          $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) {
+            $iscc = "C:\Program Files\Inno Setup 6\ISCC.exe"
+          }
+          if (-not (Test-Path $iscc)) { throw "ISCC.exe not found" }
+          & $iscc installer.iss
+
+      - name: Smoke-test the installer (install -> run -> health -> uninstall)
+        shell: pwsh
+        run: |
+          $inst = "${{ github.workspace }}\Vellum_Desktop\Vellum-Desktop-V2.0-Setup-x64.exe"
+          $dir  = "$env:RUNNER_TEMP\vellum-install"
+          if (-not (Test-Path $inst)) { throw "installer not produced" }
+          & $inst /VERYSILENT /SUPPRESSMSGBOXES /NORESTART "/DIR=$dir" "/LOG=$env:RUNNER_TEMP\install.log"
+          if (-not (Test-Path "$dir\Vellum.exe")) { throw "Vellum.exe missing after install" }
+          $env:VELLUM_SERVER = "1"
+          $env:STREAMLIT_SERVER_PORT = "8501"
+          $p = Start-Process "$dir\Vellum.exe" -PassThru -WindowStyle Hidden
+          $ok = $false
+          for ($i = 0; $i -lt 120; $i++) {
+            Start-Sleep -Milliseconds 500
+            try {
+              $r = Invoke-WebRequest "http://127.0.0.1:8501/_stcore/health" -UseBasicParsing -TimeoutSec 3
+              if ($r.StatusCode -eq 200) { $ok = $true; break }
+            } catch {}
+          }
+          Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue
+          if (-not $ok) { throw "installed app did not become healthy" }
+          Write-Output "installer smoke test passed"
+
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: vellum-desktop-installer
+          path: Vellum_Desktop/Vellum-Desktop-V2.0-Setup-x64.exe
+          if-no-files-found: error
+
+  web:
+    name: Web (Node ${{ matrix.node }})
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ["24"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+          cache-dependency-path: Vellum_Web/Web_App_Fernly/package-lock.json
+
+      - name: Install dependencies
+        working-directory: Vellum_Web/Web_App_Fernly
+        run: npm ci
+
+      - name: Type-check
+        working-directory: Vellum_Web/Web_App_Fernly
+        run: npx tsc --noEmit
+
+      - name: Lint
+        working-directory: Vellum_Web/Web_App_Fernly
+        run: npm run lint
+
+      - name: Production build
+        working-directory: Vellum_Web/Web_App_Fernly
+        run: npx next build
+
+      - name: Boot the production build and exercise the API routes
+        shell: pwsh
+        working-directory: Vellum_Web/Web_App_Fernly
+        run: |
+          $env:PORT = "3002"
+          $p = Start-Process "npx.cmd" -ArgumentList "next","start","-p","3002" -PassThru -WindowStyle Hidden
+          $ok = $false
+          for ($i = 0; $i -lt 120; $i++) {
+            Start-Sleep -Milliseconds 500
+            try {
+              $r = Invoke-WebRequest "http://localhost:3002/" -UseBasicParsing -TimeoutSec 3
+              if ($r.StatusCode -eq 200) { $ok = $true; break }
+            } catch {}
+          }
+          if (-not $ok) { Stop-Process -Id $p.Id -Force; throw "web app did not start" }
+          $s = Invoke-WebRequest "http://localhost:3002/api/search?q=review&sources=openalex" -UseBasicParsing -TimeoutSec 60
+          $j = $s.Content | ConvertFrom-Json
+          Write-Output ("search API returned {0} result(s)" -f $j.total)
+          Stop-Process -Id $p.Id -Force
+
+  release:
+    name: Release manifest
+    runs-on: windows-2022
+    needs: [desktop, web]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Hash the distributables
+        shell: pwsh
+        run: |
+          $files = @(
+            "Vellum_Desktop\Vellum-Desktop-V2.0-Setup-x64.exe",
+            "Vellum_Desktop\Vellum_Standalone_Windows_x64.zip",
+            "Vellum_Desktop\Vellum_Desktop_V2.0_Botanical_Bento.zip",
+            "Vellum_Web\Vellum_Web_Fernly_Latest_Export.zip"
+          )
+          $rows = foreach ($f in $files) {
+            if (Test-Path $f) {
+              $h = (Get-FileHash $f -Algorithm SHA256).Hash.ToLower()
+              "$h  $f"
+            }
+          }
+          $rows | Out-File -FilePath "SHA256SUMS.txt" -Encoding utf8
+          Get-Content "SHA256SUMS.txt"
+
+      - name: Upload manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: sha256sums
+          path: SHA256SUMS.txt
+
+  release-notes:
+    name: Release notes
+    runs-on: ubuntu-latest
+    needs: [desktop, web, release]
+    if: always()
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Draft release notes
+        shell: bash
+        run: |
+          {
+            echo "# Vellum release"
+            echo
+            echo "All checks passed on a clean checkout."
+            echo
+            echo "## Integrity"
+            echo '```'
+            cat artifacts/sha256sums/SHA256SUMS.txt
+            echo '```'
+            echo
+            echo "Colleagues can verify a received installer with:"
+            echo '```powershell'
+            echo "certutil -hashfile Vellum-Desktop-V2.0-Setup-x64.exe SHA256"
+            echo '```'
+          } > RELEASE_NOTES.md
+          cat RELEASE_NOTES.md

@@ -29,6 +29,12 @@ It installs to `%LOCALAPPDATA%\Programs\Vellum Desktop` — **no administrator r
 You get a Start Menu entry, an optional desktop shortcut, and a proper *Apps & Features*
 uninstaller. The installed app needs **no Python**.
 
+> **First run:** the installer is not code-signed, so Windows SmartScreen shows
+> *"Windows protected your PC"*. Click **More info → Run anyway**. To confirm the
+> file you received is the one that was built, compare
+> `certutil -hashfile Vellum-Desktop-V2.0-Setup-x64.exe SHA256` with the hash in
+> `DISTRIBUTABLES\SHA256SUMS.txt`.
+
 ### Option B — Run straight from source
 
 The repository already ships a ready virtual environment, so the desktop app runs with a
@@ -41,7 +47,18 @@ Vellum_Desktop\1_launch_desktop_app.bat
 This launches `http://localhost:8501` in your default browser using
 `Vellum_Desktop\Desktop_App\.venv`.
 
-### Option C — Run the web studio
+### Option C — Send the web studio to a colleague (no install at all)
+
+```
+Vellum_Web\Vellum_Web_Fernly_SHARE.zip
+```
+
+Unzip it anywhere and double-click **`START_VELLUM_WEB.bat`**. It is fully
+self-contained: a portable Node.js runtime is bundled and verified against
+`nodejs.org`'s own checksum list, so the colleague needs **no Node.js, no
+Python and no admin rights**. The browser opens on `http://localhost:3002`.
+
+### Option D — Run the web studio from this repository
 
 ```
 Vellum_Web\2_launch_fernly_web_app.bat
@@ -125,9 +142,15 @@ PDF_Downloader_Dual_Pack/
 │   │   └── .next/                         ←   production build
 │   ├── 2_launch_fernly_web_app.bat        ←   web studio launcher
 │   ├── Vellum_Web_Fernly_Latest_Export.zip←   source export
+│   ├── Vellum_Web_Fernly_SHARE.zip        ←   ONE-CLICK share folder (portable Node bundled)
+│   ├── Vellum_Web_Fernly_SHARE/           ←   the same folder, unpacked
 │   ├── README.md                          ←   web manual (this app)
 │   └── Web_App_Fernly/README_FOR_COLLEAGUES.md ← full standalone manual
 ├── 3_launch_both_apps.bat                 ← launches both together
+├── tools/                                 ← build + verification scripts
+├── BUILDING.md                            ← how the artefacts are built and proved
+├── RELEASE_REPORT.md                      ← latest verification results
+├── DISTRIBUTABLES/SHA256SUMS.txt           ← hashes of everything shipped
 ├── readme.md                              ← this file
 ├── README_FOR_COLLEAGUES.md / .pdf        ← printable manual for the whole pack
 ├── quick_start_for_colleagues.md
@@ -139,14 +162,16 @@ PDF_Downloader_Dual_Pack/
 
 ## 🧪 Testing & Verification
 
-Everything in this pack has been exercised end to end.
+Everything in this pack has been exercised end to end — and the checks exercise the
+**shipped files**, not just the source.
 
 ```powershell
+# Full release verification (tests + clean-room install + live API calls)
+& "Vellum_Desktop\Desktop_App\.venv\Scripts\python.exe" tools\verify_release.py
+
 # Desktop unit suite (64 tests) + in-process smoke test of all 10 pages
 cd Vellum_Desktop
 Desktop_App\.venv\Scripts\python.exe -m pytest -o pythonpath=Desktop_App Desktop_App\tests -v
-
-# Page smoke test on its own, with full tracebacks
 Desktop_App\.venv\Scripts\python.exe Desktop_App\tests\smoke_app_pages.py
 
 # Web app: type-check + production build
@@ -160,20 +185,46 @@ npx next build
 | Desktop unit tests (`Desktop_App/tests`) | **64 passed** |
 | Streamlit page smoke test (main app + 10 pages) | **11 / 11 ran clean** |
 | Web app production build + TypeScript | **compiled, 0 errors** |
-| Frozen `Vellum.exe` server health check | **HTTP 200** |
+| Installer: silent install → boot → health → uninstall | **passed** |
+| Web share folder: relocated → launched → live APIs → stopped | **passed** |
+
+`tools\verify_release.py` writes `RELEASE_REPORT.md` and
+`DISTRIBUTABLES\SHA256SUMS.txt`. The same checks run unattended in CI
+(`.github\workflows\release.yml`) on every push, so the result does not depend
+on the author's machine. See **`BUILDING.md`** for the full release procedure.
+
+---
+
+## 🔐 Verifying what you received
+
+```powershell
+certutil -hashfile Vellum-Desktop-V2.0-Setup-x64.exe SHA256
+```
+
+Compare with `DISTRIBUTABLES\SHA256SUMS.txt`. The web share folder carries its
+own `SHA256SUMS.txt` covering all 8 599 files inside it.
 
 ---
 
 ## ❓ Troubleshooting
 
-**`[ERROR] Node.js 18+ was not found`** — install Node.js LTS from [nodejs.org](https://nodejs.org)
-and tick *Add to PATH* during setup.
+**SmartScreen says "Windows protected your PC"** — the installer is not
+code-signed. Click **More info → Run anyway**. To confirm the file is the one
+that was built, check its SHA-256 against `DISTRIBUTABLES\SHA256SUMS.txt`.
+
+**`[ERROR] Node.js 18+ was not found`** — you launched the *repository* copy of
+the web app (`2_launch_fernly_web_app.bat`), which does need Node.js. If you
+are sending the app to a colleague, send `Vellum_Web\Vellum_Web_Fernly_SHARE.zip`
+instead: it bundles its own Node.js runtime and needs nothing installed.
 
 **Port already in use (3002 / 8501)** — an earlier session is still running:
 
 ```powershell
 Get-Process -Name node,Vellum -ErrorAction SilentlyContinue | Stop-Process -Force
 ```
+
+The share folder also ships `STOP_VELLUM_WEB.bat`, which stops the studio
+without hunting for processes.
 
 **Desktop window is blank** — Vellum needs the Microsoft Edge **WebView2 Runtime**. It ships with
 Windows 11 and modern Windows 10; if it is missing, install the

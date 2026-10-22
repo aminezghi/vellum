@@ -48,7 +48,10 @@ DisableDirPage=no
 AllowNoIcons=yes
 OutputDir=..
 OutputBaseFilename=Vellum-Desktop-V2.0-Setup-x64
-SetupIconFile=..\downloader.ico
+; This script lives in Desktop_App\, and so does the application icon.
+; (It used to point at "..\downloader.ico", which broke when Desktop_App\ was
+; moved under Vellum_Desktop\ - the icon did not move with it.)
+SetupIconFile=downloader.ico
 UninstallDisplayIcon={app}\{#AppExeName}
 UninstallDisplayName={#AppNameFull}
 

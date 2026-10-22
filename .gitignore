@@ -119,6 +119,14 @@ build/
 dist/
 # Distribution archives (standalone zip, Bento zip, Fernly export zip)
 *.zip
+# The compiled Windows installer. It is a 129 MB build artefact, regenerated
+# by tools/build_distributables.py + ISCC (see BUILDING.md). Shipping it
+# through git would add its full weight to every clone and every future
+# commit, for a file that is rebuilt from source anyway. It stays on disk so
+# it can be sent to colleagues directly.
+Vellum_Desktop/Vellum-Desktop-V2.0-Setup-x64.exe
+# The generated one-click web package (bundles a portable Node.js runtime).
+Vellum_Web/Vellum_Web_Fernly_SHARE/
 # Open Science Desktop session marker
 .openscience/
 

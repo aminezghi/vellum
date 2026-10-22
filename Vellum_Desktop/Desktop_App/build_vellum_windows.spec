@@ -51,7 +51,7 @@ hiddenimports = [
     "altair", "narwhals", "narwhals.stable.v1",
     "pandas", "pandas._libs", "numpy", "pyarrow",
     "sklearn", "sklearn.feature_extraction", "sklearn.feature_extraction.text", "sklearn.naive_bayes", "scipy",
-    "requests", "bs4", "beautifulsoup4", "cloudscraper", "curl_cffi", "curl_cffi.requests", "DrissionPage",
+    "requests", "bs4", "cloudscraper", "curl_cffi", "curl_cffi.requests", "DrissionPage",
     "urllib3", "certifi", "charset_normalizer",
     "zipfile", "threading", "queue", "pathlib", "tempfile",
     "signal", "io", "importlib", "importlib.metadata",

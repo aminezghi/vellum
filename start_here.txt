@@ -18,12 +18,25 @@ Neither folder depends on the other - use either one on its own.
    (Standard Windows installer. No admin rights needed. Adds a Start
     Menu entry and a proper uninstaller. No Python required.)
 
+   NOTE: Windows may say "Windows protected your PC" on first run because
+   the installer is not code-signed. Click: More info -> Run anyway.
+   To check the file is the one that was built, run
+     certutil -hashfile Vellum-Desktop-V2.0-Setup-x64.exe SHA256
+   and compare it with DISTRIBUTABLES\SHA256SUMS.txt.
+
 2. TO TRY THE DESKTOP WORKBENCH WITHOUT INSTALLING:
    -> Double-click: Vellum_Desktop\1_launch_desktop_app.bat
    (Runs from source using the bundled virtual environment.
     Opens at http://localhost:8501)
 
 3. TO TRY THE WEB RESEARCH STUDIO:
+   -> Double-click: Vellum_Web\Vellum_Web_Fernly_SHARE\START_VELLUM_WEB.bat
+   (Nothing to install - a portable Node.js runtime is bundled inside.
+    Opens at http://localhost:3002.
+    This is the folder to send to someone else: Vellum_Web\
+    Vellum_Web_Fernly_SHARE.zip)
+
+   If you are working inside this repository instead:
    -> Double-click: Vellum_Web\2_launch_fernly_web_app.bat
    (Requires Node.js 18+. Opens at http://localhost:3002)
 
@@ -38,4 +51,8 @@ For the full feature list, testing scenarios and technical details:
 Per-application manuals:
 -> Vellum_Desktop\README.md
 -> Vellum_Web\README.md
+
+To rebuild or re-verify everything:
+-> BUILDING.md  (build procedure + how the artefacts are proved correct)
+-> tools\verify_release.py  (full verification harness)
 =====================================================================
