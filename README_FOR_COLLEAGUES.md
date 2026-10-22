@@ -17,14 +17,15 @@ multi-tier PDF harvesting, offline deduplication, active-learning screening) wit
 web interfaces (force-directed citation graphs, grounded document readers, and PRISMA
 systematic workflows).
 
-The package is partitioned into **two synchronized applications**:
+The package is partitioned into **two synchronized applications**, each in its own
+self-contained folder:
 
-1. **Vellum Desktop V2.0 — Fernly Botanical Bento (`Desktop_App`)**
+1. **Vellum Desktop V2.0 — Fernly Botanical Bento (`Vellum_Desktop\`)**
    Python 3.13 / Streamlit / PyInstaller native desktop workbench for heavy batch downloads
    (10 000+ DOIs), multi-format import (Scopus, WoS, PubMed, RIS, BibTeX), local vault
-   indexing, and PRISMA flow export.
+   indexing, and PRISMA flow export. Its source lives in `Vellum_Desktop\Desktop_App\`.
 
-2. **Vellum Web — Fernly Botanical Bento (`Web_App_Fernly`)**
+2. **Vellum Web — Fernly Botanical Bento (`Vellum_Web\`)**
    Next.js 16 (Turbopack) / React 19 / Tailwind CSS 4 browser studio on port 3002, featuring:
    - **Connected Papers Force-Directed Citation Network** — real-time canvas physics with
      origin halo, citation-weighted sizing, year gradients, and prior/derivative catalogues.
@@ -91,18 +92,18 @@ None of these are touched by the uninstaller.
 
 | Launcher Script | Target Application | Host & Port | Primary Purpose |
 | :--- | :--- | :--- | :--- |
-| **`dist\Vellum-Desktop-V2.0-Setup-x64.exe`** | Vellum Desktop installer | — | Installs the desktop app per-user, no admin required |
-| **`1_Launch_Desktop_App.bat`** | Vellum Desktop Workbench | `http://localhost:8501` | High-volume PDF downloads, RIS/BibTeX import, vault indexing |
-| **`2_Launch_Fernly_Web_App.bat`** | Vellum Web Studio | `http://localhost:3002` | Citation graph, AI screening, visual boolean search, notebooks |
-| **`3_Launch_Both_Apps.bat`** | Dual Workbench Mode | Ports 8501 & 3002 | Launches desktop and web side by side |
-| **`CLICK_TO_RUN_STANDALONE_EXE.bat`** | Vellum Desktop (compiled) | `http://localhost:8501` | Prefers the installed copy, falls back to the portable bundle |
+| **`Vellum_Desktop\Vellum-Desktop-V2.0-Setup-x64.exe`** | Vellum Desktop installer | — | Installs the desktop app per-user, no admin required |
+| **`Vellum_Desktop\1_launch_desktop_app.bat`** | Vellum Desktop Workbench | `http://localhost:8501` | High-volume PDF downloads, RIS/BibTeX import, vault indexing |
+| **`Vellum_Web\2_launch_fernly_web_app.bat`** | Vellum Web Studio | `http://localhost:3002` | Citation graph, AI screening, visual boolean search, notebooks |
+| **`3_launch_both_apps.bat`** | Dual Workbench Mode | Ports 8501 & 3002 | Launches desktop and web side by side |
+| **`Vellum_Desktop\CLICK_TO_RUN_STANDALONE_EXE.bat`** | Vellum Desktop (compiled) | `http://localhost:8501` | Prefers the installed copy, falls back to the portable bundle |
 
 ---
 
 ### Step-by-Step User & Colleague Workflow
 
 #### Phase 1 — Exploration via the Connected Papers Network
-1. Launch **`2_Launch_Fernly_Web_App.bat`** and open the **Connected Papers** tab.
+1. Launch **`Vellum_Web\2_launch_fernly_web_app.bat`** and open the **Connected Papers** tab.
 2. Enter a paper title or DOI (or click a seminal preset such as *DeepFruits* or *Transformers*).
 3. The interactive canvas maps related literature:
    - **Purple halo ring** — the root origin paper.
@@ -141,7 +142,7 @@ None of these are touched by the uninstaller.
 
 #### Phase 4 — High-Throughput PDF Retrieval
 - **In the browser:** use the **Batch Downloader** tab on port 3002.
-- **For 1 000+ bulk files:** launch **`1_Launch_Desktop_App.bat`**, paste the DOI list, set the
+- **For 1 000+ bulk files:** launch **`Vellum_Desktop\1_launch_desktop_app.bat`**, paste the DOI list, set the
   output folder, and run the multi-threaded extraction with automated paywall detection and
   naming conventions.
 
@@ -153,13 +154,16 @@ Every component of this pack has been exercised end to end.
 
 ```powershell
 # Desktop unit suite (64 tests) + in-process smoke test of all 10 pages
+cd Vellum_Desktop
 Desktop_App\.venv\Scripts\python.exe -m pytest -o pythonpath=Desktop_App Desktop_App\tests -v
 
 # Page smoke test alone, with full tracebacks
 Desktop_App\.venv\Scripts\python.exe Desktop_App\tests\smoke_app_pages.py
 
 # Web app: type-check + production build
-cd Web_App_Fernly; npm run build
+cd ..\Vellum_Web\Web_App_Fernly
+npx tsc --noEmit
+npx next build
 ```
 
 | Suite | Result |

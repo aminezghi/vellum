@@ -20,7 +20,7 @@ from reportlab.platypus import (
 )
 from reportlab.pdfgen import canvas
 
-PDF_PATH = Path(__file__).resolve().parent / "README_VELLUM_DESKTOP_V2.0.pdf"
+PDF_PATH = Path(__file__).resolve().parent / "Vellum_Desktop" / "README_VELLUM_DESKTOP_V2.0.pdf"
 
 # Fernly Botanical Bento Palette
 COLOR_PINE = colors.HexColor("#1b4332")
@@ -239,8 +239,8 @@ def build_pdf():
         body_style,
     ))
 
-    story.append(Paragraph("<b>Step 1:</b> Double-click the launch script located in the extracted folder:", bullet_style))
-    story.append(Paragraph("<code>CLICK_TO_RUN_VELLUM_DESKTOP.bat</code> &nbsp;&nbsp;(or <code>1_launch_desktop_app.bat</code>)", code_style))
+    story.append(Paragraph("<b>Step 1:</b> Double-click the launch script in the <code>Vellum_Desktop</code> folder:", bullet_style))
+    story.append(Paragraph("<code>Vellum_Desktop\\1_launch_desktop_app.bat</code> &nbsp;&nbsp;(or <code>Vellum_Desktop\\CLICK_TO_RUN_VELLUM_DESKTOP.bat</code>)", code_style))
     story.append(Paragraph("<b>Step 2:</b> The script automatically detects the local Python environment and installs any missing packages.", bullet_style))
     story.append(Paragraph("<b>Step 3:</b> Your default browser will launch automatically to the interface:", bullet_style))
     story.append(Paragraph("<code>http://localhost:8501</code>", code_style))
@@ -339,23 +339,26 @@ def build_pdf():
 
     tree_text = (
         "PDF_Downloader_Dual_Pack/\n"
-        "  ├── dist/\n"
-        "  │     └── Vellum-Desktop-V2.0-Setup-x64.exe  <-- Windows installer\n"
-        "  ├── CLICK_TO_RUN_VELLUM_DESKTOP.bat   <-- 1-Click main launcher\n"
-        "  ├── 1_launch_desktop_app.bat          <-- Alternative launcher\n"
-        "  ├── README_VELLUM_DESKTOP_V2.0.pdf    <-- This documentation\n"
-        "  └── Desktop_App/\n"
-        "        ├── pdf_downloader_app.py       <-- Main application router\n"
-        "        ├── vellum_theme.py             <-- Fernly Botanical Bento theme\n"
-        "        ├── app_pages/\n"
-        "        │     ├── screening.py          <-- ASReview Active Learning Engine\n"
-        "        │     ├── citation_graph.py     <-- Connected Papers force graph\n"
-        "        │     ├── project_overview.py   <-- Dashboard & PRISMA matrix\n"
-        "        │     └── library.py            <-- Unified Paper Pool\n"
-        "        ├── requirements.txt            <-- Complete dependencies (UTF-8)\n"
-        "        ├── build_vellum_windows.spec   <-- PyInstaller build spec\n"
-        "        ├── installer.iss               <-- Inno Setup installer script\n"
-        "        └── tests/                      <-- 64 unit tests + page smoke test"
+        "  ├── Vellum_Desktop/                 <-- Application 1, self-contained\n"
+        "  │     ├── Vellum-Desktop-V2.0-Setup-x64.exe  <-- Windows installer\n"
+        "  │     ├── CLICK_TO_RUN_VELLUM_DESKTOP.bat   <-- 1-Click main launcher\n"
+        "  │     ├── 1_launch_desktop_app.bat          <-- Alternative launcher\n"
+        "  │     ├── README_VELLUM_DESKTOP_V2.0.pdf    <-- This documentation\n"
+        "  │     └── Desktop_App/\n"
+        "  │           ├── pdf_downloader_app.py       <-- Main application router\n"
+        "  │           ├── vellum_theme.py             <-- Fernly Botanical Bento theme\n"
+        "  │           ├── app_pages/\n"
+        "  │           │     ├── screening.py          <-- ASReview Active Learning Engine\n"
+        "  │           │     ├── citation_graph.py     <-- Connected Papers force graph\n"
+        "  │           │     ├── project_overview.py   <-- Dashboard & PRISMA matrix\n"
+        "  │           │     └── library.py            <-- Unified Paper Pool\n"
+        "  │           ├── requirements.txt            <-- Complete dependencies (UTF-8)\n"
+        "  │           ├── build_vellum_windows.spec   <-- PyInstaller build spec\n"
+        "  │           ├── installer.iss               <-- Inno Setup installer script\n"
+        "  │           └── tests/                      <-- 64 unit tests + page smoke test\n"
+        "  └── Vellum_Web/                     <-- Application 2, self-contained\n"
+        "        ├── 2_launch_fernly_web_app.bat      <-- Web studio launcher\n"
+        "        └── Web_App_Fernly/                 <-- Next.js 16 app (port 3002)"
     )
     story.append(Paragraph(tree_text.replace("\n", "<br/>").replace(" ", "&nbsp;"), code_style))
     story.append(Spacer(1, 10))

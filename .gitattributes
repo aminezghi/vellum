@@ -1,0 +1,45 @@
+# Normalise line endings so the Windows launchers behave identically on every
+# colleague's machine, whatever their local core.autocrlf setting is.
+#
+# Why this matters: the whole point of the *.bat launchers is that a colleague
+# with no Python and no Node can still start the app by double-clicking. A .bat
+# checked out with LF-only endings behaves inconsistently on Windows (labels
+# and multi-line blocks in particular), and core.autocrlf is a *local* setting
+# that may be false on their machine.
+
+# --- Windows launchers: always CRLF ---
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+*.iss text eol=crlf
+*.spec text eol=crlf
+
+# --- Cross-platform scripts and sources: always LF ---
+*.py   text eol=lf
+*.ts   text eol=lf
+*.tsx  text eol=lf
+*.js   text eol=lf
+*.mjs  text eol=lf
+*.json text eol=lf
+*.css  text eol=lf
+*.html text eol=lf
+*.md   text eol=lf
+*.txt  text eol=lf
+*.yml  text eol=lf
+*.yaml text eol=lf
+*.sh   text eol=lf
+
+# --- Repo metadata: always LF ---
+.gitattributes text eol=lf
+.gitignore    text eol=lf
+.gitmodules   text eol=lf
+
+# --- Binary: never touched ---
+*.ico   binary
+*.png   binary
+*.jpg   binary
+*.pdf   binary
+*.exe   binary
+*.zip   binary
+*.woff  binary
+*.woff2 binary

@@ -3,13 +3,31 @@
 *Author: Amine Zouaghi (amine.zouaghi@unipr.it) | University of Parma*
 *Local-First • Zero Telemetry • 100% Privacy-Preserving*
 
+This folder is the **complete, self-contained Vellum Desktop application**. Nothing
+in it depends on the web app or on any other folder in the pack.
+
+---
+
+## 📁 What's in this folder
+
+| Item | What it is |
+| :--- | :--- |
+| `Desktop_App\` | The application: source, bundled virtual environment, tests, and the compiled `dist\Vellum\` bundle |
+| `1_launch_desktop_app.bat` | Runs the workbench from source (Streamlit) |
+| `CLICK_TO_RUN_VELLUM_DESKTOP.bat` | Same, with dependency auto-configuration |
+| `CLICK_TO_RUN_STANDALONE_EXE.bat` | Runs the compiled `Vellum.exe` (native WebView2 window) |
+| `Vellum-Desktop-V2.0-Setup-x64.exe` | Windows installer (no admin rights, no Python needed) |
+| `Vellum_Standalone_Windows_x64.zip` | The portable compiled bundle, ready to unzip anywhere |
+| `Vellum_Desktop_V2.0_Botanical_Bento.zip` | Lightweight source drop for colleagues (no venv, no binary) |
+| `README_VELLUM_DESKTOP_V2.0.pdf` | The full publication-grade manual |
+
 ---
 
 ## 🚀 Quick Start (1-Click Run)
 
 ### Option A — Install it (recommended)
 
-Double-click **`..\dist\Vellum-Desktop-V2.0-Setup-x64.exe`**.
+Double-click **`Vellum-Desktop-V2.0-Setup-x64.exe`**.
 
 - Standard Windows installer, **no administrator rights required**
 - Installs to `%LOCALAPPDATA%\Programs\Vellum Desktop`
@@ -17,9 +35,9 @@ Double-click **`..\dist\Vellum-Desktop-V2.0-Setup-x64.exe`**.
   uninstaller
 - **Zero Python required** — the whole scientific stack is bundled
 
-### Option B — Run from this folder
+### Option B — Run from source
 
-Double-click **`..\1_launch_desktop_app.bat`** (or `CLICK_TO_RUN.bat`).
+Double-click **`1_launch_desktop_app.bat`** (or `CLICK_TO_RUN_VELLUM_DESKTOP.bat`).
 The launcher detects the bundled virtual environment, verifies the dependencies and
 opens:
 
@@ -29,8 +47,8 @@ http://localhost:8501
 
 ### Option C — Compiled bundle, no installer
 
-Double-click **`..\CLICK_TO_RUN_STANDALONE_EXE.bat`**. It prefers the installed copy and
-falls back to the portable build in `dist\Vellum\Vellum.exe`.
+Double-click **`CLICK_TO_RUN_STANDALONE_EXE.bat`**. It prefers the installed copy and
+falls back to the portable build in `Desktop_App\dist\Vellum\Vellum.exe`.
 
 ---
 
@@ -66,6 +84,8 @@ The PDF contains comprehensive documentation covering:
 
 ## 🧪 Testing & Verification
 
+Run from this folder:
+
 ```powershell
 # Unit suite + in-process smoke test of every page
 Desktop_App\.venv\Scripts\python.exe -m pytest -o pythonpath=Desktop_App Desktop_App\tests -v
@@ -85,7 +105,7 @@ Desktop_App\.venv\Scripts\python.exe Desktop_App\tests\smoke_app_pages.py
 ## 🏗️ Rebuilding
 
 ```powershell
-# 1. Compile the frozen application bundle
+# 1. Compile the frozen application bundle (must run from Desktop_App)
 cd Desktop_App
 .venv\Scripts\python.exe -m PyInstaller --noconfirm --clean build_vellum_windows.spec
 
@@ -93,7 +113,7 @@ cd Desktop_App
 & "$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe" installer.iss
 ```
 
-The installer lands in `..\dist\Vellum-Desktop-V2.0-Setup-x64.exe`.
+The installer lands in `Vellum-Desktop-V2.0-Setup-x64.exe`, next to this file.
 
 ---
 

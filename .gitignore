@@ -173,3 +173,26 @@ dist/
 *.wma
 *.aiff
 *.aif
+
+# --- Vellum brand assets: MUST stay tracked ---
+# The bulk-media rule above is aimed at datasets and renders, but these few
+# files are *build inputs* and *product identity*:
+#   downloader.ico  -> build_vellum_windows.spec (icon=) and installer.iss
+#                      (SetupIconFile=). Without it a fresh clone cannot
+#                      produce the installer at all.
+#   downloader.png  -> runtime PhotoImage fallback (vellum_packaging.ICONS).
+#   assets/         -> shipped into the frozen bundle (vellum_packaging.TREES)
+#                      and used by the in-app documentation pages.
+#   favicon.ico     -> the web app's browser tab icon.
+# Losing any of them makes the repository non-reproducible.
+!Vellum_Desktop/Desktop_App/downloader.ico
+!Vellum_Desktop/Desktop_App/downloader.png
+!Vellum_Desktop/Desktop_App/assets/
+!Vellum_Desktop/Desktop_App/assets/**
+!Vellum_Desktop/Vellum_Desktop_V2.0_Botanical_Bento/Desktop_App/downloader.ico
+!Vellum_Desktop/Vellum_Desktop_V2.0_Botanical_Bento/Desktop_App/downloader.png
+!Vellum_Desktop/Vellum_Desktop_V2.0_Botanical_Bento/Desktop_App/assets/
+!Vellum_Desktop/Vellum_Desktop_V2.0_Botanical_Bento/Desktop_App/assets/**
+!Vellum_Web/Web_App_Fernly/downloader.ico
+!Vellum_Web/Web_App_Fernly/downloader.png
+!Vellum_Web/Web_App_Fernly/src/app/favicon.ico

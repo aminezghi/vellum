@@ -265,29 +265,29 @@ def build_pdf(filename="README_FOR_COLLEAGUES.pdf"):
     # 3. 1-Click Launchers
     story.append(Paragraph("3. 1-Click Application Launchers", h1_style))
     story.append(Paragraph(
-        "Each application can be launched directly from the root workspace folder without command-line configuration:",
+        "Each application lives in its own self-contained folder and can be launched directly without command-line configuration:",
         body_style,
     ))
 
     launch_data = [
         [Paragraph("File to Double-Click", table_header_style), Paragraph("Target Application", table_header_style), Paragraph("Local URL & Action", table_header_style)],
         [
-            Paragraph("<b>dist\\Vellum-Desktop-V2.0-Setup-x64.exe</b>", code_style),
+            Paragraph("<b>Vellum_Desktop\\Vellum-Desktop-V2.0-Setup-x64.exe</b>", code_style),
             Paragraph("Vellum Desktop Installer", table_cell_style),
             Paragraph("Installs per-user, no admin rights • Start Menu + uninstaller", table_cell_style),
         ],
         [
-            Paragraph("<b>2_Launch_Fernly_Web_App.bat</b>", code_style),
+            Paragraph("<b>Vellum_Web\\2_launch_fernly_web_app.bat</b>", code_style),
             Paragraph("Vellum Web — Fernly Bento (Flagship)", table_cell_style),
             Paragraph("<code>http://localhost:3002</code> • Force Graph, AI Screening, Boolean Search", table_cell_style),
         ],
         [
-            Paragraph("<b>1_Launch_Desktop_App.bat</b>", code_style),
+            Paragraph("<b>Vellum_Desktop\\1_launch_desktop_app.bat</b>", code_style),
             Paragraph("Vellum Desktop V2.0 Workbench", table_cell_style),
             Paragraph("<code>http://localhost:8501</code> • High-volume batch PDF extraction", table_cell_style),
         ],
         [
-            Paragraph("<b>3_Launch_Both_Apps.bat</b>", code_style),
+            Paragraph("<b>3_launch_both_apps.bat</b>", code_style),
             Paragraph("Dual Suite Concurrent Launch", table_cell_style),
             Paragraph("Boots Desktop (8501) and Web (3002) simultaneously", table_cell_style),
         ],

@@ -26,7 +26,7 @@ if exist "%INSTALLED%" (
     echo [OK] Vellum Desktop V2.0 is running!
 ) else (
     echo [!] No compiled binary found.
-    echo [*] Run the installer in the dist folder, or fall back to the source launcher...
+    echo [*] Run Vellum-Desktop-V2.0-Setup-x64.exe in this folder, or fall back to the source launcher...
     call "%~dp0CLICK_TO_RUN_VELLUM_DESKTOP.bat"
 )
 

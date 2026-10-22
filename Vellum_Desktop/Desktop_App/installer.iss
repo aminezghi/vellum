@@ -46,9 +46,9 @@ DefaultGroupName={#AppNameFull}
 DisableProgramGroupPage=yes
 DisableDirPage=no
 AllowNoIcons=yes
-OutputDir=..\dist
+OutputDir=..
 OutputBaseFilename=Vellum-Desktop-V2.0-Setup-x64
-SetupIconFile=..\Desktop_App\downloader.ico
+SetupIconFile=..\downloader.ico
 UninstallDisplayIcon={app}\{#AppExeName}
 UninstallDisplayName={#AppNameFull}
 

@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.units import inch
 from reportlab.lib import colors
@@ -289,4 +290,4 @@ def build_pdf(filename="README_FOR_COLLEAGUES.pdf"):
     print(f"[OK] Generated Standalone Web PDF: {filename}")
 
 if __name__ == "__main__":
-    build_pdf("c:/Users/azoua/Downloads/PDF_Downloader_Dual_Pack/Web_App_Fernly/README_FOR_COLLEAGUES.pdf")
+    build_pdf(str(Path(__file__).resolve().parent / "README_FOR_COLLEAGUES.pdf"))

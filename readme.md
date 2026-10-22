@@ -19,10 +19,10 @@ interactive exploration.
 
 ### Option A — Install Vellum Desktop (recommended)
 
-Run the installer in the **`dist/`** folder:
+Run the installer in the **`Vellum_Desktop\`** folder:
 
 ```
-dist\Vellum-Desktop-V2.0-Setup-x64.exe
+Vellum_Desktop\Vellum-Desktop-V2.0-Setup-x64.exe
 ```
 
 It installs to `%LOCALAPPDATA%\Programs\Vellum Desktop` — **no administrator rights required**.
@@ -35,10 +35,22 @@ The repository already ships a ready virtual environment, so the desktop app run
 double-click:
 
 ```
-1_launch_desktop_app.bat
+Vellum_Desktop\1_launch_desktop_app.bat
 ```
 
-This launches `http://localhost:8501` in your default browser using `Desktop_App\.venv`.
+This launches `http://localhost:8501` in your default browser using
+`Vellum_Desktop\Desktop_App\.venv`.
+
+### Option C — Run the web studio
+
+```
+Vellum_Web\2_launch_fernly_web_app.bat
+```
+
+Opens `http://localhost:3002`. Needs Node.js 18+.
+
+The two applications live in **separate, self-contained folders** — `Vellum_Desktop\`
+and `Vellum_Web\` — and neither depends on the other.
 
 ---
 
@@ -89,26 +101,38 @@ The browser studio for visual, interactive research:
 
 ```
 PDF_Downloader_Dual_Pack/
-├── dist/
-│   └── Vellum-Desktop-V2.0-Setup-x64.exe   ← the installer
-├── Desktop_App/                           ← Vellum Desktop V2.0 source
-│   ├── pdf_downloader_app.py              ← main application
-│   ├── app_pages/                         ← the 10 Streamlit pages
-│   ├── vellum_*.py                        ← feature modules
-│   ├── tests/                             ← pytest suite + page smoke test
-│   ├── docs/adr/                          ← architecture decision records
-│   ├── build_vellum_windows.spec          ← PyInstaller spec
-│   ├── installer.iss                      ← Inno Setup script
-│   └── dist/Vellum/                       ← compiled portable bundle
-├── Web_App_Fernly/                        ← Vellum Web source (port 3002)
-│   ├── src/app, src/components, src/lib
-│   └── .next/                             ← production build
-├── 1_launch_desktop_app.bat               ← desktop (from source)
-├── 2_launch_fernly_web_app.bat            ← web studio
-├── 3_launch_both_apps.bat                 ← both together
-├── CLICK_TO_RUN_VELLUM_DESKTOP.bat        ← desktop, auto-configuring launcher
-├── CLICK_TO_RUN_STANDALONE_EXE.bat        ← desktop, compiled binary
-└── README_FOR_COLLEAGUES.pdf              ← printable manual
+├── Vellum_Desktop/                        ← APPLICATION 1 (self-contained)
+│   ├── Desktop_App/                       ←   source + bundled venv + compiled bundle
+│   │   ├── pdf_downloader_app.py          ←   main application
+│   │   ├── app_pages/                     ←   the 10 Streamlit pages
+│   │   ├── vellum_*.py                    ←   feature modules
+│   │   ├── tests/                         ←   pytest suite + page smoke test
+│   │   ├── docs/adr/                      ←   architecture decision records
+│   │   ├── build_vellum_windows.spec      ←   PyInstaller spec
+│   │   ├── installer.iss                  ←   Inno Setup script
+│   │   └── dist/Vellum/                   ←   compiled portable bundle
+│   ├── Vellum-Desktop-V2.0-Setup-x64.exe  ←   the installer
+│   ├── Vellum_Standalone_Windows_x64.zip  ←   portable compiled bundle
+│   ├── Vellum_Desktop_V2.0_Botanical_Bento.zip ← source drop for colleagues
+│   ├── 1_launch_desktop_app.bat           ←   desktop (from source)
+│   ├── CLICK_TO_RUN_VELLUM_DESKTOP.bat    ←   desktop, auto-configuring launcher
+│   ├── CLICK_TO_RUN_STANDALONE_EXE.bat    ←   desktop, compiled binary
+│   ├── README.md                          ←   desktop manual (this app)
+│   └── README_VELLUM_DESKTOP_V2.0.pdf     ←   printable manual
+├── Vellum_Web/                            ← APPLICATION 2 (self-contained)
+│   ├── Web_App_Fernly/                    ←   source (port 3002)
+│   │   ├── src/app, src/components, src/lib
+│   │   └── .next/                         ←   production build
+│   ├── 2_launch_fernly_web_app.bat        ←   web studio launcher
+│   ├── Vellum_Web_Fernly_Latest_Export.zip←   source export
+│   ├── README.md                          ←   web manual (this app)
+│   └── Web_App_Fernly/README_FOR_COLLEAGUES.md ← full standalone manual
+├── 3_launch_both_apps.bat                 ← launches both together
+├── readme.md                              ← this file
+├── README_FOR_COLLEAGUES.md / .pdf        ← printable manual for the whole pack
+├── quick_start_for_colleagues.md
+├── glossary.md
+└── start_here.txt
 ```
 
 ---
@@ -119,13 +143,16 @@ Everything in this pack has been exercised end to end.
 
 ```powershell
 # Desktop unit suite (64 tests) + in-process smoke test of all 10 pages
+cd Vellum_Desktop
 Desktop_App\.venv\Scripts\python.exe -m pytest -o pythonpath=Desktop_App Desktop_App\tests -v
 
 # Page smoke test on its own, with full tracebacks
 Desktop_App\.venv\Scripts\python.exe Desktop_App\tests\smoke_app_pages.py
 
 # Web app: type-check + production build
-cd Web_App_Fernly; npm run build
+cd ..\Vellum_Web\Web_App_Fernly
+npx tsc --noEmit
+npx next build
 ```
 
 | Suite | Result |

@@ -14,11 +14,14 @@ on your machine — no account, no cloud, no telemetry.
 
 | What you want to test | File to double-click | Setup required |
 | :--- | :--- | :--- |
-| **📥 Install Vellum Desktop** | **`dist\Vellum-Desktop-V2.0-Setup-x64.exe`** | None — standard installer, no admin rights |
-| **🖥️ Desktop Workbench** | **`1_Launch_Desktop_App.bat`** | None (virtual environment is bundled) |
-| **🌐 Web Research Studio** | **`2_Launch_Fernly_Web_App.bat`** | Node.js 18+ (opens on port 3002) |
-| **🚀 Both Together** | **`3_Launch_Both_Apps.bat`** | Launches desktop and web side by side |
-| **⚡ Compiled Desktop** | **`CLICK_TO_RUN_STANDALONE_EXE.bat`** | Prefers the installed copy, falls back to the portable bundle |
+| **📥 Install Vellum Desktop** | **`Vellum_Desktop\Vellum-Desktop-V2.0-Setup-x64.exe`** | None — standard installer, no admin rights |
+| **🖥️ Desktop Workbench** | **`Vellum_Desktop\1_launch_desktop_app.bat`** | None (virtual environment is bundled) |
+| **🌐 Web Research Studio** | **`Vellum_Web\2_launch_fernly_web_app.bat`** | Node.js 18+ (opens on port 3002) |
+| **🚀 Both Together** | **`3_launch_both_apps.bat`** | Launches desktop and web side by side |
+| **⚡ Compiled Desktop** | **`Vellum_Desktop\CLICK_TO_RUN_STANDALONE_EXE.bat`** | Prefers the installed copy, falls back to the portable bundle |
+
+The two applications live in **separate, self-contained folders** — `Vellum_Desktop\`
+and `Vellum_Web\` — and neither depends on the other.
 
 ---
 
@@ -27,8 +30,8 @@ on your machine — no account, no cloud, no telemetry.
 **Port:** `http://localhost:8501` · Native window, no browser chrome.
 
 ### How to Run
-Double-click **`1_Launch_Desktop_App.bat`** — or install properly with
-**`dist\Vellum-Desktop-V2.0-Setup-x64.exe`**, which needs no Python at all.
+Double-click **`Vellum_Desktop\1_launch_desktop_app.bat`** — or install properly with
+**`Vellum_Desktop\Vellum-Desktop-V2.0-Setup-x64.exe`**, which needs no Python at all.
 
 ### Key Features to Test
 1. **📥 High-Throughput PDF Downloader** — enter DOIs, arXiv IDs or titles, or upload exported
@@ -60,7 +63,7 @@ Double-click **`1_Launch_Desktop_App.bat`** — or install properly with
 **Port:** `http://localhost:3002` · Next.js 16 + React 19 + Tailwind 4.
 
 ### How to Run
-Double-click **`2_Launch_Fernly_Web_App.bat`**.
+Double-click **`Vellum_Web\2_launch_fernly_web_app.bat`**.
 
 ### Key Features to Test
 1. **🔬 250M+ Academic Multi-Source Search** — OpenAlex, arXiv, Semantic Scholar, Crossref,
@@ -88,12 +91,12 @@ Double-click **`2_Launch_Fernly_Web_App.bat`**.
 ## ❓ Frequently Asked Questions & Troubleshooting
 
 ### Q1 — Do I need to install Python for the Desktop App?
-**No.** Run `dist\Vellum-Desktop-V2.0-Setup-x64.exe` and the app works with zero Python. The
+**No.** Run `Vellum_Desktop\Vellum-Desktop-V2.0-Setup-x64.exe` and the app works with zero Python. The
 in-repository launcher also works because the virtual environment is already bundled.
 
 ### Q2 — What do I need to run the Web App?
 Only **Node.js 18+** ([nodejs.org](https://nodejs.org)). Dependencies are already installed in
-`Web_App_Fernly/node_modules/`.
+`Vellum_Web\Web_App_Fernly\node_modules\`.
 
 ### Q3 — How do I stop the servers?
 Close the desktop window (the background engine terminates with it). For the web app, close the
