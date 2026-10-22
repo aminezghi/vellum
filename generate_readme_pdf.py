@@ -233,8 +233,8 @@ def build_pdf(filename="README_FOR_COLLEAGUES.pdf"):
         ],
         [
             Paragraph("<b>Web Editions</b>", table_cell_style),
-            Paragraph("Node.js 18.0.0 or higher", table_cell_style),
-            Paragraph("Node.js LTS 20+ from <font color='#1b4332'><u>https://nodejs.org</u></font>", table_cell_style),
+            Paragraph("Zero setup (one-click package)<br/>or Node.js 18+ (from source)", table_cell_style),
+            Paragraph("The shareable package <code>Vellum_Web_Fernly_SHARE.zip</code> bundles its own portable Node.js runtime, verified against nodejs.org checksums. Running from source still needs Node.js LTS 20+.", table_cell_style),
         ],
         [
             Paragraph("<b>Browser</b>", table_cell_style),
@@ -277,6 +277,11 @@ def build_pdf(filename="README_FOR_COLLEAGUES.pdf"):
             Paragraph("Installs per-user, no admin rights • Start Menu + uninstaller", table_cell_style),
         ],
         [
+            Paragraph("<b>Vellum_Web\\Vellum_Web_Fernly_SHARE\\START_VELLUM_WEB.bat</b>", code_style),
+            Paragraph("Vellum Web — Fernly Bento (one-click package)", table_cell_style),
+            Paragraph("The package to send to a colleague • <b>nothing to install</b> • Node.js bundled", table_cell_style),
+        ],
+        [
             Paragraph("<b>Vellum_Web\\2_launch_fernly_web_app.bat</b>", code_style),
             Paragraph("Vellum Web — Fernly Bento (Flagship)", table_cell_style),
             Paragraph("<code>http://localhost:3002</code> • Force Graph, AI Screening, Boolean Search", table_cell_style),
@@ -305,6 +310,18 @@ def build_pdf(filename="README_FOR_COLLEAGUES.pdf"):
         ("RIGHTPADDING", (0, 0), (-1, -1), 6),
     ]))
     story.append(launch_table)
+    story.append(Spacer(1, 10))
+
+    # SmartScreen / integrity note - the two things a colleague asks about
+    # when a Windows installer warns them.
+    story.append(Paragraph(
+        "<b>First run of the installer:</b> it is not code-signed, so Windows SmartScreen shows "
+        "\u201cWindows protected your PC\u201d. Choose <b>More info \u2192 Run anyway</b>. To confirm "
+        "the file you received is the one that was built, run "
+        "<code>certutil -hashfile Vellum-Desktop-V2.0-Setup-x64.exe SHA256</code> and compare it with "
+        "<code>DISTRIBUTABLES\\SHA256SUMS.txt</code>.",
+        body_style,
+    ))
     story.append(Spacer(1, 10))
 
     # 4. Core Features & Scientific Workflows

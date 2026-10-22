@@ -56,12 +56,21 @@ accounts, no cloud sync, no telemetry, no telemetry endpoints.
 - **Operating System:** Windows 10 (version 1903+) or Windows 11 (64-bit).
 - **For Vellum Desktop:** **Zero software dependencies.** The installer bundles a
   pre-compiled standalone binary (`Vellum.exe`). No Python installation is needed.
-- **For Vellum Web:** **Node.js 18.0.0 or higher** (LTS 20+ recommended) from
-  [https://nodejs.org](https://nodejs.org).
+- **For Vellum Web (one-click package):** **Zero software dependencies.** The
+  shareable package `Vellum_Web\Vellum_Web_Fernly_SHARE.zip` carries its own
+  portable Node.js runtime, verified against `nodejs.org`'s published checksums.
+  Unzip it and double-click `START_VELLUM_WEB.bat` — nothing to install.
+- **For Vellum Web (running from this repository):** **Node.js 18.0.0 or higher**
+  (LTS 20+ recommended) from [https://nodejs.org](https://nodejs.org).
 - **Browser:** Any modern Chromium-based browser (Chrome, Edge, Brave) or Firefox.
 - **Desktop only:** Microsoft Edge **WebView2 Runtime** for the native window. It ships with
   Windows 11 and current Windows 10; Vellum falls back to a standalone Edge/Chrome app
   window when it is unavailable.
+- **SmartScreen:** the desktop installer is not code-signed, so Windows shows
+  *"Windows protected your PC"* on first run. Choose **More info → Run anyway**.
+  To confirm the file you received is the one that was built, run
+  `certutil -hashfile Vellum-Desktop-V2.0-Setup-x64.exe SHA256` and compare it
+  with `DISTRIBUTABLES\SHA256SUMS.txt`.
 
 #### 3. Network & Firewall
 - Outbound access on ports **80** and **443** (HTTPS) to resolve open-access literature from:
@@ -94,7 +103,8 @@ None of these are touched by the uninstaller.
 | :--- | :--- | :--- | :--- |
 | **`Vellum_Desktop\Vellum-Desktop-V2.0-Setup-x64.exe`** | Vellum Desktop installer | — | Installs the desktop app per-user, no admin required |
 | **`Vellum_Desktop\1_launch_desktop_app.bat`** | Vellum Desktop Workbench | `http://localhost:8501` | High-volume PDF downloads, RIS/BibTeX import, vault indexing |
-| **`Vellum_Web\2_launch_fernly_web_app.bat`** | Vellum Web Studio | `http://localhost:3002` | Citation graph, AI screening, visual boolean search, notebooks |
+| **`Vellum_Web\Vellum_Web_Fernly_SHARE\START_VELLUM_WEB.bat`** | Vellum Web Studio | `http://localhost:3002` | **The package to send to a colleague.** Nothing to install — Node.js is bundled |
+| **`Vellum_Web\2_launch_fernly_web_app.bat`** | Vellum Web Studio (from source) | `http://localhost:3002` | Citation graph, AI screening, visual boolean search, notebooks |
 | **`3_launch_both_apps.bat`** | Dual Workbench Mode | Ports 8501 & 3002 | Launches desktop and web side by side |
 | **`Vellum_Desktop\CLICK_TO_RUN_STANDALONE_EXE.bat`** | Vellum Desktop (compiled) | `http://localhost:8501` | Prefers the installed copy, falls back to the portable bundle |
 

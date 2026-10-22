@@ -245,6 +245,16 @@ def build_pdf():
     story.append(Paragraph("<b>Step 3:</b> Your default browser will launch automatically to the interface:", bullet_style))
     story.append(Paragraph("<code>http://localhost:8501</code>", code_style))
 
+    story.append(Paragraph("<b>Prefer the installer?</b> Double-click <code>Vellum-Desktop-V2.0-Setup-x64.exe</code> — it installs per-user, needs no administrator rights and no Python.", bullet_style))
+    story.append(Paragraph(
+        "<b>First run:</b> the installer is not code-signed, so Windows SmartScreen shows "
+        "\u201cWindows protected your PC\u201d. Choose <b>More info \u2192 Run anyway</b>. To confirm the "
+        "file you received is the one that was built, run "
+        "<code>certutil -hashfile Vellum-Desktop-V2.0-Setup-x64.exe SHA256</code> and compare it with "
+        "<code>DISTRIBUTABLES\\SHA256SUMS.txt</code>.",
+        bullet_style,
+    ))
+
     # System Requirements Table
     req_data = [
         ["Component", "Minimum Requirement", "Recommended"],

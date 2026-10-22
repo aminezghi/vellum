@@ -317,6 +317,29 @@ def check_installer(rep: Report, do_install: bool = True) -> None:
     kill_tree(proc.pid)
     time.sleep(1.5)
 
+    # The check above exercises the server path. This one exercises the path a
+    # colleague actually takes: double-click the installed Vellum.exe, get the
+    # native WebView2 window, and be served by it. The launcher picks its own
+    # free port, so every candidate is probed.
+    t = time.time()
+    gui = subprocess.Popen([str(exe)], cwd=str(target),
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    gui_port, gui_ok = 0, False
+    deadline = time.time() + 150
+    while time.time() < deadline and not gui_ok:
+        for p in range(8501, 8526):
+            if http(f"http://127.0.0.1:{p}/_stcore/health", timeout=1)[0] == 200:
+                gui_port, gui_ok = p, True
+                break
+        if gui_ok or gui.poll() is not None:
+            break
+        time.sleep(0.5)
+    rep.add("installed Vellum.exe opens its native window and serves", gui_ok,
+            f"native app healthy on port {gui_port}" if gui_ok
+            else "no native window came up within 150s", dt=time.time() - t)
+    kill_tree(gui.pid)
+    time.sleep(1.5)
+
     t = time.time()
     unins = target / "unins000.exe"
     if unins.is_file():
