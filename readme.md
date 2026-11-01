@@ -65,7 +65,7 @@ Download **[`Vellum_Standalone_Windows_x64.zip`](https://github.com/aminezghi/ve
 - Zero installation required; completely portable on USB drives.
 
 ### Option 3: Zero-Install Web Studio (Colleague Share Package)
-Download **[`Vellum_Web_Fernly_OneClick_Package.zip`](https://github.com/aminezghi/vellum/releases/download/v2.1.0/Vellum_Web_Fernly_OneClick_Package.zip)**:
+Download **[`Vellum_Web_OneClick_Package.zip`](https://github.com/aminezghi/vellum/releases/download/v2.1.0/Vellum_Web_OneClick_Package.zip)**:
 - Extract anywhere and double-click **`START_VELLUM_WEB.bat`**.
 - Ships with a bundled, pre-verified portable Node.js runtime (`v24.22.1 LTS`).
 - **No Node.js, no Python, and no administrator rights needed**. Automatically opens `http://localhost:3002`.

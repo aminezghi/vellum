@@ -62,7 +62,7 @@ jobs:
       - name: Smoke-test the installer (install -> run -> health -> uninstall)
         shell: pwsh
         run: |
-          $inst = "${{ github.workspace }}\Vellum_Desktop\Vellum-Desktop-V2.0-Setup-x64.exe"
+          $inst = "${{ github.workspace }}\Vellum_Desktop\Vellum-Desktop-V2.1-Setup-x64.exe"
           $dir  = "$env:RUNNER_TEMP\vellum-install"
           if (-not (Test-Path $inst)) { throw "installer not produced" }
           & $inst /VERYSILENT /SUPPRESSMSGBOXES /NORESTART "/DIR=$dir" "/LOG=$env:RUNNER_TEMP\install.log"
@@ -86,7 +86,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: vellum-desktop-installer
-          path: Vellum_Desktop/Vellum-Desktop-V2.0-Setup-x64.exe
+          path: Vellum_Desktop/Vellum-Desktop-V2.1-Setup-x64.exe
           if-no-files-found: error
 
   web:
@@ -103,30 +103,30 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
           cache: npm
-          cache-dependency-path: Vellum_Web/Web_App_Fernly/package-lock.json
+          cache-dependency-path: Vellum_Web/Web_App/package-lock.json
 
       - name: Install dependencies
-        working-directory: Vellum_Web/Web_App_Fernly
+        working-directory: Vellum_Web/Web_App
         run: npm ci
 
       - name: Type-check
-        working-directory: Vellum_Web/Web_App_Fernly
+        working-directory: Vellum_Web/Web_App
         run: npx tsc --noEmit
 
       - name: Lint
-        working-directory: Vellum_Web/Web_App_Fernly
+        working-directory: Vellum_Web/Web_App
         # Zero errors and zero warnings, enforced. --max-warnings 0 keeps the
         # gate from decaying: a warning that nobody has to fix is how the tree
         # drifted to 46 errors / 53 warnings in the first place.
         run: npx eslint . --max-warnings 0
 
       - name: Production build
-        working-directory: Vellum_Web/Web_App_Fernly
+        working-directory: Vellum_Web/Web_App
         run: npx next build
 
       - name: Boot the production build and exercise the API routes
         shell: pwsh
-        working-directory: Vellum_Web/Web_App_Fernly
+        working-directory: Vellum_Web/Web_App
         run: |
           $env:PORT = "3002"
           $p = Start-Process "npx.cmd" -ArgumentList "next","start","-p","3002" -PassThru -WindowStyle Hidden
@@ -158,10 +158,8 @@ jobs:
         shell: pwsh
         run: |
           $files = @(
-            "Vellum_Desktop\Vellum-Desktop-V2.0-Setup-x64.exe",
-            "Vellum_Desktop\Vellum_Standalone_Windows_x64.zip",
-            "Vellum_Desktop\Vellum_Desktop_V2.0_Botanical_Bento.zip",
-            "Vellum_Web\Vellum_Web_Fernly_Latest_Export.zip"
+            "Vellum_Desktop\Vellum-Desktop-V2.1-Setup-x64.exe",
+            "Vellum_Desktop\Vellum_Standalone_Windows_x64.zip"
           )
           $rows = foreach ($f in $files) {
             if (Test-Path $f) {
@@ -202,7 +200,7 @@ jobs:
             echo
             echo "Colleagues can verify a received installer with:"
             echo '```powershell'
-            echo "certutil -hashfile Vellum-Desktop-V2.0-Setup-x64.exe SHA256"
+            echo "certutil -hashfile Vellum-Desktop-V2.1-Setup-x64.exe SHA256"
             echo '```'
           } > RELEASE_NOTES.md
           cat RELEASE_NOTES.md

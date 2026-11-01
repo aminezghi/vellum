@@ -60,7 +60,7 @@ cd Vellum_Desktop\Desktop_App
 cd ..\..
 
 # 4. web: production build
-cd Vellum_Web\Web_App_Fernly
+cd Vellum_Web\Web_App
 npm run lint
 npx tsc --noEmit
 npx next build

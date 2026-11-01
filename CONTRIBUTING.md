@@ -27,7 +27,7 @@ streamlit run pdf_downloader_app.py
 
 ### 2. Vellum Web Studio (Next.js 16 + React 19 + Tailwind CSS)
 ```powershell
-cd Vellum_Web\Web_App_Fernly
+cd Vellum_Web\Web_App
 npm install
 npm run dev
 ```
@@ -45,7 +45,7 @@ Every PR must pass automated testing before merging:
 & "Vellum_Desktop\Desktop_App\.venv\Scripts\python.exe" "Vellum_Desktop\Desktop_App\tests\smoke_app_pages.py"
 
 # 2. Web studio test suite (64 unit & adversarial tests)
-cd Vellum_Web\Web_App_Fernly
+cd Vellum_Web\Web_App
 npm test
 npm run build
 cd ..\..

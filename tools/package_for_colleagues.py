@@ -7,7 +7,7 @@
    - User manuals: README_VELLUM_DESKTOP_V2.1.pdf, README_FOR_COLLEAGUES.pdf
    - Quick instructions: README.txt
 
-2. Web: Vellum_Web_Fernly_OneClick_Package.zip
+2. Web: Vellum_Web_OneClick_Package.zip
    - Self-contained portable Node.js runtime (runtime/node/)
    - Pre-compiled production Next.js app (app/)
    - 1-click launcher: START_VELLUM_WEB.bat
@@ -102,7 +102,7 @@ def build_desktop_package() -> Path:
     # 4. Create README.txt
     readme_txt = (
         "=====================================================================\n"
-        "VELLUM DESKTOP V2.1 by AMINE - BOTANICAL BENTO EDITION\n"
+        "VELLUM DESKTOP V2.1 by AMINE\n"
         "Academic Research, Systematic Review & Heavy PDF Retrieval Workbench\n"
         "=====================================================================\n\n"
         "HOW TO INSTALL & RUN (One-Click Setup):\n"
@@ -153,7 +153,7 @@ def build_desktop_package() -> Path:
 
 def build_web_package() -> Path:
     print("\n[2/2] Building Web One-Click Share Package...")
-    share_dir = REPO_ROOT / "Vellum_Web" / "Vellum_Web_Fernly_SHARE"
+    share_dir = REPO_ROOT / "Vellum_Web" / "Vellum_Web_OneClick_Package"
     if not share_dir.is_dir():
         raise FileNotFoundError(f"Missing {share_dir}")
 
@@ -162,20 +162,20 @@ def build_web_package() -> Path:
     if colleague_pdf.is_file():
         shutil.copy2(colleague_pdf, share_dir / "README_FOR_COLLEAGUES.pdf")
 
-    out_zip = DIST / "Vellum_Web_Fernly_OneClick_Package.zip"
+    out_zip = DIST / "Vellum_Web_OneClick_Package.zip"
     print(f"  Zipping package to: {out_zip.name} (includes portable Node.js runtime) ...")
     files = sorted(p for p in share_dir.rglob("*") if p.is_file())
     with zipfile.ZipFile(out_zip, "w", zipfile.ZIP_DEFLATED, compresslevel=6) as zf:
         for p in files:
-            arcname = f"Vellum_Web_Fernly_SHARE/{p.relative_to(share_dir).as_posix()}"
+            arcname = f"Vellum_Web_OneClick_Package/{p.relative_to(share_dir).as_posix()}"
             add_file_to_zip(zf, arcname, p)
 
     # Copy to root as well
-    root_zip = REPO_ROOT / "Vellum_Web_Fernly_OneClick_Package.zip"
+    root_zip = REPO_ROOT / "Vellum_Web_OneClick_Package.zip"
     shutil.copy2(out_zip, root_zip)
 
-    # Also synchronize Vellum_Web_Fernly_SHARE.zip
-    shutil.copy2(out_zip, REPO_ROOT / "Vellum_Web" / "Vellum_Web_Fernly_SHARE.zip")
+    # Also synchronize Vellum_Web_OneClick_Package.zip
+    shutil.copy2(out_zip, REPO_ROOT / "Vellum_Web" / "Vellum_Web_OneClick_Package.zip")
 
     print(f"  [OK] Web Package: {out_zip.stat().st_size / 1024 / 1024:.1f} MB (SHA-256: {sha256(out_zip)[:16]}...)")
     return out_zip

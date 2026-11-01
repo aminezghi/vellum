@@ -233,11 +233,6 @@ source drop is `Vellum_Desktop_V2.1_Botanical_Bento.zip`.
 
 The Bento editions.
 
-- **Vellum Desktop V2.0** — Fernly Botanical Bento Edition: ASReview active
-  learning screening, Connected Papers citation graph, multi-source LitCheck,
-  batch PDF downloader, bibliographic importer, local PDF vault and PRISMA
-  2020 export.
-- **Vellum Web** — Fernly Botanical Bento Edition: the same workflow as an
-  interactive browser studio on port 3002, with a tri-pane grounded
-  workspace and IndexedDB persistence.
+- **Vellum Desktop V2.0** — Active learning screening, Connected Papers citation graph, multi-source LitCheck, batch PDF downloader, bibliographic importer, local PDF vault and PRISMA 2020 export.
+- **Vellum Web** — The same workflow as an interactive browser studio on port 3002, with a tri-pane grounded workspace and IndexedDB persistence.
 - The Windows installer, the portable bundle, and the source drops.

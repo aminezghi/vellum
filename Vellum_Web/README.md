@@ -24,4 +24,4 @@ Double-click **`launch_web_app.bat`** (or run `npm run dev` / `npm run build` in
 The launcher boots the studio on `http://localhost:3002`.
 
 ### 2. Zero-Install Colleague Share Package
-If sharing with colleagues who do not have Node.js installed, use the pre-built **`Vellum_Web_Fernly_OneClick_Package.zip`** from [GitHub Releases](https://github.com/aminezghi/vellum/releases/latest) or `DISTRIBUTABLES/`, which bundles its own verified portable Node.js runtime.
+If sharing with colleagues who do not have Node.js installed, use the pre-built **`Vellum_Web_OneClick_Package.zip`** from [GitHub Releases](https://github.com/aminezghi/vellum/releases/latest) or `DISTRIBUTABLES/`, which bundles its own verified portable Node.js runtime.

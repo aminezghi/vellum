@@ -15,7 +15,7 @@ Vellum is a 100% local-first academic research suite designed for literature dis
 2. **`Vellum_Standalone_Windows_x64.zip`** (177.7 MB)
    - Portable, zero-install desktop distribution. Unzip anywhere and double-click `Vellum.exe`.
 
-3. **`Vellum_Web_Fernly_OneClick_Package.zip`** (127.1 MB)
+3. **`Vellum_Web_OneClick_Package.zip`** (127.1 MB)
    - Self-contained web studio package. Includes pre-verified portable Node.js runtime (`v24.22.1 LTS`).
    - Double-click `START_VELLUM_WEB.bat` to launch on `http://localhost:3002`.
 
@@ -39,5 +39,6 @@ Check against `SHA256SUMS.txt`:
 ```
 db0e5e5eced31efe041562b93d8a37adf43d01678502365b7edce041b3044354  Vellum-Desktop-V2.1-Setup-x64.exe
 cee9fd71eb3452d53e252ac4ff04d73c63aeda5caccb6578a6d80781a2a6dc47  Vellum_Standalone_Windows_x64.zip
-b469ca2e4ca1223f31c253db962928246e7517b943d84f9fb5eef71b342beed8  Vellum_Web_Fernly_SHARE.zip
+787768b598b9605332f1ea30c5e630ec8b4e7ce2b8a01f930e4b85d95be04583  Vellum_Desktop_Installer_Windows_x64.zip
+b469ca2e4ca1223f31c253db962928246e7517b943d84f9fb5eef71b342beed8  Vellum_Web_OneClick_Package.zip
 ```
