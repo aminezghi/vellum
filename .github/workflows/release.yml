@@ -65,8 +65,11 @@ jobs:
           $inst = "${{ github.workspace }}\Vellum_Desktop\Vellum-Desktop-V2.1-Setup-x64.exe"
           $dir  = "$env:RUNNER_TEMP\vellum-install"
           if (-not (Test-Path $inst)) { throw "installer not produced" }
-          & $inst /VERYSILENT /SUPPRESSMSGBOXES /NORESTART "/DIR=$dir" "/LOG=$env:RUNNER_TEMP\install.log"
-          if (-not (Test-Path "$dir\Vellum.exe")) { throw "Vellum.exe missing after install" }
+          Start-Process -FilePath $inst -ArgumentList "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/DIR=$dir", "/LOG=$env:RUNNER_TEMP\install.log" -Wait
+          if (-not (Test-Path "$dir\Vellum.exe")) {
+            if (Test-Path "$env:RUNNER_TEMP\install.log") { Get-Content "$env:RUNNER_TEMP\install.log" }
+            throw "Vellum.exe missing after install"
+          }
           $env:VELLUM_SERVER = "1"
           $env:STREAMLIT_SERVER_PORT = "8501"
           $p = Start-Process "$dir\Vellum.exe" -PassThru -WindowStyle Hidden
@@ -79,6 +82,7 @@ jobs:
             } catch {}
           }
           Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue
+          & taskkill /F /IM Vellum.exe /T 2>$null
           if (-not $ok) { throw "installed app did not become healthy" }
           Write-Output "installer smoke test passed"
 
@@ -154,12 +158,17 @@ jobs:
         with:
           python-version: "3.13"
 
+      - name: Download built desktop installer
+        uses: actions/download-artifact@v4
+        with:
+          name: vellum-desktop-installer
+          path: Vellum_Desktop
+
       - name: Hash the distributables
         shell: pwsh
         run: |
           $files = @(
-            "Vellum_Desktop\Vellum-Desktop-V2.1-Setup-x64.exe",
-            "Vellum_Desktop\Vellum_Standalone_Windows_x64.zip"
+            "Vellum_Desktop\Vellum-Desktop-V2.1-Setup-x64.exe"
           )
           $rows = foreach ($f in $files) {
             if (Test-Path $f) {
@@ -179,8 +188,7 @@ jobs:
   release-notes:
     name: Release notes
     runs-on: ubuntu-latest
-    needs: [desktop, web, release]
-    if: always()
+    needs: [release]
     steps:
       - uses: actions/download-artifact@v4
         with:
