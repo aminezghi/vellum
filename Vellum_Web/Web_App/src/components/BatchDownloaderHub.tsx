@@ -275,7 +275,6 @@ export function BatchDownloaderHub({ notebooks }: BatchDownloaderHubProps) {
         const item = queue[itemIdx];
         if (!item || item.status === "success") continue;
 
-        // Set worker status
         setQueue((prev) =>
           prev.map((q, idx) =>
             idx === itemIdx

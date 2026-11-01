@@ -153,7 +153,7 @@ None of these are touched by the uninstaller.
   - **Ocean** (Deep academic maritime cyan/blue)
   - **Plum** (Scholarly imperial amethyst)
   - **Ember** (Warm research terracotta)
-- Accent palettes switch instantly and persist seamlessly across both Day and Night modes.
+- Accent palettes switch instantly and persist reliably across both Day and Night modes.
 
 ---
 

@@ -10,7 +10,7 @@ Implements:
   - Unmistakable Active Tab Highlighting: Solid Wispr Flare (#FF6C4C) pill with crisp white text
   - Matching Top Tool Pill Capsules: ⚙️ Vault, ☀️/🌙 Theme, ℹ️ About, 🔄 Reset
   - Ultra-high contrast typography & labels ensuring 100% readability across both modes
-  - Seamless, zero-network font rendering for zero-latency instant theme switching
+  - Offline, local font rendering for zero-latency instant theme switching
 """
 
 from __future__ import annotations

@@ -9,7 +9,7 @@ Enables:
      - Unpaywall API (all OA locations)
      - Semantic Scholar Open Access API
      - Sci-Hub fallback mirrors
-  3. Returns browser fallback URL for seamless manual access if CAPTCHA blocks retrieval.
+  3. Returns browser fallback URL for direct browser access if CAPTCHA blocks automated retrieval.
   4. Synchronized persistent Download Queue with bulk processing.
 """
 
@@ -488,7 +488,7 @@ def add_to_download_queue(
     doi = paper.get("doi") or ""
     title = paper.get("title") or "Untitled Paper"
 
-    # Avoid duplicate
+    # Prevent duplicate queue entries by matching canonical DOI or title
     for q in queue:
         if (doi and q.get("doi") == doi) or (q.get("title") == title):
             return False

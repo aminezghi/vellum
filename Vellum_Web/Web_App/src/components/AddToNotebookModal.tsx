@@ -89,7 +89,6 @@ function AddToNotebookDialog({
       return;
     }
 
-    // Add source to IndexedDB
     const newSource: Source = {
       id: `src-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
       notebookId: targetNotebookId,
@@ -105,7 +104,6 @@ function AddToNotebookDialog({
 
     await db.sources.put(newSource);
 
-    // Update notebook counts
     const count = await db.sources.where("notebookId").equals(targetNotebookId).count();
     await db.notebooks.update(targetNotebookId, {
       sourcesCount: count,

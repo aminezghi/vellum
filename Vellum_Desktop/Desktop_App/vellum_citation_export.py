@@ -1,7 +1,7 @@
 """
 vellum_citation_export.py — 1-Click Export to Zotero (.ris), EndNote (.enw), and BibTeX (.bib).
 
-Provides compliant citation formats for seamless import into:
+Provides compliant citation formats for direct import into:
   - Zotero (via RIS or BibTeX)
   - EndNote (via Tagged ENW or RIS)
   - Mendeley & Paperpile (via RIS or BibTeX)

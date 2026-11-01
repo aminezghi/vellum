@@ -143,10 +143,10 @@ class VellumDesktopApp:
             import vellum_workspace
             env["VELLUM_VAULT_DIR"] = str(vellum_workspace.get_vault_dir())
             env["VELLUM_ACTIVE_PROJECT"] = str(vellum_workspace.get_active_project_name())
-        except Exception:
-            pass
+        except Exception as exc:
+            log_app(f"Workspace environment discovery notice: {exc}")
 
-        # Log output
+        # Redirect background Streamlit standard streams to server log
         try:
             log_file = open(SERVER_LOG, "w", encoding="utf-8", errors="replace")
         except OSError:

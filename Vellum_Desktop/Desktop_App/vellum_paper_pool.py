@@ -300,7 +300,6 @@ def render_paper_pool(
 
     st.markdown("<hr style='margin: 8px 0 16px 0; border: none; border-bottom: 1px solid rgba(255,255,255,0.06);'>", unsafe_allow_html=True)
 
-    # Filter papers
     filtered = papers
     if search_filter.strip():
         q = search_filter.strip().lower()

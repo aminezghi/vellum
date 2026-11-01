@@ -445,7 +445,7 @@ export function ConnectedGraphHub({
     const coords = getCanvasCoords(e);
     const nodes = simNodesRef.current;
 
-    // Check if clicked a node
+    // Reverse-iteration hit-test to prioritize top-rendered node; fallback to panning
     for (let i = nodes.length - 1; i >= 0; i--) {
       const n = nodes[i];
       const dx = coords.x - n.x;
@@ -457,7 +457,6 @@ export function ConnectedGraphHub({
       }
     }
 
-    // Otherwise, pan canvas
     isDraggingCanvas.current = true;
     dragStart.current = { x: e.clientX - transform.x, y: e.clientY - transform.y };
   };

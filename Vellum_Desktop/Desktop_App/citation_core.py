@@ -116,19 +116,16 @@ def _parse_openalex_work(item: Dict[str, Any]) -> Dict[str, Any]:
     oa_id = (item.get("id") or "").replace("https://openalex.org/", "")
     doi = clean_doi(item.get("doi") or "")
 
-    # Authors
     authors = []
     for authorship in item.get("authorships", []):
         author_name = authorship.get("author", {}).get("display_name")
         if author_name:
             authors.append(author_name)
 
-    # Primary venue
     location = item.get("primary_location") or {}
     source = location.get("source") or {}
     venue = source.get("display_name") or "Unknown Venue"
 
-    # PDF / OA URL
     pdf_url = location.get("pdf_url") or ""
     landing_url = location.get("landing_page_url") or ""
 

@@ -397,7 +397,6 @@ class ASReviewActiveLearningModel:
         except Exception:
             return labeled + pending
 
-        # Index mapping
         id_to_idx = {c.get("id"): idx for idx, c in enumerate(candidates)}
         
         train_indices = [id_to_idx[c.get("id")] for c in labeled]
@@ -489,7 +488,7 @@ def get_active_session(sessions: List[Dict[str, Any]]) -> Dict[str, Any]:
     if sessions:
         st.session_state["_as_active_session_id"] = sessions[0]["id"]
         return sessions[0]
-    # Fallback create
+    # Initialize new session if no existing session is found
     new_s = {
         "id": f"session_{uuid.uuid4().hex[:6]}",
         "name": "Systematic Review Screening",
@@ -660,7 +659,6 @@ def render():
                     st.rerun()
 
     with s_col4:
-        # Delete session
         if len(sessions) > 1:
             if st.button("🗑️ Delete", key="_btn_del_session", use_container_width=True, help="Delete this screening session"):
                 sessions = [s for s in sessions if s.get("id") != session.get("id")]

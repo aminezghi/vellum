@@ -341,7 +341,6 @@ export function ScreeningHub({ notebooks }: ScreeningHubProps) {
         return;
       }
 
-      // Add to staged sources
       const ext = file.name.split(".").pop()?.toLowerCase() || "csv";
       const newSource: StagedSource = {
         id: `source-${Date.now()}`,
