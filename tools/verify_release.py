@@ -40,9 +40,9 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 DESKTOP = REPO_ROOT / "Vellum_Desktop"
 DESKTOP_APP = DESKTOP / "Desktop_App"
 WEB = REPO_ROOT / "Vellum_Web"
-WEB_APP = WEB / "Web_App_Fernly"
-WEB_SHARE = WEB / "Vellum_Web_Fernly_SHARE"
-INSTALLER = DESKTOP / "Vellum-Desktop-V2.1-Setup-x64.exe"
+WEB_APP = WEB / "Web_App"
+WEB_SHARE = REPO_ROOT / "DISTRIBUTABLES" / "Vellum_Web_SHARE"
+INSTALLER = REPO_ROOT / "DISTRIBUTABLES" / "Vellum_Desktop_Installer_Windows_x64" / "Vellum-Desktop-V2.1-Setup-x64.exe"
 
 WORK = Path(os.environ.get("TEMP", "/tmp")) / "vellum_verify"
 
@@ -179,7 +179,7 @@ def check_hygiene(rep: Report) -> None:
         "Vellum_Desktop/Desktop_App/downloader.ico",
         "Vellum_Desktop/Desktop_App/downloader.png",
         "Vellum_Desktop/Desktop_App/assets/icon.ico",
-        "Vellum_Web/Web_App_Fernly/src/app/favicon.ico",
+        "Vellum_Web/Web_App/src/app/favicon.ico",
         "Vellum_Desktop/Desktop_App/build_vellum_windows.spec",
         "Vellum_Desktop/Desktop_App/installer.iss",
         ".gitattributes",

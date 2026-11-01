@@ -20,7 +20,7 @@ import pytest
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DESKTOP_APP = REPO_ROOT / "Vellum_Desktop" / "Desktop_App"
-WEB_APP = REPO_ROOT / "Vellum_Web" / "Web_App_Fernly"
+WEB_APP = REPO_ROOT / "Vellum_Web" / "Web_App"
 PARSE_CLI = WEB_APP / "tests" / "parseFileCli.mjs"
 
 sys.path.insert(0, str(DESKTOP_APP))

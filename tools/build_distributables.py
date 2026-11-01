@@ -138,22 +138,22 @@ def main() -> int:
             if src.is_file():
                 entries.append((rel[len("Vellum_Desktop/"):], src))
     print("Desktop source drop:")
-    build_source_zip(REPO_ROOT / "Vellum_Desktop" / "Vellum_Desktop_V2.1_Botanical_Bento.zip",
+    build_source_zip(REPO_ROOT / "DISTRIBUTABLES" / "Vellum_Desktop_Source_Drop.zip",
                      entries)
 
     # ---- web source export --------------------------------------------------
     entries = []
     for rel in tracked:
-        if rel.startswith("Vellum_Web/Web_App_Fernly/"):
+        if rel.startswith("Vellum_Web/Web_App/"):
             if rel in WEB_SOURCE_EXCLUDE:
                 continue
             if any(part in {"node_modules", ".next"} for part in rel.split("/")):
                 continue
             src = REPO_ROOT / rel
             if src.is_file():
-                entries.append((f"Vellum_Web_Fernly/{rel[len('Vellum_Web/Web_App_Fernly/'):]}", src))
+                entries.append((f"Vellum_Web/{rel[len('Vellum_Web/Web_App/'):]}", src))
     print("Web source export:")
-    build_source_zip(REPO_ROOT / "Vellum_Web" / "Vellum_Web_Fernly_Latest_Export.zip", entries)
+    build_source_zip(REPO_ROOT / "DISTRIBUTABLES" / "Vellum_Web_Source_Export.zip", entries)
 
     # ---- frozen desktop bundle ----------------------------------------------
     bundle = REPO_ROOT / "Vellum_Desktop" / "Desktop_App" / "dist" / "Vellum"

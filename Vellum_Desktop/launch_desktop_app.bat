@@ -1,12 +1,12 @@
 @echo off
 setlocal enabledelayedexpansion
-title Vellum Desktop V2.1 - Botanical Bento Edition
+title Vellum by Amine - Desktop App
 cd /d "%~dp0"
 
 cls
 echo =====================================================================
-echo       VELLUM DESKTOP V2.1 (FERNLY BOTANICAL BENTO EDITION)
-echo       ASReview Active Learning Screening + Connected Papers Hub
+echo       VELLUM BY AMINE - DESKTOP WORKBENCH
+echo       Active Learning Screening + Citation Exploration + Batch Harvester
 echo =====================================================================
 echo.
 
@@ -45,28 +45,12 @@ if "%PY_BIN%"=="" (
 echo [*] Target Directory: %~dp0Desktop_App
 cd /d "%~dp0Desktop_App"
 
-:: 2. Fast sanity check on dependencies
-"%PY_BIN%" -c "import streamlit, sklearn, pandas" >nul 2>nul
-if !errorlevel! neq 0 (
-    echo [..] Installing required scientific packages into virtualenv...
-    "%PY_BIN%" -m pip install -r requirements.txt scikit-learn
-    if !errorlevel! neq 0 (
-        echo [ERROR] Dependency installation failed.
-        pause
-        exit /b 1
-    )
-)
-
-echo [*] Initializing Vellum Desktop V2.1 server...
-echo [*] Opening interface at http://localhost:8501 ...
+:: 2. Launch Streamlit app
+echo [*] Starting Vellum Desktop on http://localhost:8501 ...
 echo.
-
-:: 3. Launch Streamlit and open browser window
-start "Vellum Desktop Server" "%PY_BIN%" -m streamlit run pdf_downloader_app.py --server.port=8501 --server.headless=false --browser.gatherUsageStats=false
-
-echo =====================================================================
-echo [SUCCESS] Vellum Desktop V2.1 is now running!
-echo Interface URL: http://localhost:8501
-echo =====================================================================
-ping 127.0.0.1 -n 3 >nul
-exit /b 0
+"%PY_BIN%" -m streamlit run pdf_downloader_app.py --browser.serverAddress localhost --server.port 8501
+if !errorlevel! neq 0 (
+    echo [ERROR] Failed to start Vellum Desktop.
+    pause
+    exit /b 1
+)

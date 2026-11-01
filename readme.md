@@ -28,17 +28,23 @@
 
 ## 💡 The Story & Motivation Behind Vellum
 
-> *"As a PhD student with a background in Computer Engineering, beginning my academic research journey quickly exposed me to the frustrating reality of modern systematic literature reviews.*
+> *"As a PhD student with a background in Computer Engineering, beginning my doctoral research journey quickly exposed me to the frustrating reality of modern systematic literature reviews.*
 > 
-> *I found myself completely lost and overwhelmed in a fragmented maze of commercial tools: paying steep annual subscriptions for Covidence and Rayyan just to screen titles and abstracts, paying another fee for Connected Papers to explore citation trees, juggling separate reference managers, struggling with paywalled PDFs, and constantly losing control over where my notes and research bibliographies were stored.*
+> *I found myself completely lost and overwhelmed in a fragmented maze of commercial tools: paying steep annual subscriptions for Covidence and Rayyan just to screen titles and abstracts, paying another recurring fee for Connected Papers to explore citation trees, juggling separate reference managers, struggling with paywalled PDFs, and constantly losing control over where my notes and research bibliographies were stored.*
 > 
-> *Every tool demanded another cloud login, another recurring monthly fee, and another proprietary silo holding my research data hostage.*
+> *Every tool demanded another cloud login, another recurring monthly charge, and another proprietary silo holding my research data hostage.*
 > 
 > *Coming from a computer engineering background, I asked a simple question: **Why can't all of this run in a single, high-performance, 100% local workbench on my own machine?***
 > 
-> *That question drove the creation of **Vellum**: a unified, local-first academic research suite that integrates multi-source search across 250M+ records, D3 citation networks, active-learning screening, multi-tier open-access PDF harvesting, and grounded claim extraction into an elegant, zero-subscription studio. Nothing leaves your workstation. Every note, PDF, and decision belongs entirely to you."*
->
-> — **Amine Zouaghi**, *Author & Lead Architect*
+> *That question drove the creation of **Vellum by Amine**: a unified, local-first academic research platform that integrates multi-source search across 250M+ records, D3 citation networks, active-learning screening, multi-tier open-access PDF harvesting, and grounded claim extraction into an elegant, zero-subscription studio. Nothing leaves your workstation. Every note, PDF, and decision belongs entirely to you."*
+
+### 👤 About the Author & Current Research
+**Amine Zouaghi** is a Doctoral Researcher and **FutureData4EU Fellow** funded under the European Union’s **Marie Skłodowska-Curie Actions (MSCA COFUND / Horizon Europe)**, carrying out research affiliated with the **University of Parma** (Department of Engineering and Architecture / Food Project) and the **University of Bologna**. His research focuses on Big Data, AI, Computer Vision, and Digital Transition:
+
+- 🏛️ **Doctoral Fellowship Profile:** [FutureData4EU MSCA Fellow — Amine Zouaghi](https://site.unibo.it/futuredata4eu/en/fellows/thematic-area-5-food-bioeconomy-natural-resources-agriculture-and-environment)
+- 🎓 **Institutional Faculty Page:** [University of Parma Profile](https://personale.unipr.it/en/ugovdocenti/person/270639)
+- 📖 **Google Scholar:** [Amine Zouaghi on Google Scholar](https://scholar.google.com/citations?user=KeVyb90AAAAJ&hl=en)
+- 🔬 **ResearchGate:** [Amine Zouaghi on ResearchGate](https://www.researchgate.net/profile/Amine-Zouaghi)
 
 ---
 
@@ -69,21 +75,47 @@ Download **[`Vellum_Web_Fernly_OneClick_Package.zip`](https://github.com/aminezg
 
 ## 🛠️ Running from Source
 
-If you prefer building and running directly from the repository:
+If you prefer building and running directly from the repository, clean 1-click root launchers are provided:
 
-### 1. Vellum Desktop Workbench
 ```powershell
-# From the repository root
-Vellum_Desktop\1_launch_desktop_app.bat
-```
-Launches `http://localhost:8501` using the configured desktop virtual environment.
+# Launch Desktop Workbench (http://localhost:8501)
+.\launch_desktop.bat
 
-### 2. Vellum Web Studio
-```powershell
-# From the repository root
-Vellum_Web\2_launch_fernly_web_app.bat
+# Launch Web Studio (http://localhost:3002)
+.\launch_web.bat
+
+# Launch both applications together
+.\launch_both.bat
 ```
-Launches `http://localhost:3002`. Requires Node.js 18+.
+
+---
+
+## 📂 Streamlined Repository Layout
+
+```
+vellum/
+├── Vellum_Desktop/              ← Desktop Workbench (Python 3.13 + Streamlit)
+│   ├── launch_desktop_app.bat   ←   Run desktop app from source
+│   ├── Desktop_App/             ←   Source code, modules, Pytest suite
+│   └── README.md                ←   Desktop guide
+├── Vellum_Web/                  ← Web Studio (Next.js 16 + React 19 + Tailwind CSS)
+│   ├── launch_web_app.bat       ←   Run web studio from source
+│   ├── Web_App/                 ←   Next.js source, components, API routes
+│   └── README.md                ←   Web guide
+├── brand-assets/                ← Official brand identity (The Folded Folio mark)
+│   ├── vectors/                 ←   High-resolution SVGs (horizontal, stacked, mono)
+│   ├── rasters/                 ←   Scale ladder transparent PNGs (16px to 1024px)
+│   ├── web-icons/               ←   favicon.ico, apple-touch-icon, webmanifest
+│   └── guidelines/              ←   Brand specifications and geometry rules
+├── demo/                        ← Demonstration videos & visual walkthroughs
+├── DISTRIBUTABLES/              ← SHA-256 manifests & offline packages
+├── launch_desktop.bat           ← Quick root launcher: Desktop (:8501)
+├── launch_web.bat               ← Quick root launcher: Web (:3002)
+├── launch_both.bat              ← Quick root launcher: Both apps together
+├── LICENSE                      ← MIT License
+├── CONTRIBUTING.md              ← Contribution guidelines & test reproduction
+└── README.md                    ← Main documentation
+```
 
 ---
 
@@ -112,7 +144,7 @@ Every component and distribution is strictly tested before release:
 & "Vellum_Desktop\Desktop_App\.venv\Scripts\python.exe" -m pytest "Vellum_Desktop\Desktop_App\tests"
 
 # Web Studio Test Suite (64 unit & adversarial tests)
-cd Vellum_Web\Web_App_Fernly; npm test
+cd Vellum_Web\Web_App; npm test
 ```
 
 See [`RELEASE_REPORT.md`](RELEASE_REPORT.md) for the latest execution report and [`BUILDING.md`](BUILDING.md) for build instructions.
@@ -160,7 +192,8 @@ Contributions are welcome! Please review [`CONTRIBUTING.md`](CONTRIBUTING.md) fo
 ## 👤 Author & Lead Architect
 
 **Amine Zouaghi**
-- Academic Researcher & Lead Architect
+- Doctoral Researcher & Lead Architect
+- Affiliations: University of Parma & University of Bologna (FutureData4EU MSCA Fellow)
 - Contact: `amine.zouaghi@unipr.it` · [LinkedIn](https://www.linkedin.com/in/zouaghi-amine/)
 
 ---

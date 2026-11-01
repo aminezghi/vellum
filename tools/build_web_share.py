@@ -411,8 +411,8 @@ def write_manifest(out: Path) -> Path:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--app", default=str(REPO_ROOT / "Vellum_Web" / "Web_App_Fernly"))
-    ap.add_argument("--out", default=str(REPO_ROOT / "Vellum_Web" / "Vellum_Web_Fernly_SHARE"))
+    ap.add_argument("--app", default=str(REPO_ROOT / "Vellum_Web" / "Web_App"))
+    ap.add_argument("--out", default=str(REPO_ROOT / "DISTRIBUTABLES" / "Vellum_Web_SHARE"))
     ap.add_argument("--node-zip", default=None, help="path to node-vX-win-x64.zip (or omit to reuse existing runtime/node)")
     ap.add_argument("--version", default="2.1.0")
     ap.add_argument("--no-prune", action="store_true",

@@ -1,15 +1,9 @@
 @echo off
-title Vellum Web (Fernly Botanical Bento Edition) - Academic Research Studio
+title Vellum by Amine - Web App
 cd /d "%~dp0"
 
-:: NOTE ON STYLE: this script uses goto labels rather than a parenthesised
-:: "if (...)" block for the error paths. A closing parenthesis inside an echo
-:: line - for example "echo ... (LTS recommended)" - silently terminates the
-:: block and makes cmd.exe misparse everything after it. Labels cannot be
-:: broken that way.
-
 echo =====================================================================
-echo       VELLUM WEB (FERNLY BOTANICAL BENTO EDITION)
+echo       VELLUM BY AMINE - WEB STUDIO
 echo       Academic Research Studio - Force Networks - AI Screening
 echo =====================================================================
 echo.
@@ -59,9 +53,8 @@ echo [ERROR] Node.js 18 or newer was not found on your system.
 echo         Please install the LTS release from https://nodejs.org/
 echo         and tick "Add to PATH" during setup.
 echo.
-echo         Alternatively, send the colleague the self-contained package
-echo         Vellum_Web_Fernly_SHARE.zip - it bundles its own Node.js
-echo         runtime and needs nothing installed at all.
+echo         Alternatively, run the self-contained package from DISTRIBUTABLES
+echo         which bundles its own Node.js runtime and needs nothing installed.
 echo.
 pause
 exit /b 1
