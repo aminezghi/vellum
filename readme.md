@@ -54,19 +54,19 @@ https://github.com/user-attachments/assets/f66ce09c-252b-46f2-869b-1e44669e1c96
 All compiled Windows executables and portable bundles are available under **[Releases (v2.1.0)](https://github.com/aminezghi/vellum/releases/latest)**:
 
 ### Option 1: Native Windows Installer (Recommended)
-Download **[`Vellum-Desktop-V2.1-Setup-x64.exe`](https://github.com/aminezghi/vellum/releases/download/v2.1.0/Vellum-Desktop-V2.1-Setup-x64.exe)**:
+Download **[`Vellum-Desktop-v2.1.0-Windows-x64.exe`](https://github.com/aminezghi/vellum/releases/download/v2.1.0/Vellum-Desktop-v2.1.0-Windows-x64.exe)**:
 - Standard Inno Setup installer for 64-bit Windows 10/11.
 - Installs to `%LOCALAPPDATA%\Programs\Vellum Desktop` with Start Menu shortcut and clean uninstaller.
 - **Requires no Python or dependency installation**.
 - *Note:* Because the binary is self-published without a commercial code-signing certificate, Windows SmartScreen may prompt *"Windows protected your PC"*. Click **More info → Run anyway**.
 
 ### Option 2: Portable Standalone Desktop ZIP
-Download **[`Vellum_Standalone_Windows_x64.zip`](https://github.com/aminezghi/vellum/releases/download/v2.1.0/Vellum_Standalone_Windows_x64.zip)**:
-- Extract anywhere (e.g., `C:\Vellum`) and double-click `Vellum.exe`.
-- Zero installation required; completely portable on USB drives.
+Download **[`Vellum-Desktop-v2.1.0-Windows-x64.zip`](https://github.com/aminezghi/vellum/releases/download/v2.1.0/Vellum-Desktop-v2.1.0-Windows-x64.zip)**:
+- Extract anywhere (e.g., `C:\Vellum` or a USB drive) and double-click `Vellum.exe`.
+- Zero installation required; completely portable.
 
 ### Option 3: Zero-Install Web Studio (Colleague Share Package)
-Download **[`Vellum_Web_OneClick_Package.zip`](https://github.com/aminezghi/vellum/releases/download/v2.1.0/Vellum_Web_OneClick_Package.zip)**:
+Download **[`Vellum-Web-v2.1.0-Windows-x64.zip`](https://github.com/aminezghi/vellum/releases/download/v2.1.0/Vellum-Web-v2.1.0-Windows-x64.zip)**:
 - Extract anywhere and double-click **`START_VELLUM_WEB.bat`**.
 - Ships with a bundled, pre-verified portable Node.js runtime (`v24.22.1 LTS`).
 - **No Node.js, no Python, and no administrator rights needed**. Automatically opens `http://localhost:3002`.
@@ -78,15 +78,19 @@ Download **[`Vellum_Web_OneClick_Package.zip`](https://github.com/aminezghi/vell
 
 Native Apple Silicon (`arm64`) and Intel packages are available under **[Releases (v2.1.0)](https://github.com/aminezghi/vellum/releases/latest)**:
 
-### Option 1: Native macOS Desktop App (`Vellum.app`)
-Download **[`Vellum_Desktop_macOS.zip`](https://github.com/aminezghi/vellum/releases/download/v2.1.0/Vellum_Desktop_macOS.zip)**:
-- Standalone native macOS application bundle (`Vellum.app`) compiled natively for Apple Silicon & Intel.
+### Option 1: Native macOS Disk Image (DMG Installer — Recommended)
+Download **[`Vellum-Desktop-v2.1.0-macOS.dmg`](https://github.com/aminezghi/vellum/releases/download/v2.1.0/Vellum-Desktop-v2.1.0-macOS.dmg)**:
+- Native Apple Disk Image (`.dmg`) with Drag-to-Applications installation.
 - Bundles Python 3.13, Streamlit, PyMuPDF, scikit-learn, and native WKWebView desktop frame.
-- **Requires zero Python installation**. Extract, drag `Vellum.app` to Applications or Desktop, and double-click to launch!
-- *First-time launch note:* Because Vellum is distributed directly without an Apple Developer subscription, macOS Gatekeeper may show a verification dialog on first open. Simply **Right-Click `Vellum.app` → Open → click Open** (or go to *System Settings → Privacy & Security → Open Anyway*).
+- **Zero Python or dependency installation required**. Open DMG, drag `Vellum.app` to Applications, and launch!
+- *First-time launch note:* Because Vellum is distributed directly to researchers without an Apple Developer subscription, macOS Gatekeeper may show a verification dialog on first open. Simply **Right-Click `Vellum.app` → Open → click Open** (or go to *System Settings → Privacy & Security → Open Anyway*).
 
-### Option 2: Zero-Install Web Studio for macOS (Colleague Share Package)
-Download **[`Vellum_Web_macOS.zip`](https://github.com/aminezghi/vellum/releases/download/v2.1.0/Vellum_Web_macOS.zip)**:
+### Option 2: Standalone macOS Desktop ZIP
+Download **[`Vellum-Desktop-v2.1.0-macOS.zip`](https://github.com/aminezghi/vellum/releases/download/v2.1.0/Vellum-Desktop-v2.1.0-macOS.zip)**:
+- Portable standalone `Vellum.app` bundle in a ZIP archive. Extract anywhere and launch.
+
+### Option 3: Zero-Install Web Studio for macOS (Colleague Share Package)
+Download **[`Vellum-Web-v2.1.0-macOS.zip`](https://github.com/aminezghi/vellum/releases/download/v2.1.0/Vellum-Web-v2.1.0-macOS.zip)**:
 - Ships with a pre-configured portable Node.js runtime (`v20.18.0 LTS`) and native Darwin acceleration binaries.
 - **No Node.js, no npm, and no administrator rights needed**.
 - Extract anywhere and double-click **`START_VELLUM_WEB.command`** (or open `Vellum Web Studio.app`). Automatically opens `http://localhost:3002`.

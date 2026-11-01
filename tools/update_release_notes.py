@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Update GitHub Release v2.1.0 with complete unified description."""
+"""Update GitHub Release v2.1.0 with complete unified description and standardized asset names."""
 
 import json
 import subprocess
@@ -10,44 +10,44 @@ RELEASE_TAG = "v2.1.0"
 
 body_text = """# Vellum v2.1.0 — Academic Literature & Systematic Review Studio
 
-Welcome to the **v2.1.0 Unified Release** of **Vellum by Amine**!
+Welcome to the **v2.1.0 Unified Dual-Platform Release** of **Vellum by Amine**!
 
 Vellum is a 100% local-first academic research suite designed for literature discovery, high-throughput batch harvesting, active-learning screening, citation graph exploration, and PRISMA-compliant evidence synthesis.
 
 ---
 
-### 🍏 macOS Distributables Included (Apple Silicon `arm64` & Intel)
+### 🍏 macOS Distributables (Apple Silicon `arm64` & Intel)
 
-1. **`Vellum_Desktop_macOS.zip`** (285.4 MB)
-   - **Standalone Native macOS App (`Vellum.app`)** compiled natively on Apple Silicon.
+1. **[`Vellum-Desktop-v2.1.0-macOS.dmg`](https://github.com/aminezghi/vellum/releases/download/v2.1.0/Vellum-Desktop-v2.1.0-macOS.dmg)** (194.0 MB) — **Recommended for macOS**
+   - **Native Apple Disk Image (.dmg) Installer** with Drag-to-Applications shortcut.
    - Bundles Python 3.13, Streamlit, PyMuPDF, scikit-learn, and native Cocoa WKWebView desktop frame.
-   - **Zero Python or dependency installation required**. Extract, drag `Vellum.app` to Applications or Desktop, and double-click to launch!
+   - **Zero Python or dependency installation required**. Open the DMG and drag `Vellum.app` to Applications.
    - *First-time launch note:* Because Vellum is distributed directly to academic colleagues without an Apple Developer subscription, macOS Gatekeeper may show a verification dialog on first open. Simply **Right-Click `Vellum.app` → Open → click Open** (or go to *System Settings → Privacy & Security → Open Anyway*).
 
-2. **`Vellum_Web_macOS.zip`** (476.1 MB)
+2. **[`Vellum-Desktop-v2.1.0-macOS.zip`](https://github.com/aminezghi/vellum/releases/download/v2.1.0/Vellum-Desktop-v2.1.0-macOS.zip)** (285.4 MB)
+   - Portable, standalone `Vellum.app` bundle in a ZIP archive. Extract anywhere and double-click to launch.
+
+3. **[`Vellum-Web-v2.1.0-macOS.zip`](https://github.com/aminezghi/vellum/releases/download/v2.1.0/Vellum-Web-v2.1.0-macOS.zip)** (476.1 MB)
    - **Zero-Install Web Studio Package for macOS**.
-   - Includes a pre-configured portable Node.js runtime (`v20.18.0 LTS`) and native Darwin acceleration binaries (`@next/swc-darwin-arm64`, `sharp`).
+   - Includes pre-verified portable Node.js runtime (`v20.18.0 LTS`) and native Darwin acceleration binaries (`@next/swc-darwin-arm64`, `sharp`).
    - **No Node.js, no npm, and no administrator rights needed**.
-   - Extract anywhere and double-click **`START_VELLUM_WEB.command`** (or open `Vellum Web Studio.app`). Automatically launches and opens `http://localhost:3002`.
-   - Stop anytime with **`STOP_VELLUM_WEB.command`**.
+   - Extract anywhere and double-click **`START_VELLUM_WEB.command`** (or open `Vellum Web Studio.app`). Automatically launches and opens `http://localhost:3002`. Stop anytime with **`STOP_VELLUM_WEB.command`**.
 
 ---
 
-### 📦 Windows Distributables Included (Windows 10 / 11 64-bit)
+### 📦 Windows Distributables (Windows 10 / 11 64-bit)
 
-1. **`Vellum-Desktop-V2.1-Setup-x64.exe`** (129.3 MB)
-   - Native Windows 10/11 installer.
-   - Installs to `%LOCALAPPDATA%\\Programs\\Vellum Desktop`. No administrator rights or Python installation required.
-   
-2. **`Vellum_Standalone_Windows_x64.zip`** (177.7 MB)
-   - Portable, zero-install desktop distribution. Unzip anywhere and double-click `Vellum.exe`.
+1. **[`Vellum-Desktop-v2.1.0-Windows-x64.exe`](https://github.com/aminezghi/vellum/releases/download/v2.1.0/Vellum-Desktop-v2.1.0-Windows-x64.exe)** (129.2 MB) — **Recommended for Windows**
+   - Native Windows 10/11 Inno Setup installer.
+   - Installs cleanly to `%LOCALAPPDATA%\\Programs\\Vellum Desktop` with Start Menu shortcuts and uninstaller.
+   - **Requires zero Python or dependency installation**.
 
-3. **`Vellum_Web_OneClick_Package.zip`** (127.1 MB)
-   - Self-contained web studio package. Includes pre-verified portable Node.js runtime (`v24.22.1 LTS`).
-   - Double-click `START_VELLUM_WEB.bat` to launch on `http://localhost:3002`.
+2. **[`Vellum-Desktop-v2.1.0-Windows-x64.zip`](https://github.com/aminezghi/vellum/releases/download/v2.1.0/Vellum-Desktop-v2.1.0-Windows-x64.zip)** (177.7 MB)
+   - Portable, zero-install desktop distribution. Unzip anywhere (or on a USB drive) and double-click `Vellum.exe`.
 
-4. **`Vellum_Desktop_Installer_Windows_x64.zip`** (128.8 MB)
-   - Complete installer bundle with offline manuals and batch helpers.
+3. **[`Vellum-Web-v2.1.0-Windows-x64.zip`](https://github.com/aminezghi/vellum/releases/download/v2.1.0/Vellum-Web-v2.1.0-Windows-x64.zip)** (127.1 MB)
+   - Self-contained web studio package for Windows. Includes pre-verified portable Node.js runtime (`v24.22.1 LTS`).
+   - Double-click **`START_VELLUM_WEB.bat`** to launch on `http://localhost:3002`. Stop anytime with **`STOP_VELLUM_WEB.bat`**.
 
 ---
 
@@ -73,12 +73,12 @@ If you prefer running directly from source, clean 1-click launchers are provided
 ### 🔐 SHA-256 Checksums
 Verified against `DISTRIBUTABLES/SHA256SUMS.txt`:
 ```text
-db0e5e5eced31efe041562b93d8a37adf43d01678502365b7edce041b3044354  Vellum-Desktop-V2.1-Setup-x64.exe
-cee9fd71eb3452d53e252ac4ff04d73c63aeda5caccb6578a6d80781a2a6dc47  Vellum_Standalone_Windows_x64.zip
-787768b598b9605332f1ea30c5e630ec8b4e7ce2b8a01f930e4b85d95be04583  Vellum_Desktop_Installer_Windows_x64.zip
-b469ca2e4ca1223f31c253db962928246e7517b943d84f9fb5eef71b342beed8  Vellum_Web_OneClick_Package.zip
-9a9a49c174c50440c0e4815c1e50c828944e9f2613a638d7a869ae8b246034f8  Vellum_Desktop_macOS.zip
-b5a5539f5dae74bcf76386a0fe2cb2c9d76864720ba4ab342657b54c82119678  Vellum_Web_macOS.zip
+f6a940db4ad6aad6afda2cc081697b0829b1e47ef8b4014fe3820e2fffa78a9c  Vellum-Desktop-v2.1.0-macOS.dmg
+9a9a49c174c50440c0e4815c1e50c828944e9f2613a638d7a869ae8b246034f8  Vellum-Desktop-v2.1.0-macOS.zip
+550379990821735050dfcff4b980743c54baf8a32cd7352b4a37b6d779af87c5  Vellum-Desktop-v2.1.0-Windows-x64.exe
+cee9fd71eb3452d53e252ac4ff04d73c63aeda5caccb6578a6d80781a2a6dc47  Vellum-Desktop-v2.1.0-Windows-x64.zip
+b5a5539f5dae74bcf76386a0fe2cb2c9d76864720ba4ab342657b54c82119678  Vellum-Web-v2.1.0-macOS.zip
+b469ca2e4ca1223f31c253db962928246e7517b943d84f9fb5eef71b342beed8  Vellum-Web-v2.1.0-Windows-x64.zip
 ```
 """
 

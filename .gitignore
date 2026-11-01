@@ -119,6 +119,8 @@ build/
 dist/
 # Distribution archives (standalone zip, Bento zip, Fernly export zip)
 *.zip
+*.exe
+*.dmg
 # The compiled Windows installer. It is a 129 MB build artefact, regenerated
 # by tools/build_distributables.py + ISCC (see BUILDING.md). Shipping it
 # through git would add its full weight to every clone and every future
@@ -211,7 +213,9 @@ Vellum_Web/Vellum_Web_Fernly_SHARE/
 
 # Development & local scratch tools
 .agents/
+.local/
 logo-design-skill-repo/
+*.dmg
 /Desktop_App/
 /Web_App/
 /Vellum_Web_macOS/
