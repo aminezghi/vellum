@@ -3,7 +3,7 @@
 
 > **Document Version:** 4.1 (Unified Vellum by Amine Release)  
 > **Author & Lead System Architect:** Amine Zouaghi  
-> **Target OS:** Windows 10 / Windows 11 (64-bit)  
+> **Target OS:** Windows 10 / Windows 11 (64-bit) & macOS (Apple Silicon arm64 / Intel)  
 > **Distribution Architecture:** Vellum Desktop + Vellum Web (Vellum by Amine)  
 > **License:** Free & Open-Access Academic Tool (MIT)  
 
@@ -53,13 +53,11 @@ accounts, no cloud sync, no telemetry endpoints.
 - **Display Resolution:** 1280 × 800 minimum; 1920 × 1080 recommended for the tri-pane view.
 
 #### 2. Software Requirements
-- **Operating System:** Windows 10 (version 1903+) or Windows 11 (64-bit).
-- **For Vellum Desktop:** Pre-configured environment included in `Vellum_Desktop\Desktop_App\.venv\`.
-- **For Vellum Web:** Node.js 18.0.0 or higher (LTS 20+ recommended) from [https://nodejs.org](https://nodejs.org).
-- **Browser:** Any modern Chromium-based browser (Chrome, Edge, Brave) or Firefox.
-- **Desktop only:** Microsoft Edge **WebView2 Runtime** for the native window. It ships with
-  Windows 11 and current Windows 10; Vellum falls back to a standalone Edge/Chrome app
-  window when it is unavailable.
+- **Operating System:** Windows 10 (version 1903+) / Windows 11 (64-bit), or macOS 11.0+ (Big Sur, Monterey, Ventura, Sonoma, Sequoia on Apple Silicon & Intel).
+- **For Vellum Desktop:** Native standalone executable/app bundled in the release; requires no Python installation for end users. Pre-configured environment included for development.
+- **For Vellum Web:** Pre-bundled portable Node.js runtime included in the macOS & Windows one-click packages (zero installation). When running from source, Node.js 18.0.0 or higher is used.
+- **Browser:** Any modern browser (Safari, Chrome, Edge, Brave, Firefox).
+- **Desktop only:** Native WebView2 on Windows / native Cocoa WKWebView on macOS. Vellum automatically falls back to an application window if needed.
 
 #### 3. Network & Firewall
 - Outbound access on ports **80** and **443** (HTTPS) to resolve open-access literature from:

@@ -244,10 +244,14 @@ class VellumDesktopApp:
             Path(os.environ.get("ProgramFiles(x86)", "")) / "Microsoft/Edge/Application/msedge.exe",
             Path(os.environ.get("ProgramFiles", "")) / "Microsoft/Edge/Application/msedge.exe",
             Path(os.environ.get("LOCALAPPDATA", "")) / "Microsoft/Edge/Application/msedge.exe",
+            Path("/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge"),
         ]
         chrome_paths = [
             Path(os.environ.get("ProgramFiles", "")) / "Google/Chrome/Application/chrome.exe",
             Path(os.environ.get("ProgramFiles(x86)", "")) / "Google/Chrome/Application/chrome.exe",
+            Path("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"),
+            Path(os.path.expanduser("~/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")),
+            Path("/Applications/Brave Browser.app/Contents/MacOS/Brave Browser"),
         ]
 
         browser_exe = None

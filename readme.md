@@ -9,6 +9,7 @@
 
 <p align="center">
   <a href="#-quick-download--installation-windows"><img src="https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011%20(64--bit)-0078D6?logo=windows" alt="Platform" /></a>
+  <a href="#-quick-download--installation-macos"><img src="https://img.shields.io/badge/Platform-macOS%20(Apple%20Silicon%20%7C%20Intel)-000000?logo=apple" alt="macOS" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-10B981?style=flat" alt="License" /></a>
   <a href="#-testing--verification"><img src="https://img.shields.io/badge/Tests-304%20Passing%20(100%25)-brightgreen" alt="Tests" /></a>
   <a href="https://github.com/aminezghi/vellum/releases/tag/v2.1.0"><img src="https://img.shields.io/badge/Release-v2.1.0-blue" alt="Release" /></a>
@@ -73,10 +74,31 @@ Download **[`Vellum_Web_OneClick_Package.zip`](https://github.com/aminezghi/vell
 
 ---
 
+## 🍏 Quick Download & Installation (macOS)
+
+Native Apple Silicon (`arm64`) and Intel packages are available under **[Releases (v2.1.0)](https://github.com/aminezghi/vellum/releases/latest)**:
+
+### Option 1: Native macOS Desktop App (`Vellum.app`)
+Download **[`Vellum_Desktop_macOS.zip`](https://github.com/aminezghi/vellum/releases/download/v2.1.0/Vellum_Desktop_macOS.zip)**:
+- Standalone native macOS application bundle (`Vellum.app`) compiled natively for Apple Silicon & Intel.
+- Bundles Python 3.13, Streamlit, PyMuPDF, scikit-learn, and native WKWebView desktop frame.
+- **Requires zero Python installation**. Extract, drag `Vellum.app` to Applications or Desktop, and double-click to launch!
+- *First-time launch note:* Because Vellum is distributed directly without an Apple Developer subscription, macOS Gatekeeper may show a verification dialog on first open. Simply **Right-Click `Vellum.app` → Open → click Open** (or go to *System Settings → Privacy & Security → Open Anyway*).
+
+### Option 2: Zero-Install Web Studio for macOS (Colleague Share Package)
+Download **[`Vellum_Web_macOS.zip`](https://github.com/aminezghi/vellum/releases/download/v2.1.0/Vellum_Web_macOS.zip)**:
+- Ships with a pre-configured portable Node.js runtime (`v20.18.0 LTS`) and native Darwin acceleration binaries.
+- **No Node.js, no npm, and no administrator rights needed**.
+- Extract anywhere and double-click **`START_VELLUM_WEB.command`** (or open `Vellum Web Studio.app`). Automatically opens `http://localhost:3002`.
+- Stop anytime with **`STOP_VELLUM_WEB.command`**.
+
+---
+
 ## 🛠️ Running from Source
 
-If you prefer building and running directly from the repository, clean 1-click root launchers are provided:
+If you prefer building and running directly from the repository, clean 1-click root launchers are provided for both Windows and macOS:
 
+### Windows (PowerShell / Command Prompt)
 ```powershell
 # Launch Desktop Workbench (http://localhost:8501)
 .\launch_desktop.bat
@@ -88,6 +110,18 @@ If you prefer building and running directly from the repository, clean 1-click r
 .\launch_both.bat
 ```
 
+### macOS (Terminal / 1-Click Finder)
+```bash
+# Launch Desktop Workbench (http://localhost:8501)
+./launch_desktop_macos.command
+
+# Launch Web Studio (http://localhost:3002)
+./launch_web_macos.command
+
+# Launch both applications together
+./launch_both_macos.command
+```
+
 ---
 
 ## 📂 Streamlined Repository Layout
@@ -95,11 +129,13 @@ If you prefer building and running directly from the repository, clean 1-click r
 ```
 vellum/
 ├── Vellum_Desktop/              ← Desktop Workbench (Python 3.13 + Streamlit)
-│   ├── launch_desktop_app.bat   ←   Run desktop app from source
+│   ├── launch_desktop_app.bat   ←   Run desktop app on Windows
+│   ├── launch_desktop_app_macos.command ← Run desktop app on macOS
 │   ├── Desktop_App/             ←   Source code, modules, Pytest suite
 │   └── README.md                ←   Desktop guide
 ├── Vellum_Web/                  ← Web Studio (Next.js 16 + React 19 + Tailwind CSS)
-│   ├── launch_web_app.bat       ←   Run web studio from source
+│   ├── launch_web_app.bat       ←   Run web studio on Windows
+│   ├── launch_web_app_macos.command ← Run web studio on macOS
 │   ├── Web_App/                 ←   Next.js source, components, API routes
 │   └── README.md                ←   Web guide
 ├── brand-assets/                ← Official brand identity (The Folded Folio mark)
@@ -109,9 +145,12 @@ vellum/
 │   └── guidelines/              ←   Brand specifications and geometry rules
 ├── demo/                        ← Demonstration videos & visual walkthroughs
 ├── DISTRIBUTABLES/              ← SHA-256 manifests & offline packages
-├── launch_desktop.bat           ← Quick root launcher: Desktop (:8501)
-├── launch_web.bat               ← Quick root launcher: Web (:3002)
-├── launch_both.bat              ← Quick root launcher: Both apps together
+├── launch_desktop.bat           ← Quick root launcher (Windows): Desktop (:8501)
+├── launch_web.bat               ← Quick root launcher (Windows): Web (:3002)
+├── launch_both.bat              ← Quick root launcher (Windows): Both apps
+├── launch_desktop_macos.command ← Quick root launcher (macOS): Desktop (:8501)
+├── launch_web_macos.command     ← Quick root launcher (macOS): Web (:3002)
+├── launch_both_macos.command    ← Quick root launcher (macOS): Both apps
 ├── LICENSE                      ← MIT License
 ├── CONTRIBUTING.md              ← Contribution guidelines & test reproduction
 └── README.md                    ← Main documentation

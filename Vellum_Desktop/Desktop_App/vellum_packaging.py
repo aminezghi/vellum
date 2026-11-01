@@ -31,6 +31,7 @@ MODULES = [
     "vellum_keyboard.py",
     "vellum_pdf_viewer.py",
     "vellum_pdf_server.py",
+    "vellum_pages.py",
 ]
 
 # Directories whose contents are needed at runtime.

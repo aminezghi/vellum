@@ -195,6 +195,7 @@ Vellum_Web/Vellum_Web_Fernly_SHARE/
 # Losing any of them makes the repository non-reproducible.
 !Vellum_Desktop/Desktop_App/downloader.ico
 !Vellum_Desktop/Desktop_App/downloader.png
+!Vellum_Desktop/Desktop_App/downloader.icns
 !Vellum_Desktop/Desktop_App/assets/
 !Vellum_Desktop/Desktop_App/assets/**
 !Vellum_Web/Web_App/downloader.ico
@@ -211,6 +212,10 @@ Vellum_Web/Vellum_Web_Fernly_SHARE/
 # Development & local scratch tools
 .agents/
 logo-design-skill-repo/
+/Desktop_App/
+/Web_App/
+/Vellum_Web_macOS/
+/Vellum_Desktop_macOS/
 DISTRIBUTABLES/Vellum_Desktop_Installer_Windows_x64/
 DISTRIBUTABLES/Vellum_Desktop_macOS/
 DISTRIBUTABLES/Vellum_Web_macOS/

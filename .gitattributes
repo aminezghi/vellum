@@ -28,6 +28,7 @@
 *.yml  text eol=lf
 *.yaml text eol=lf
 *.sh   text eol=lf
+*.command text eol=lf
 
 # --- Repo metadata: always LF ---
 .gitattributes text eol=lf
@@ -36,6 +37,7 @@
 
 # --- Binary: never touched ---
 *.ico   binary
+*.icns  binary
 *.png   binary
 *.jpg   binary
 *.pdf   binary

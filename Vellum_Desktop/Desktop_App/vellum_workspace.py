@@ -139,6 +139,9 @@ def load_config() -> Dict[str, Any]:
 def save_config(cfg: Dict[str, Any]) -> bool:
     """Save global Vellum preferences to config path. Returns True on success, False on failure."""
     cfg_path = get_config_path()
+    if re.search(r'[*?<>|"]', str(cfg_path)):
+        logger.error(f"Invalid path characters in configuration path: {cfg_path}")
+        return False
     try:
         cfg_path.parent.mkdir(parents=True, exist_ok=True)
         with open(cfg_path, "w", encoding="utf-8") as f:

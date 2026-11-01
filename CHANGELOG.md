@@ -6,6 +6,18 @@ and the project uses [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [2.1.1] — 2026-11-01
+
+### Added — Native macOS (Apple Silicon & Intel) Distribution
+
+- **Standalone Native macOS App (`Vellum.app`)**: Built natively on Apple Silicon with Python 3.13, Streamlit, PyMuPDF, scikit-learn, and native Cocoa WKWebView desktop frame. Zero Python or dependency installation required.
+- **Zero-Install Web Studio for macOS (`Vellum_Web_macOS.zip`)**: Bundles pre-verified portable Node.js v20 LTS runtime and native Darwin acceleration binaries (`@next/swc-darwin-arm64`, `sharp`). Automatically serves on `http://localhost:3002`.
+- **macOS 1-Click Launchers**: Added root and component `.command` scripts (`launch_both_macos.command`, `launch_desktop_macos.command`, `launch_web_macos.command`) with clean terminal UI and automatic browser spawning.
+- **High-Resolution macOS App Icon (`downloader.icns`)**: Generated official multi-resolution Retina `.icns` (16px to 1024px) using Apple's `iconutil` from the Vellum folded folio brand mark.
+- **Cross-Platform Path Validation**: Hardened `vellum_workspace.py` path sanitization for strict cross-platform compatibility across Windows, macOS, and Linux (240/240 unit tests passing).
+
+---
+
 ## [2.1.0] — 2026-10-22
 
 The release that closes the gap between what the documentation promised and
