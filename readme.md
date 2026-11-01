@@ -19,11 +19,11 @@
 
 ## 🎬 Video Demonstration
 
-[![Vellum Studio Demo Preview](demo/preview.jpg)](demo/vellum-demo-horizontal.mp4)
+https://github.com/user-attachments/assets/f66ce09c-252b-46f2-869b-1e44669e1c96
 
 > 🎥 **Watch the Demo:** A 24-second tour showcasing the Active-Learning Screening engine, Connected Papers citation networks, grounded evidence extraction, and high-speed batch PDF harvesting.
-> - **16:9 Landscape Video:** [`demo/vellum-demo-horizontal.mp4`](demo/vellum-demo-horizontal.mp4)
-> - **9:16 Vertical Video:** [`demo/vellum-demo-vertical.mp4`](demo/vellum-demo-vertical.mp4)
+> - **16:9 Landscape Video:** [`demo/vellum-demo-horizontal.mp4`](demo/vellum-demo-horizontal.mp4) · [Direct Stream](https://github.com/user-attachments/assets/f66ce09c-252b-46f2-869b-1e44669e1c96)
+> - **9:16 Vertical Video:** [`demo/vellum-demo-vertical.mp4`](demo/vellum-demo-vertical.mp4) · [Direct Stream](https://github.com/user-attachments/assets/7dce1134-597e-4648-849f-0df01e3fd261)
 
 ---
 

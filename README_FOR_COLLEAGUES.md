@@ -1,7 +1,7 @@
 # 🌿 Vellum Research Suite
 ## System Documentation & Technical Requirements Manual
 
-> **Document Version:** 4.1 (Unified Vellum by Amine Release)  
+> **Release Version:** 2.1.0 (Unified Vellum by Amine Release)  
 > **Author & Lead System Architect:** Amine Zouaghi  
 > **Target OS:** Windows 10 / Windows 11 (64-bit) & macOS (Apple Silicon arm64 / Intel)  
 > **Distribution Architecture:** Vellum Desktop + Vellum Web (Vellum by Amine)  

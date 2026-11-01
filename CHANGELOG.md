@@ -6,7 +6,9 @@ and the project uses [Semantic Versioning](https://semver.org/).
 
 ---
 
-## [2.1.1] — 2026-11-01
+## [2.1.0] — 2026-11-01 (Unified Windows & macOS Release)
+
+The unified dual-platform release of Vellum by Amine: literature discovery, high-throughput batch harvesting, active-learning screening, citation graph exploration, and PRISMA-compliant evidence synthesis.
 
 ### Added — Native macOS (Apple Silicon & Intel) Distribution
 
@@ -15,14 +17,6 @@ and the project uses [Semantic Versioning](https://semver.org/).
 - **macOS 1-Click Launchers**: Added root and component `.command` scripts (`launch_both_macos.command`, `launch_desktop_macos.command`, `launch_web_macos.command`) with clean terminal UI and automatic browser spawning.
 - **High-Resolution macOS App Icon (`downloader.icns`)**: Generated official multi-resolution Retina `.icns` (16px to 1024px) using Apple's `iconutil` from the Vellum folded folio brand mark.
 - **Cross-Platform Path Validation**: Hardened `vellum_workspace.py` path sanitization for strict cross-platform compatibility across Windows, macOS, and Linux (240/240 unit tests passing).
-
----
-
-## [2.1.0] — 2026-10-22
-
-The release that closes the gap between what the documentation promised and
-what the software actually did, and that makes both applications usable with
-a keyboard and with a screen reader.
 
 ### Fixed — the desktop advertised a shortcut that did not exist
 
