@@ -6,13 +6,6 @@ Vellum is a 100% local-first academic research suite designed for literature dis
 
 ---
 
-### 🎥 Launch Tour & Demo
-Watch the 24-second launch tour showcasing the Active-Learning Screening engine, Connected Papers citation networks, grounded evidence claim extraction, and batch PDF harvesting.
-- **Horizontal 16:9 (1080p)**: Attached below as `vellum-promo-horizontal.mp4`
-- **Vertical 9:16 (1080p)**: Attached below as `vellum-promo-vertical.mp4`
-
----
-
 ### 📦 Windows Distributables Included
 
 1. **`Vellum-Desktop-V2.1-Setup-x64.exe`** (129.3 MB)
@@ -25,6 +18,9 @@ Watch the 24-second launch tour showcasing the Active-Learning Screening engine,
 3. **`Vellum_Web_Fernly_OneClick_Package.zip`** (127.1 MB)
    - Self-contained web studio package. Includes pre-verified portable Node.js runtime (`v24.22.1 LTS`).
    - Double-click `START_VELLUM_WEB.bat` to launch on `http://localhost:3002`.
+
+4. **`Vellum_Desktop_Installer_Windows_x64.zip`** (128.8 MB)
+   - Complete installer bundle with offline manuals and batch helpers.
 
 ---
 

@@ -1,58 +1,65 @@
-# <p align="center"><img src="brand-assets/vellum-logo-kit/vectors/vellum-symbol.svg" width="80" height="80" alt="Vellum Logo" /><br/>Vellum by Amine</p>
-
 <p align="center">
-  <strong>The 100% Local-First Academic Literature & Systematic Review Studio</strong><br/>
-  <em>Zero subscription · Zero cloud tracking · Multi-source discovery across 250M+ papers</em>
+  <img src="brand-assets/vectors/vellum-symbol.svg" width="90" height="90" alt="Vellum Logo" />
+  <h1 align="center">Vellum by Amine</h1>
+  <p align="center">
+    <strong>The 100% Local-First Academic Literature & Systematic Review Studio</strong><br/>
+    <em>Zero subscription · Zero cloud tracking · Multi-source discovery across 250M+ papers</em>
+  </p>
 </p>
 
 <p align="center">
-  <a href="#-quick-download--install-windows"><img src="https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011%20(64--bit)-0078D6?logo=windows" alt="Platform" /></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-emerald?style=flat" alt="License" /></a>
+  <a href="#-quick-download--installation-windows"><img src="https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011%20(64--bit)-0078D6?logo=windows" alt="Platform" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-10B981?style=flat" alt="License" /></a>
   <a href="#-testing--verification"><img src="https://img.shields.io/badge/Tests-304%20Passing%20(100%25)-brightgreen" alt="Tests" /></a>
-  <a href="RELEASE_REPORT.md"><img src="https://img.shields.io/badge/Release-v2.1.0-blue" alt="Release" /></a>
+  <a href="https://github.com/aminezghi/vellum/releases/tag/v2.1.0"><img src="https://img.shields.io/badge/Release-v2.1.0-blue" alt="Release" /></a>
 </p>
 
 ---
 
-## 🎬 Product Overview & Demo
+## 🎬 Video Demonstration
 
-[![Vellum Launch Preview](brag-output/vellum-promo-horizontal.jpg)](brag-output/vellum-promo-horizontal.mp4)
+[![Vellum Studio Demo Preview](demo/preview.jpg)](demo/vellum-demo-horizontal.mp4)
 
-> 🎥 **Exploratory Walkthrough:** Watch the 24-second launch tour showcasing the Active-Learning Screening engine, Connected Papers citation graph, grounded evidence extraction, and high-speed multi-source harvesting.
-
----
-
-## 💡 What is Vellum?
-
-Academic research tools like Rayyan ($480/yr), Connected Papers ($120/yr), and commercial reference managers hold research corpora hostage in the cloud. 
-
-**Vellum by Amine** is an open-source, local-first dual-application research platform designed for independent researchers, PhD candidates, and systematic review teams:
-
-1. **Vellum Web Studio** (`localhost:3002`): Interactive Next.js 16 studio featuring D3/canvas citation graphs, visual Boolean search, active-learning candidate screening, and tri-pane grounded evidence synthesis notebooks.
-2. **Vellum Desktop Workbench** (`localhost:8501`): High-throughput native Python 3.13 workbench for bulk PDF batch harvesting, multi-tier open-access resolution (Unpaywall, PubMed Central, arXiv), local vault indexing, and PRISMA 2020 flow reporting.
-
-**Privacy Guarantee:** All PDFs, bibliographic records, IndexedDB notes, and screening decisions remain **100% on your local machine**. No telemetry, no accounts, and no data tracking.
+> 🎥 **Watch the Demo:** A 24-second tour showcasing the Active-Learning Screening engine, Connected Papers citation networks, grounded evidence extraction, and high-speed batch PDF harvesting.
+> - **16:9 Landscape Video:** [`demo/vellum-demo-horizontal.mp4`](demo/vellum-demo-horizontal.mp4)
+> - **9:16 Vertical Video:** [`demo/vellum-demo-vertical.mp4`](demo/vellum-demo-vertical.mp4)
 
 ---
 
-## 🚀 Quick Download & Install (Windows)
+## 💡 The Story & Motivation Behind Vellum
 
-Choose the setup option that best fits your workflow:
+> *"As a PhD student with a background in Computer Engineering, beginning my academic research journey quickly exposed me to the frustrating reality of modern systematic literature reviews.*
+> 
+> *I found myself completely lost and overwhelmed in a fragmented maze of commercial tools: paying steep annual subscriptions for Covidence and Rayyan just to screen titles and abstracts, paying another fee for Connected Papers to explore citation trees, juggling separate reference managers, struggling with paywalled PDFs, and constantly losing control over where my notes and research bibliographies were stored.*
+> 
+> *Every tool demanded another cloud login, another recurring monthly fee, and another proprietary silo holding my research data hostage.*
+> 
+> *Coming from a computer engineering background, I asked a simple question: **Why can't all of this run in a single, high-performance, 100% local workbench on my own machine?***
+> 
+> *That question drove the creation of **Vellum**: a unified, local-first academic research suite that integrates multi-source search across 250M+ records, D3 citation networks, active-learning screening, multi-tier open-access PDF harvesting, and grounded claim extraction into an elegant, zero-subscription studio. Nothing leaves your workstation. Every note, PDF, and decision belongs entirely to you."*
+>
+> — **Amine Zouaghi**, *Author & Lead Architect*
+
+---
+
+## 🚀 Quick Download & Installation (Windows)
+
+All compiled Windows executables and portable bundles are available under **[Releases (v2.1.0)](https://github.com/aminezghi/vellum/releases/latest)**:
 
 ### Option 1: Native Windows Installer (Recommended)
-Download **[`Vellum-Desktop-V2.1-Setup-x64.exe`](https://github.com/aminezghi/vellum/releases/latest)**:
+Download **[`Vellum-Desktop-V2.1-Setup-x64.exe`](https://github.com/aminezghi/vellum/releases/download/v2.1.0/Vellum-Desktop-V2.1-Setup-x64.exe)**:
 - Standard Inno Setup installer for 64-bit Windows 10/11.
 - Installs to `%LOCALAPPDATA%\Programs\Vellum Desktop` with Start Menu shortcut and clean uninstaller.
 - **Requires no Python or dependency installation**.
-- *Note:* Because the binary is self-published without a costly commercial code-signing certificate, Windows SmartScreen may prompt *"Windows protected your PC"*. Click **More info → Run anyway**.
+- *Note:* Because the binary is self-published without a commercial code-signing certificate, Windows SmartScreen may prompt *"Windows protected your PC"*. Click **More info → Run anyway**.
 
 ### Option 2: Portable Standalone Desktop ZIP
-Download **[`Vellum_Standalone_Windows_x64.zip`](https://github.com/aminezghi/vellum/releases/latest)**:
-- Extract anywhere (e.g. `C:\Vellum`) and double-click `Vellum.exe`.
-- Zero installation, completely portable on USB drives.
+Download **[`Vellum_Standalone_Windows_x64.zip`](https://github.com/aminezghi/vellum/releases/download/v2.1.0/Vellum_Standalone_Windows_x64.zip)**:
+- Extract anywhere (e.g., `C:\Vellum`) and double-click `Vellum.exe`.
+- Zero installation required; completely portable on USB drives.
 
 ### Option 3: Zero-Install Web Studio (Colleague Share Package)
-Download **[`Vellum_Web_Fernly_SHARE.zip`](https://github.com/aminezghi/vellum/releases/latest)**:
+Download **[`Vellum_Web_Fernly_OneClick_Package.zip`](https://github.com/aminezghi/vellum/releases/download/v2.1.0/Vellum_Web_Fernly_OneClick_Package.zip)**:
 - Extract anywhere and double-click **`START_VELLUM_WEB.bat`**.
 - Ships with a bundled, pre-verified portable Node.js runtime (`v24.22.1 LTS`).
 - **No Node.js, no Python, and no administrator rights needed**. Automatically opens `http://localhost:3002`.
@@ -119,6 +126,28 @@ Verify the integrity of downloaded binaries against [`DISTRIBUTABLES/SHA256SUMS.
 ```powershell
 certutil -hashfile Vellum-Desktop-V2.1-Setup-x64.exe SHA256
 ```
+
+---
+
+## 🙏 Acknowledgments & Inspirations
+
+Vellum was built on the shoulders of remarkable open-science projects, academic tools, and open-source software libraries:
+
+- **Inspirations & Pioneers**:
+  - **Rayyan** & **Covidence**: For pioneering web-based systematic review screening workflows.
+  - **Connected Papers** & **Litmaps**: For inspiring interactive citation network visualization and co-citation discovery.
+  - **ASReview LAB**: For pioneering machine-learning active-learning screening principles and stopping heuristics.
+  - **The Open Science Community**: For tirelessly advocating for open-access literature and barrier-free scholarship.
+- **Academic Data & Discovery APIs**:
+  - **OpenAlex**: For providing open, cataloged access to 250M+ global scholarly works and citation graphs.
+  - **Unpaywall**: For making legal, open-access full-text PDF resolution reliable worldwide.
+  - **Crossref**, **NCBI PubMed / PubMed Central**, and **arXiv**: For robust bibliographic metadata and open preprint distribution.
+- **Open-Source Foundations**:
+  - **Web Studio**: [Next.js](https://nextjs.org/) (Vercel), [React](https://react.dev/), [Tailwind CSS](https://tailwindcss.com/), [Dexie.js](https://dexie.org/) (client-side IndexedDB reactive persistence), and [Lucide Icons](https://lucide.dev/).
+  - **Desktop Workbench**: [Python](https://www.python.org/), [Streamlit](https://streamlit.io/), [PyMuPDF / pdfplumber](https://github.com/pymupdf/PyMuPDF), [PyInstaller](https://pyinstaller.org/), and [Inno Setup](https://jrsoftware.org/isinfo.php).
+- **Design & Creative Frameworks**:
+  - [HyperFrames](https://hyperframes.studio/): For deterministic, high-frame-rate programmatic demo rendering.
+  - [Kaan Kiziltug's Logo Design Skill](https://github.com/kaankiziltug/logo-design-skill): For the mathematical geometry audit and production branding pipeline behind the **Folded Folio** identity.
 
 ---
 
