@@ -92,7 +92,7 @@ It unites four academic tools into a single, cohesive local-first interface:
 - Screen articles using rapid keyboard shortcuts:
   - **`[I]`**: Include / Relevant
   - **`[E]`**: Exclude / Irrelevant
-  - **`[U]`**: Uncertain / Flag for Second Review
+  - **`[U]`**: Undo the last decision
 - As you make decisions, the machine learning ranker updates in real time, pushing the most probable relevant articles to the top of your queue so you achieve exhaustive recall early.
 - Monitor the **Stopping Curve** and export your final inclusion decisions as PRISMA-compliant CSV or RIS files.
 

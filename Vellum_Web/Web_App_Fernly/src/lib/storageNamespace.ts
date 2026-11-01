@@ -19,7 +19,7 @@
 /** Identifies this edition. Must stay unique across the Vellum web editions. */
 export const APP_ID = "fernly" as const;
 
-export const APP_LABEL = "Vellum Web (Fernly Botanical Bento Edition)";
+export const APP_LABEL = "Vellum Web by Amine";
 
 /** IndexedDB database owned by this edition. */
 export const DB_NAME = `VellumWebDB_${APP_ID}`;

@@ -88,16 +88,29 @@ def _clean_html(html_str: str) -> str:
     return " ".join(line.strip() for line in html_str.splitlines() if line.strip())
 
 
+import concurrent.futures
+
+
+@st.cache_data(ttl=3600, show_spinner=False)
 def _fetch_tailored_suggestions(field: str, keywords: str) -> List[Dict[str, Any]]:
-    """Fetch 3-5 open-access papers from OpenAlex matching user's field and keywords."""
+    """Fetch 3-5 open-access papers from OpenAlex matching user's field and keywords with 2s timeout and fallback."""
     query = f"{field} {keywords}".strip() or "Systematic review methodology"
+    executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
     try:
         import litcheck_sources as ls
-        results, _ = ls.search_openalex(query=query, per_source=5, max_records=5, oa_only=True)
+
+        def _do_search():
+            res, _ = ls.search_openalex(query=query, per_source=5, max_records=5, oa_only=True)
+            return res
+
+        future = executor.submit(_do_search)
+        results = future.result(timeout=2.0)
+        executor.shutdown(wait=False, cancel_futures=True)
         if results:
             return results
     except Exception:
-        pass
+        executor.shutdown(wait=False, cancel_futures=True)
+
     sample_size = min(3, len(SEMINAL_FALLBACKS))
     return random.sample(SEMINAL_FALLBACKS, sample_size)
 
@@ -172,30 +185,97 @@ def render() -> None:
 
     st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
 
-    # 3. Fast Workflow Quick-Launch Row
-    lp1, lp2, lp3, lp4 = st.columns(4)
+    # 3. Core Research Engines Bento Grid (Apple HIG & Design System)
+    st.markdown(
+        """
+        <div style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 8px;">
+            Core Research Engines
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    lp1, lp2, lp3, lp4 = st.columns(4, gap="medium")
     with lp1:
-        if st.button("🔍 Search Literature", width="stretch", help="Run multi-source queries across OpenAlex, PubMed, Crossref"):
-            vellum_pages.go("discover_literature")
+        with st.container(border=True):
+            st.markdown(
+                """
+                <div style="min-height: 56px;">
+                    <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-main); margin-bottom: 3px;">
+                        📥 PDF Downloader
+                    </div>
+                    <div style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.35;">
+                        Batch harvest full-texts via Unpaywall &amp; Sci-Hub mirrors.
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+            if st.button("Launch Downloader ➔", key="_ovw_launch_dl", type="primary", use_container_width=True):
+                vellum_pages.go("library_downloader")
+
     with lp2:
-        if st.button("🕸️ Citation Lineage", width="stretch", help="Explore upstream references & downstream citations"):
-            if not st.session_state.get("_cg_pending_target"):
-                pool_papers = data.get("search_records", [])
-                if pool_papers:
-                    p_seed = pool_papers[-1]
-                    st.session_state["_cg_pending_target"] = p_seed.get("doi") or p_seed.get("title")
-                elif "_suggested_feed" in st.session_state and st.session_state["_suggested_feed"]:
-                    sug_list = st.session_state["_suggested_feed"]
-                    sug_idx = st.session_state.get("_suggested_idx", 0)
-                    p_sug = sug_list[sug_idx % len(sug_list)]
-                    st.session_state["_cg_pending_target"] = p_sug.get("doi") or p_sug.get("title")
-            vellum_pages.go("discover_citation")
+        with st.container(border=True):
+            st.markdown(
+                """
+                <div style="min-height: 56px;">
+                    <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-main); margin-bottom: 3px;">
+                        🕸️ Citation Lineage
+                    </div>
+                    <div style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.35;">
+                        Map foundational roots &amp; derivative citation clusters.
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+            if st.button("Explore Graph ➔", key="_ovw_launch_graph", use_container_width=True):
+                if not st.session_state.get("_cg_pending_target"):
+                    pool_papers = data.get("search_records", [])
+                    if pool_papers:
+                        p_seed = pool_papers[-1]
+                        st.session_state["_cg_pending_target"] = p_seed.get("doi") or p_seed.get("title")
+                    elif "_suggested_feed" in st.session_state and st.session_state["_suggested_feed"]:
+                        sug_list = st.session_state["_suggested_feed"]
+                        sug_idx = st.session_state.get("_suggested_idx", 0)
+                        p_sug = sug_list[sug_idx % len(sug_list)]
+                        st.session_state["_cg_pending_target"] = p_sug.get("doi") or p_sug.get("title")
+                vellum_pages.go("discover_citation")
+
     with lp3:
-        if st.button("📚 Unified Paper Pool", width="stretch", help="Screen and manage all papers"):
-            vellum_pages.go("library_pool")
+        with st.container(border=True):
+            st.markdown(
+                """
+                <div style="min-height: 56px;">
+                    <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-main); margin-bottom: 3px;">
+                        🔬 AI Screening
+                    </div>
+                    <div style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.35;">
+                        ASReview active learning &amp; stopping curve heuristics.
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+            if st.button("Start Screening ➔", key="_ovw_launch_screening", use_container_width=True):
+                vellum_pages.go("screening")
+
     with lp4:
-        if st.button("📥 PDF Downloader", width="stretch", help="Batch download queue and folder management"):
-            vellum_pages.go("library_downloader")
+        with st.container(border=True):
+            st.markdown(
+                """
+                <div style="min-height: 56px;">
+                    <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-main); margin-bottom: 3px;">
+                        📚 Paper Pool
+                    </div>
+                    <div style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.35;">
+                        Manage screened literature and 1-click citation export.
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+            if st.button("Open Paper Pool ➔", key="_ovw_launch_pool", use_container_width=True):
+                vellum_pages.go("library_pool")
 
     # 4. Advanced Scope & Criteria Drawer (Collapsed by default for a clean single-focus interface)
     with st.expander("⚙️ Advanced Project Scope & Inclusion Criteria", expanded=False):
@@ -234,10 +314,12 @@ def render() -> None:
                 st.markdown(f"📥 **Download Queue:** `{len(queue)}` papers waiting for batch download")
             with qc2:
                 if st.button(f"🚀 Download All in Queue ({len(queue)})", type="primary", width="stretch", key="_ovw_dl_all_btn"):
-                    with st.spinner(f"Downloading {len(queue)} papers..."):
-                        res = VDD.download_all_in_queue()
-                        st.toast(f"Downloaded {res['success']} PDFs! (Remaining: {res['remaining']})", icon="✅")
-                        st.rerun()
+                    prog_bar = st.progress(0, text=f"Downloading {len(queue)} papers...")
+                    def _prog(done, total):
+                        prog_bar.progress(int((done / max(1, total)) * 100), text=f"Downloaded {done} of {total} papers...")
+                    res = VDD.download_all_in_queue(progress_callback=_prog)
+                    st.toast(f"Downloaded {res['success']} PDFs! (Remaining: {res['remaining']})", icon="✅")
+                    st.rerun()
             with qc3:
                 if st.button("🗑️ Clear", width="stretch", key="_ovw_clear_q_btn", help="Clear queue"):
                     VDD.clear_download_queue()
@@ -328,8 +410,8 @@ def render() -> None:
 
             card_box = f"""
 <div style="margin-bottom: 8px;">
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 4px;">
-        <div style="font-size: 1.05rem; font-weight: 700; color: var(--text-main, #1d1d1f); line-height: 1.35; flex: 1;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 6px;">
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; font-size: 1.05rem; font-weight: 700; color: var(--text-main, #1d1d1f); line-height: 1.35; flex: 1;">
             {s_title}
         </div>
         <div style="display: flex; gap: 6px; flex-shrink: 0;">
@@ -337,10 +419,10 @@ def render() -> None:
             <span class="badge-violet">📈 {s_cites:,} Cites</span>
         </div>
     </div>
-    <div style="font-size: 0.83rem; color: var(--text-muted, #86868b); margin-top: 3px;">
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif; font-size: 0.83rem; color: var(--text-muted, #86868b); margin-top: 3px;">
         👥 <b>{author_preview or 'Featured Authors'}</b> &nbsp;•&nbsp; 🏛️ <i>{s_venue}</i> &nbsp;•&nbsp; 📅 <b>{s_year}</b>
     </div>
-    <div style="font-size: 0.86rem; color: var(--text-main, #1d1d1f); line-height: 1.5; margin-top: 10px; background: rgba(125,125,125,0.08); padding: 10px 14px; border-radius: 8px; border-left: 3px solid var(--apple-blue, #0071e3);">
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif; font-size: 0.86rem; color: var(--text-main, #1d1d1f); line-height: 1.5; margin-top: 10px; background: rgba(125,125,125,0.08); padding: 10px 14px; border-radius: 8px; border-left: 3px solid var(--apple-blue, #0a84ff);">
         {s_abstract[:360]}{"..." if len(s_abstract) > 360 else ""}
     </div>
 </div>

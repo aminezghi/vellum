@@ -24,7 +24,7 @@ import time
 from pathlib import Path
 from typing import Optional
 
-APP_NAME = "Vellum"
+APP_NAME = "Vellum by Amine"
 DEFAULT_PORT = 8501
 HEALTH_TIMEOUT = 45.0  # seconds
 SERVER_LOG = Path(tempfile.gettempdir()) / "vellum-desktop-server.log"

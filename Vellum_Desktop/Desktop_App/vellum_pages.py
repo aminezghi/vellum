@@ -215,7 +215,6 @@ def go(url_path: str) -> None:
         return
 
     # No registry: fall back to the handover flags the pages have always used.
-    section = SECTION_OF.get(url_path, "")
     mapping = {
         "overview": ("overview", None),
         "discover_literature": ("discover", "Literature Search"),

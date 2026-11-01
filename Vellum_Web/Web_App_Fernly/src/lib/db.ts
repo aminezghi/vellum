@@ -46,10 +46,13 @@ export interface EvidenceExtraction {
   id: string;
   notebookId: string;
   sourceId: string;
-  category: "method" | "sampling" | "statistics" | "rigour";
+  category: "method" | "sampling" | "statistics" | "rigour" | string;
   claim: string;
-  pageNumber: number;
-  confidence: number;
+  quote?: string;
+  methodology?: string;
+  pageNumber?: number;
+  confidence?: number;
+  createdAt?: number;
 }
 
 export interface ScreeningSession {

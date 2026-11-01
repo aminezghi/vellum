@@ -68,23 +68,8 @@ def render_paper_action_bar(
                                 st.caption(f"[Open browser access]({fallback})")
             elif act == "queue":
                 if st.button("⬇️ Queue PDF", key=f"{key_prefix}_queue", help="Add to active project download queue", use_container_width=True):
-                    data = vellum_workspace.load_project_data()
-                    queue = data.get("download_queue", [])
-                    already_queued = any(
-                        (q.get("doi") and q.get("doi") == doi) or (q.get("title") == title)
-                        for q in queue
-                    )
-                    if not already_queued:
-                        queue.append({
-                            "doi": doi,
-                            "title": title,
-                            "authors": paper.get("authors") or [],
-                            "year": paper.get("year") or 0,
-                            "pdf_url": paper.get("pdf_url") or "",
-                            "status": "pending",
-                        })
-                        data["download_queue"] = queue
-                        vellum_workspace.save_project_data(data)
+                    added = VDD.add_to_download_queue(paper)
+                    if added:
                         st.toast(f"Added to queue: {title[:40]}...", icon="📥")
                     else:
                         st.toast("Already in download queue", icon="ℹ️")

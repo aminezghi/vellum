@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <title>Vellum Logo - Concept B: The Citation Vertex</title>
+  <g id="mark">
+    <!-- Connecting Angled Struts -->
+    <path d="M 132 110 L 256 380 L 380 110 L 328 110 L 256 268 L 184 110 Z" fill="#10B981"/>
+    <path d="M 184 110 L 256 268 L 256 380 L 132 110 Z" fill="#059669"/>
+    
+    <!-- Top Left Node (Seminal Works) with true hole -->
+    <path fill-rule="evenodd" d="M 132 64 C 157.4 64 178 84.6 178 110 C 178 135.4 157.4 156 132 156 C 106.6 156 86 135.4 86 110 C 86 84.6 106.6 64 132 64 Z M 132 88 C 144.1 88 154 97.9 154 110 C 154 122.1 144.1 132 132 132 C 119.9 132 110 122.1 110 110 C 110 97.9 119.9 88 132 88 Z" fill="#10B981"/>
+
+    <!-- Top Right Node (Derivative Clusters) with true hole -->
+    <path fill-rule="evenodd" d="M 380 64 C 405.4 64 426 84.6 426 110 C 426 135.4 405.4 156 380 156 C 354.6 156 334 135.4 334 110 C 334 84.6 354.6 64 380 64 Z M 380 88 C 392.1 88 402 97.9 402 110 C 402 122.1 392.1 132 380 132 C 367.9 132 358 122.1 358 110 C 358 97.9 367.9 88 380 88 Z" fill="#38BDF8"/>
+
+    <!-- Bottom Origin Node (The Seed Paper) with true hole -->
+    <path fill-rule="evenodd" d="M 256 326 C 285.8 326 310 350.2 310 380 C 310 409.8 285.8 434 256 434 C 226.2 434 202 409.8 202 380 C 202 350.2 226.2 326 256 326 Z M 256 358 C 268.1 358 278 367.9 278 380 C 278 392.1 268.1 402 256 402 C 243.9 402 234 392.1 234 380 C 234 367.9 243.9 358 256 358 Z" fill="#059669"/>
+  </g>
+</svg>

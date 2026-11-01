@@ -22,6 +22,7 @@ import {
   X,
   FileText,
   Network,
+  AlertTriangle,
 } from "lucide-react";
 
 interface ConnectedGraphHubProps {
@@ -67,6 +68,7 @@ export function ConnectedGraphHub({
 }: ConnectedGraphHubProps) {
   const [searchQuery, setSearchQuery] = useState(initialSeed || "DeepFruits: A Fruit Detection System Using Deep Neural Networks");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<{ message: string; seed?: string } | null>(null);
   const [graphData, setGraphData] = useState<ConnectedGraphResponse | null>(null);
   const [selectedNodeId, setSelectedNodeId] = useState<string>("");
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
@@ -137,14 +139,28 @@ export function ConnectedGraphHub({
   const fetchGraph = useCallback(async (term: string) => {
     if (!term.trim()) return;
     setLoading(true);
+    setError(null);
     try {
       const res = await fetch(`/api/connected?q=${encodeURIComponent(term.trim())}`);
-      const data: ConnectedGraphResponse = await res.json();
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        setError({
+          message: data.error || `No citation network found for "${term.trim()}".`,
+          seed: term.trim(),
+        });
+        setGraphData(null);
+        return;
+      }
       setGraphData(data);
       setSelectedNodeId(data.origin.id);
       initializeSimulation(data);
     } catch (err) {
       console.error("Failed to load connected graph:", err);
+      setError({
+        message: "Network error: Unable to connect to citation graph service.",
+        seed: term.trim(),
+      });
+      setGraphData(null);
     } finally {
       setLoading(false);
     }
@@ -486,14 +502,25 @@ export function ConnectedGraphHub({
     isDraggingCanvas.current = false;
   };
 
-  const handleWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
-    e.preventDefault();
-    const zoomFactor = e.deltaY < 0 ? 1.12 : 0.89;
-    setTransform((prev) => ({
-      ...prev,
-      k: Math.max(0.35, Math.min(3.5, prev.k * zoomFactor)),
-    }));
-  };
+  // Zoom on wheel with non-passive listener to avoid browser console violations
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const zoomFactor = e.deltaY < 0 ? 1.12 : 0.89;
+      setTransform((prev) => ({
+        ...prev,
+        k: Math.max(0.35, Math.min(3.5, prev.k * zoomFactor)),
+      }));
+    };
+
+    canvas.addEventListener("wheel", onWheel, { passive: false });
+    return () => {
+      canvas.removeEventListener("wheel", onWheel);
+    };
+  }, []);
 
   // Zoom buttons
   const handleZoom = (factor: number) => {
@@ -577,6 +604,53 @@ export function ConnectedGraphHub({
           ))}
         </div>
       </div>
+
+      {/* Visual Error / Fallback Banner */}
+      {error && (
+        <div className="fernly-card p-6 rounded-[2rem] border border-amber-300 dark:border-amber-700/60 bg-amber-50/70 dark:bg-amber-950/20 text-[var(--ink)] space-y-3 animate-fade-in mb-4">
+          <div className="flex items-start gap-3">
+            <div className="p-2.5 rounded-2xl bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300 flex-shrink-0">
+              <AlertTriangle className="h-5 w-5" />
+            </div>
+            <div className="flex-1 space-y-1.5">
+              <h3 className="text-sm font-bold text-amber-900 dark:text-amber-200">
+                Citation Network Unavailable
+              </h3>
+              <p className="text-xs text-amber-800/90 dark:text-amber-300/90 leading-relaxed font-medium">
+                {error.message}
+              </p>
+              <div className="pt-2 text-xs text-[var(--ink-muted)] space-y-1">
+                <p className="font-semibold text-[var(--ink)]">Suggested recovery steps:</p>
+                <ul className="list-disc pl-4 space-y-0.5">
+                  <li>Verify the paper title or search using its registered DOI (e.g., <code>10.1038/...</code>).</li>
+                  <li>Use the <strong>Academic Search Hub</strong> to verify if the paper exists across OpenAlex or Crossref.</li>
+                  <li>Or explore one of the verified seminal benchmark graphs:</li>
+                </ul>
+              </div>
+              <div className="pt-2 flex flex-wrap gap-2">
+                {EXAMPLE_SEEDS.map((ex) => (
+                  <button
+                    key={ex.label}
+                    onClick={() => {
+                      setSearchQuery(ex.query);
+                      fetchGraph(ex.query);
+                    }}
+                    className="px-3 py-1.5 rounded-full text-xs font-semibold bg-white dark:bg-amber-900/40 border border-amber-300 dark:border-amber-700 hover:border-amber-500 text-amber-900 dark:text-amber-200 transition-all cursor-pointer shadow-xs"
+                  >
+                    {ex.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <button
+              onClick={() => setError(null)}
+              className="text-amber-700/70 hover:text-amber-900 dark:text-amber-400 dark:hover:text-amber-200 p-1 rounded-lg cursor-pointer transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* =========================================================================
           THREE-COLUMN CONNECTED PAPERS LAYOUT (Matches connectedpapers.com)
@@ -726,7 +800,6 @@ export function ConnectedGraphHub({
                   onMouseDown={handleMouseDown}
                   onMouseMove={handleMouseMove}
                   onMouseUp={handleMouseUp}
-                  onWheel={handleWheel}
                   className="w-full h-full block select-none"
                 />
 

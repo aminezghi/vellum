@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Dexie Adversarial Challenge Suite</title>
+  <script src="../node_modules/dexie/dist/dexie.js"></script>
+</head>
+<body>
+  <h1>Dexie Adversarial Challenge Runner</h1>
+  <div id="status">RUNNING</div>
+  <pre id="output"></pre>
+
+  <script>
+    const logEl = document.getElementById("output");
+    const statusEl = document.getElementById("status");
+    const results = [];
+
+    function log(msg) {
+      console.log(msg);
+      results.push(msg);
+      logEl.textContent = results.join("\n");
+    }
+
+    async function runSuite() {
+      try {
+        log("=================================================");
+        log("Dexie Persistence & Cascade Delete Adversarial Suite");
+        log("=================================================");
+
+        const DB_NAME = "VellumWebDB_adversarial_test_" + Date.now();
+
+        // Define Vellum database schema exactly as in src/lib/db.ts
+        class TestVellumDatabase extends Dexie {
+          constructor(name) {
+            super(name);
+            this.version(1).stores({
+              notebooks: "id, title, createdAt, updatedAt, isFeatured, category",
+              sources: "id, notebookId, doi, addedAt",
+              notes: "id, notebookId, updatedAt",
+              evidence: "id, notebookId, sourceId, category",
+            });
+            this.version(2).stores({
+              notebooks: "id, title, createdAt, updatedAt, isFeatured, category",
+              sources: "id, notebookId, doi, addedAt",
+              notes: "id, notebookId, updatedAt",
+              evidence: "id, notebookId, sourceId, category",
+              screeningItems: "id, notebookId, decision, doi, relevanceScore, screenedAt",
+            });
+            this.version(3).stores({
+              notebooks: "id, title, createdAt, updatedAt, isFeatured, category",
+              sources: "id, notebookId, doi, addedAt",
+              notes: "id, notebookId, updatedAt",
+              evidence: "id, notebookId, sourceId, category",
+              screeningItems: "id, sessionId, notebookId, decision, doi, relevanceScore, screenedAt",
+              screeningSessions: "id, name, createdAt, updatedAt",
+            });
+          }
+        }
+
+        const testDb = new TestVellumDatabase(DB_NAME);
+        await testDb.open();
+        log("✓ Database initialized successfully at Version " + testDb.verno);
+
+        // -------------------------------------------------------------------
+        // CHALLENGE 1: bulkPut with 600 records and duplicate IDs
+        // -------------------------------------------------------------------
+        log("\n--- CHALLENGE 1: bulkPut with 600 records & duplicate IDs ---");
+        const batchRecords = [];
+        // Generate 500 unique records
+        for (let i = 0; i < 500; i++) {
+          batchRecords.push({
+            id: "src-bulk-" + i,
+            notebookId: "nb-batch-1",
+            title: "Batch Paper " + i,
+            authors: ["Author " + i],
+            year: 2020 + (i % 5),
+            status: "ready",
+            addedAt: Date.now() - i * 1000,
+          });
+        }
+        // Add 100 duplicates of existing IDs with UPDATED titles
+        for (let i = 0; i < 100; i++) {
+          batchRecords.push({
+            id: "src-bulk-" + i,
+            notebookId: "nb-batch-1",
+            title: "UPDATED Batch Paper " + i,
+            authors: ["Author " + i + " Updated"],
+            year: 2026,
+            status: "ready",
+            addedAt: Date.now(),
+          });
+        }
+
+        const startTime = performance.now();
+        await testDb.sources.bulkPut(batchRecords);
+        const duration = (performance.now() - startTime).toFixed(2);
+        const totalStored = await testDb.sources.where("notebookId").equals("nb-batch-1").count();
+        log("bulkPut 600 records (500 unique + 100 duplicates) completed in " + duration + "ms");
+        log("Count in table: " + totalStored + " (Expected: 500)");
+
+        if (totalStored === 500) {
+          log("✓ PASS: Duplicate IDs were successfully upserted without primary key conflict errors.");
+        } else {
+          log("✗ FAIL: Expected 500 unique records, got " + totalStored);
+        }
+
+        // Verify that duplicate ID 42 was updated to latest title
+        const item42 = await testDb.sources.get("src-bulk-42");
+        if (item42 && item42.title === "UPDATED Batch Paper 42") {
+          log("✓ PASS: Duplicate record content properly overwritten with latest version.");
+        } else {
+          log("✗ FAIL: Duplicate record was not properly updated. Found: " + (item42 ? item42.title : "null"));
+        }
+
+        // -------------------------------------------------------------------
+        // CHALLENGE 2: Cascade Delete in NotebookWorkspace vs NotebookGrid
+        // -------------------------------------------------------------------
+        log("\n--- CHALLENGE 2: Cascade Delete Logic ---");
+        const nb1Id = "nb-test-cascade-1";
+        const nb2Id = "nb-test-cascade-2";
+
+        // Seed notebook 1
+        await testDb.notebooks.put({ id: nb1Id, title: "Notebook 1", createdAt: Date.now(), updatedAt: Date.now(), sourcesCount: 2 });
+        await testDb.sources.bulkPut([
+          { id: "src-nb1-1", notebookId: nb1Id, title: "Paper 1", authors: [], addedAt: Date.now(), status: "ready" },
+          { id: "src-nb1-2", notebookId: nb1Id, title: "Paper 2", authors: [], addedAt: Date.now(), status: "ready" },
+        ]);
+        await testDb.notes.put({ id: "note-nb1", notebookId: nb1Id, content: "Notes for nb1", updatedAt: Date.now() });
+        await testDb.evidence.bulkPut([
+          { id: "evi-nb1-1", notebookId: nb1Id, sourceId: "src-nb1-1", category: "method", claim: "Claim 1" },
+          { id: "evi-nb1-2", notebookId: nb1Id, sourceId: "src-nb1-2", category: "sampling", claim: "Claim 2" },
+        ]);
+
+        // Seed notebook 2
+        await testDb.notebooks.put({ id: nb2Id, title: "Notebook 2", createdAt: Date.now(), updatedAt: Date.now(), sourcesCount: 1 });
+        await testDb.sources.put({ id: "src-nb2-1", notebookId: nb2Id, title: "Paper 3", authors: [], addedAt: Date.now(), status: "ready" });
+        await testDb.notes.put({ id: "note-nb2", notebookId: nb2Id, content: "Notes for nb2", updatedAt: Date.now() });
+        await testDb.evidence.put({ id: "evi-nb2-1", notebookId: nb2Id, sourceId: "src-nb2-1", category: "rigour", claim: "Claim 3" });
+
+        // Test NotebookWorkspace deletion sequence (lines 439-442)
+        log("Testing NotebookWorkspace deletion sequence on " + nb1Id + "...");
+        await testDb.notebooks.delete(nb1Id);
+        await testDb.sources.where("notebookId").equals(nb1Id).delete();
+        await testDb.notes.where("notebookId").equals(nb1Id).delete();
+        await testDb.evidence.where("notebookId").equals(nb1Id).delete();
+
+        const nb1Remaining = await testDb.notebooks.get(nb1Id);
+        const nb1Sources = await testDb.sources.where("notebookId").equals(nb1Id).count();
+        const nb1Notes = await testDb.notes.where("notebookId").equals(nb1Id).count();
+        const nb1Evidence = await testDb.evidence.where("notebookId").equals(nb1Id).count();
+
+        log("NotebookWorkspace delete results: notebooks=" + (nb1Remaining ? 1 : 0) + ", sources=" + nb1Sources + ", notes=" + nb1Notes + ", evidence=" + nb1Evidence);
+        if (!nb1Remaining && nb1Sources === 0 && nb1Notes === 0 && nb1Evidence === 0) {
+          log("✓ PASS: NotebookWorkspace cascade delete removes notebook, sources, notes, and evidence cleanly.");
+        } else {
+          log("✗ FAIL: NotebookWorkspace left residual records.");
+        }
+
+        // Test NotebookGrid deletion sequence (lines 25-27 of NotebookGrid.tsx)
+        log("\nTesting NotebookGrid deletion sequence on " + nb2Id + "...");
+        await testDb.notebooks.delete(nb2Id);
+        await testDb.sources.where("notebookId").equals(nb2Id).delete();
+        await testDb.notes.where("notebookId").equals(nb2Id).delete();
+        // Notice NotebookGrid.tsx DOES NOT call db.evidence.where("notebookId").equals(id).delete()
+
+        const nb2Evidence = await testDb.evidence.where("notebookId").equals(nb2Id).count();
+        log("NotebookGrid delete residual evidence count: " + nb2Evidence);
+        if (nb2Evidence > 0) {
+          log("⚠ FINDING DETECTED: NotebookGrid.tsx handleDelete OMITTED cascade deletion of db.evidence table! " + nb2Evidence + " orphaned evidence record(s) leaked in IndexedDB!");
+        } else {
+          log("✓ No orphan evidence found.");
+        }
+
+        // -------------------------------------------------------------------
+        // CHALLENGE 3: CleanNotebooksModal deletion
+        // -------------------------------------------------------------------
+        log("\n--- CHALLENGE 3: CleanNotebooksModal deletion ---");
+        const cleanNbId = "nb-clean-test";
+        await testDb.notebooks.put({ id: cleanNbId, title: "Clean Target", createdAt: Date.now(), updatedAt: Date.now() });
+        await testDb.evidence.put({ id: "evi-clean-1", notebookId: cleanNbId, sourceId: "src-clean", category: "method", claim: "Clean claim" });
+
+        // CleanNotebooksModal lines 48-50
+        await testDb.notebooks.clear();
+        await testDb.sources.clear();
+        await testDb.notes.clear();
+        // db.evidence.clear() was omitted!
+
+        const cleanEvidenceCount = await testDb.evidence.count();
+        log("Evidence count after CleanNotebooksModal 'all' clean: " + cleanEvidenceCount);
+        if (cleanEvidenceCount > 0) {
+          log("⚠ FINDING DETECTED: CleanNotebooksModal.tsx handleExecuteClean OMITTED db.evidence.clear()! " + cleanEvidenceCount + " orphaned evidence record(s) remain in IndexedDB after full workspace clear!");
+        }
+
+        // -------------------------------------------------------------------
+        // CHALLENGE 4: EvidenceExtraction schema compatibility across versions
+        // -------------------------------------------------------------------
+        log("\n--- CHALLENGE 4: Schema Compatibility (Legacy v1 -> Extended v3) ---");
+        const COMPAT_DB_NAME = "VellumCompatTest_" + Date.now();
+
+        // 1. Create a database at Version 1
+        const legacyDb = new Dexie(COMPAT_DB_NAME);
+        legacyDb.version(1).stores({
+          notebooks: "id, title, createdAt, updatedAt, isFeatured, category",
+          sources: "id, notebookId, doi, addedAt",
+          notes: "id, notebookId, updatedAt",
+          evidence: "id, notebookId, sourceId, category",
+        });
+        await legacyDb.open();
+
+        // Insert legacy evidence record (with ONLY v1 fields)
+        await legacyDb.table("evidence").put({
+          id: "evi-legacy-1",
+          notebookId: "nb-legacy",
+          sourceId: "src-legacy-1",
+          category: "method",
+          claim: "Legacy Claim without new optional fields",
+        });
+        legacyDb.close();
+        log("Legacy v1 database seeded with legacy record and closed.");
+
+        // 2. Open with the new v3 schema definition
+        const upgradedDb = new TestVellumDatabase(COMPAT_DB_NAME);
+        await upgradedDb.open();
+        log("Upgraded database opened at version " + upgradedDb.verno);
+
+        // Read legacy record
+        const fetchedLegacy = await upgradedDb.evidence.get("evi-legacy-1");
+        log("Fetched legacy record: claim=\"" + fetchedLegacy.claim + "\", quote=" + fetchedLegacy.quote + ", confidence=" + fetchedLegacy.confidence);
+
+        // Insert extended record with new optional fields
+        await upgradedDb.evidence.put({
+          id: "evi-v3-extended",
+          notebookId: "nb-legacy",
+          sourceId: "src-legacy-1",
+          category: "rigour",
+          claim: "Extended claim with all optional properties",
+          quote: "A verbatim excerpt from the empirical evaluation.",
+          methodology: "Double-blind randomized trial",
+          pageNumber: 14,
+          confidence: 98,
+          createdAt: Date.now(),
+        });
+
+        const allNbClaims = await upgradedDb.evidence.where("notebookId").equals("nb-legacy").toArray();
+        log("Total evidence records under 'nb-legacy': " + allNbClaims.length);
+
+        if (allNbClaims.length === 2 && fetchedLegacy.claim === "Legacy Claim without new optional fields") {
+          log("✓ PASS: EvidenceExtraction schema is 100% backward compatible. Legacy records coexist seamlessly with extended records.");
+        } else {
+          log("✗ FAIL: Schema incompatibility observed.");
+        }
+
+        // Cleanup test databases
+        await testDb.delete();
+        await upgradedDb.delete();
+        log("\nAll test databases cleaned up.");
+
+        log("\n=================================================");
+        log("SUITE FINISHED: ALL CHECKS EXECUTED EMPIRICALLY");
+        log("=================================================");
+        statusEl.textContent = "COMPLETED_SUCCESS";
+      } catch (err) {
+        log("\nFATAL ERROR IN TEST SUITE: " + err.message + "\n" + err.stack);
+        statusEl.textContent = "COMPLETED_FAILED";
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", runSuite);
+  </script>
+</body>
+</html>

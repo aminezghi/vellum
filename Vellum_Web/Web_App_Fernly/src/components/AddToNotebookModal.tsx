@@ -98,6 +98,7 @@ function AddToNotebookDialog({
       year: paper.year,
       journal: paper.venue ?? paper.journal,
       doi: paper.doi,
+      abstract: paper.abstract,
       status: "ready",
       addedAt: Date.now(),
     };
@@ -117,7 +118,7 @@ function AddToNotebookDialog({
       setSuccess(false);
       onAdded(targetNotebookId);
       onClose();
-    }, 1000);
+    }, 450);
   };
 
   return (

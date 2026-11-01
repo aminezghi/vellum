@@ -413,17 +413,23 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--app", default=str(REPO_ROOT / "Vellum_Web" / "Web_App_Fernly"))
     ap.add_argument("--out", default=str(REPO_ROOT / "Vellum_Web" / "Vellum_Web_Fernly_SHARE"))
-    ap.add_argument("--node-zip", required=True, help="path to node-vX-win-x64.zip")
-    ap.add_argument("--version", default="2.0.0")
+    ap.add_argument("--node-zip", default=None, help="path to node-vX-win-x64.zip (or omit to reuse existing runtime/node)")
+    ap.add_argument("--version", default="2.1.0")
     ap.add_argument("--no-prune", action="store_true",
                     help="keep build-time-only packages in node_modules")
     args = ap.parse_args()
 
     app_dir = Path(args.app).resolve()
     out = Path(args.out).resolve()
-    node_zip = Path(args.node_zip).resolve()
+    existing_runtime = out / "runtime" / "node"
 
-    if not node_zip.is_file():
+    node_zip = Path(args.node_zip).resolve() if args.node_zip else None
+    if node_zip is None:
+        if not (existing_runtime / "node.exe").is_file():
+            raise SystemExit(
+                f"node runtime zip not provided and no existing runtime found at {existing_runtime}"
+            )
+    elif not node_zip.is_file():
         raise SystemExit(f"node runtime zip not found: {node_zip}")
 
     t0 = time.time()
@@ -431,6 +437,13 @@ def main() -> int:
     print(f"  source : {app_dir}")
     print(f"  output : {out}")
     print()
+
+    temp_runtime = None
+    if node_zip is None and existing_runtime.is_dir():
+        import tempfile
+        temp_dir = Path(tempfile.mkdtemp(prefix="vellum_runtime_"))
+        temp_runtime = temp_dir / "node"
+        shutil.move(str(existing_runtime), str(temp_runtime))
 
     if out.exists():
         print("  removing previous share folder ...")
@@ -447,7 +460,16 @@ def main() -> int:
         print(f"    node_modules {human(before)} -> {human(after)} "
               f"(saved {human(before - after)})")
 
-    node_version = stage_runtime(node_zip, out / "runtime" / "node")
+    if temp_runtime and temp_runtime.is_dir():
+        print("  reusing existing portable Node.js runtime ...")
+        target_runtime = out / "runtime" / "node"
+        target_runtime.parent.mkdir(parents=True, exist_ok=True)
+        shutil.move(str(temp_runtime), str(target_runtime))
+        node_version = subprocess.run(
+            [str(target_runtime / "node.exe"), "--version"], capture_output=True, text=True
+        ).stdout.strip()
+    else:
+        node_version = stage_runtime(node_zip, out / "runtime" / "node")
 
     print("  writing launchers and documentation ...")
     (out / "START_VELLUM_WEB.bat").write_text(START_BAT, encoding="utf-8", newline="\r\n")

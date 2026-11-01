@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const SCIHUB_MIRRORS = [
+const DEFAULT_SCIHUB_MIRRORS = [
   "https://sci-hub.se/",
   "https://sci-hub.st/",
   "https://sci-hub.ru/",
+  "https://sci-hub.ee/",
 ];
+
+const DEFAULT_EMAIL = "scholar.vellum@gmail.com";
 
 const USER_AGENT =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
@@ -15,7 +18,11 @@ function isValidPdf(buffer: Uint8Array): boolean {
   return header.includes("%PDF");
 }
 
-async function fetchPdfBuffer(url: string, timeoutMs = 8000): Promise<{ buf: Uint8Array; url: string } | null> {
+async function fetchPdfBuffer(
+  url: string,
+  timeoutMs = 8000,
+  extraHeaders: Record<string, string> = {}
+): Promise<{ buf: Uint8Array; url: string } | null> {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeoutMs);
   try {
@@ -29,6 +36,7 @@ async function fetchPdfBuffer(url: string, timeoutMs = 8000): Promise<{ buf: Uin
         "User-Agent": USER_AGENT,
         Accept: "application/pdf,application/octet-stream,*/*;q=0.8",
         Referer: origin,
+        ...extraHeaders,
       },
       redirect: "follow",
     });
@@ -47,10 +55,8 @@ async function fetchPdfBuffer(url: string, timeoutMs = 8000): Promise<{ buf: Uin
 }
 
 // ---------------------------------------------------------------------------
-// Upstream payloads. Four registries are consulted in parallel and each has its
-// own shape; only the fields this route reads are described.
+// Upstream payloads
 // ---------------------------------------------------------------------------
-
 interface CrossrefEnvelope {
   message?: {
     title?: string[];
@@ -72,6 +78,12 @@ interface OpenAlexEnvelope {
   primary_location?: { pdf_url?: string };
   best_oa_location?: { pdf_url?: string };
   open_access?: { oa_url?: string };
+}
+
+interface EuropePmcEnvelope {
+  resultList?: {
+    result?: Array<{ pmcid?: string }>;
+  };
 }
 
 async function fetchJsonWithTimeout<T>(url: string, timeoutMs = 5000): Promise<T | null> {
@@ -125,7 +137,7 @@ function extractPdfLinksFromHtml(html: string, baseUrl: string): string[] {
     } catch {}
   };
 
-  // 1. <meta name="citation_pdf_url" content="...">
+  // 1. Meta citation tags
   const metaRegex = /<meta[^>]+(?:name|property)=["'](?:citation_pdf_url|bepress_citation_pdf_url|eprints\.document_url)["'][^>]+content=["']([^"']+)["']/gi;
   let m: RegExpExecArray | null;
   while ((m = metaRegex.exec(html)) !== null) {
@@ -136,7 +148,7 @@ function extractPdfLinksFromHtml(html: string, baseUrl: string): string[] {
     if (m[1]) addUrl(m[1]);
   }
 
-  // 2. Direct PDF / Download anchor tags (OJS, Detritus, Preprints, ScienceDirect, etc.)
+  // 2. Anchor tags with pdf links
   const anchorRegex = /<a[^>]+href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;
   while ((m = anchorRegex.exec(html)) !== null) {
     const href = (m[1] || "").trim();
@@ -186,6 +198,32 @@ function extractScholarPdfLinks(html: string): string[] {
   return found;
 }
 
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const doi = searchParams.get("doi");
+  if (!doi) {
+    return NextResponse.json(
+      { error: "Query parameter 'doi' is required." },
+      { status: 400 }
+    );
+  }
+  return POST(
+    new NextRequest(req.url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        doi,
+        title: searchParams.get("title") || "",
+        pdfUrl: searchParams.get("pdfUrl") || "",
+        email: searchParams.get("email") || "",
+        elsevierApiKey: searchParams.get("elsevierApiKey") || "",
+        customMirror: searchParams.get("customMirror") || "",
+        ezproxyUrl: searchParams.get("ezproxyUrl") || "",
+      }),
+    })
+  );
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -194,8 +232,24 @@ export async function POST(req: NextRequest) {
     let title = (body.title || "document").trim();
     const initialPdfUrl = (body.pdfUrl || (rawDoi.startsWith("http") && !rawDoi.includes("doi.org/") ? rawDoi : "")).trim();
 
+    // User-configured paywall bypass & resolver settings
+    const email = (body.email || DEFAULT_EMAIL).trim();
+    const elsevierApiKey = (body.elsevierApiKey || process.env.ELSEVIER_API_KEY || "").trim();
+    const customMirror = (body.customMirror || "").trim();
+    const ezproxyUrl = (body.ezproxyUrl || "").trim();
+
     const cleanTitle = title.replace(/[^\w\s-]/gi, "").slice(0, 50).trim();
     const filename = `${cleanTitle || "Paper"}.pdf`;
+
+    // Format EZProxy landing URL if paywalled
+    const getLandingUrl = (rawDoiUrl: string) => {
+      if (!ezproxyUrl) return rawDoiUrl;
+      const proxy = ezproxyUrl.trim();
+      if (proxy.includes("url=")) {
+        return `${proxy}${rawDoiUrl}`;
+      }
+      return `${proxy.replace(/\/$/, "")}/${rawDoiUrl}`;
+    };
 
     // ── Tier 1: Immediate Direct OA URL Check ────────────────────────────────
     if (initialPdfUrl && initialPdfUrl.startsWith("http")) {
@@ -217,16 +271,46 @@ export async function POST(req: NextRequest) {
         {
           success: false,
           message: "No DOI available for multi-tier repository lookup.",
-          landingUrl: initialPdfUrl || undefined,
+          landingUrl: initialPdfUrl ? getLandingUrl(initialPdfUrl) : undefined,
         },
         { status: 404 }
       );
     }
 
-    // ── Tier 2: Build candidate URLs concurrently ───────────────────────────
+    // ── Tier 2: Elsevier / ScienceDirect Official API (Dev Key Bypass) ────────
+    if (elsevierApiKey && (doi.startsWith("10.1016/") || doi.includes("elsevier") || doi.includes("sciencedirect"))) {
+      try {
+        const elsRes = await fetchPdfBuffer(
+          `https://api.elsevier.com/content/article/doi/${doi}?httpAccept=application/pdf`,
+          10000,
+          { "X-ELS-APIKey": elsevierApiKey }
+        );
+        if (elsRes) {
+          return new Response(Buffer.from(elsRes.buf), {
+            status: 200,
+            headers: {
+              "Content-Type": "application/pdf",
+              "Content-Disposition": `inline; filename="${filename}"`,
+              "X-Vellum-Resolved-Source": "Elsevier ScienceDirect API",
+            },
+          });
+        }
+      } catch {}
+    }
+
+    // ── Tier 3: Direct Publisher Open Access Routes ──────────────────────────
     const candidateUrls: { url: string; source: string }[] = [];
 
-    // Publisher direct routes
+    // MDPI Direct Route (100% OA)
+    if (doi.startsWith("10.3390/")) {
+      const slug = doi.replace("10.3390/", "");
+      candidateUrls.push({
+        url: `https://www.mdpi.com/${slug}/pdf`,
+        source: "MDPI Open Access Direct",
+      });
+    }
+
+    // Springer / Nature / BMC
     if (doi.startsWith("10.1186/") || doi.startsWith("10.1007/")) {
       candidateUrls.push({
         url: `https://link.springer.com/content/pdf/${doi}.pdf`,
@@ -240,20 +324,42 @@ export async function POST(req: NextRequest) {
         source: "Nature Publishing Direct",
       });
     }
-    if (doi.startsWith("10.48550/arxiv.")) {
-      const arxivId = doi.split("arxiv.").pop();
+
+    // Wiley direct routes
+    if (doi.startsWith("10.1111/") || doi.startsWith("10.1002/")) {
+      candidateUrls.push({
+        url: `https://onlinelibrary.wiley.com/doi/pdfdirect/${doi}`,
+        source: "Wiley Online Library Direct",
+      });
+    }
+
+    // arXiv Preprints
+    if (doi.toLowerCase().startsWith("10.48550/arxiv.")) {
+      const arxivId = doi.split(/arxiv\./i).pop();
       candidateUrls.push({
         url: `https://arxiv.org/pdf/${arxivId}.pdf`,
         source: "arXiv Preprints",
       });
     }
 
-    // ── Fast Parallel Queries across Registries (Crossref, Unpaywall, Semantic Scholar, OpenAlex) ─
-    const [crData, unpData, s2Data, oaData] = await Promise.all([
+    // bioRxiv / medRxiv Direct
+    if (doi.startsWith("10.1101/")) {
+      candidateUrls.push({
+        url: `https://www.biorxiv.org/content/${doi}v1.full.pdf`,
+        source: "bioRxiv / medRxiv Direct",
+      });
+    }
+
+    // ── Parallel Registry Queries (Unpaywall, OpenAlex, Semantic Scholar, Crossref, Europe PMC) ──
+    const unpaywallUrl = `https://api.unpaywall.org/v2/${doi}?email=${encodeURIComponent(email)}`;
+    const openAlexUrl = `https://api.openalex.org/works/https://doi.org/${doi}?mailto=${encodeURIComponent(email)}`;
+
+    const [crData, unpData, s2Data, oaData, epmcData] = await Promise.all([
       fetchJsonWithTimeout<CrossrefEnvelope>(`https://api.crossref.org/works/${doi}`, 5000),
-      fetchJsonWithTimeout<UnpaywallEnvelope>(`https://api.unpaywall.org/v2/${doi}?email=researcher@vellum.app`, 5000),
+      fetchJsonWithTimeout<UnpaywallEnvelope>(unpaywallUrl, 6000),
       fetchJsonWithTimeout<SemanticScholarEnvelope>(`https://api.semanticscholar.org/graph/v1/paper/DOI:${doi}?fields=openAccessPdf,title`, 5000),
-      fetchJsonWithTimeout<OpenAlexEnvelope>(`https://api.openalex.org/works/https://doi.org/${doi}`, 5000),
+      fetchJsonWithTimeout<OpenAlexEnvelope>(openAlexUrl, 6000),
+      fetchJsonWithTimeout<EuropePmcEnvelope>(`https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=DOI:%22${encodeURIComponent(doi)}%22&format=json&resultType=core`, 5000),
     ]);
 
     if (crData?.message) {
@@ -297,7 +403,15 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Try all candidate OA URLs in parallel!
+    if (epmcData?.resultList?.result?.[0]?.pmcid) {
+      const pmcid = epmcData.resultList.result[0].pmcid;
+      candidateUrls.push({
+        url: `https://www.ncbi.nlm.nih.gov/pmc/articles/${pmcid}/pdf/`,
+        source: "Europe PMC / PubMed Central",
+      });
+    }
+
+    // Try candidate OA URLs in parallel
     if (candidateUrls.length > 0) {
       const fetchPromises = candidateUrls.slice(0, 8).map(async (cand) => {
         const result = await fetchPdfBuffer(cand.url, 8000);
@@ -319,7 +433,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // ── Tier 3: Publisher Landing Page (<meta name="citation_pdf_url"> & direct PDF links) + Google Scholar ──
+    // ── Tier 4: Publisher HTML Metadata & Google Scholar Scraping ────────────
     const scholarQueries = [
       `https://scholar.google.com/scholar?hl=en&q=${encodeURIComponent(doi)}`,
     ];
@@ -367,22 +481,51 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // ── Tier 4: Fast Sci-Hub Mirror Check (Parallel) ──────────────────────────
-    const mirrorPromises = SCIHUB_MIRRORS.map(async (mirror) => {
+    // ── Tier 5: Academic Mirrors (Sci-Hub, LibGen) ───────────────────────────
+    const mirrors = customMirror
+      ? [customMirror, ...DEFAULT_SCIHUB_MIRRORS.filter((m) => m !== customMirror)]
+      : DEFAULT_SCIHUB_MIRRORS;
+
+    const mirrorPromises = mirrors.map(async (mirror) => {
+      const cleanMirror = mirror.endsWith("/") ? mirror : `${mirror}/`;
       try {
-        const shRes = await fetch(`${mirror}${doi}`, {
+        const shRes = await fetch(`${cleanMirror}${doi}`, {
           headers: { "User-Agent": USER_AGENT },
-          signal: AbortSignal.timeout(5000),
+          signal: AbortSignal.timeout(6000),
         });
         if (shRes.ok) {
           const text = await shRes.text();
-          const match = text.match(/(?:src|href)=["']([^"']+\.pdf[^"']*)["']/i);
-          if (match && match[1]) {
-            let pdfUrl = match[1];
-            if (pdfUrl.startsWith("//")) pdfUrl = "https:" + pdfUrl;
-            else if (pdfUrl.startsWith("/")) pdfUrl = mirror.replace(/\/$/, "") + pdfUrl;
 
-            const finalPdf = await fetchPdfBuffer(pdfUrl, 7000);
+          // 1. Check for iframe/embed id="pdf"
+          let pdfUrl: string | null = null;
+          const embedMatch = text.match(/<(?:iframe|embed)[^>]+src=["']([^"']+)["'][^>]*id=["']pdf["']/i) ||
+                             text.match(/id=["']pdf["'][^>]+src=["']([^"']+)["']/i) ||
+                             text.match(/<(?:iframe|embed)[^>]+src=["']([^"']+\.pdf[^"']*)["']/i);
+          if (embedMatch && embedMatch[1]) {
+            pdfUrl = embedMatch[1];
+          }
+
+          // 2. Check for onclick="location.href='...'"
+          if (!pdfUrl) {
+            const clickMatch = text.match(/location\.href\s*=\s*['"]([^'"]+)['"]/i);
+            if (clickMatch && clickMatch[1]) {
+              pdfUrl = clickMatch[1];
+            }
+          }
+
+          // 3. Regex search for any .pdf url
+          if (!pdfUrl) {
+            const rawPdfMatch = text.match(/(?:https?:)?\/\/[^\s'"<>]+\.pdf[^\s'"<>]*/i);
+            if (rawPdfMatch && rawPdfMatch[0]) {
+              pdfUrl = rawPdfMatch[0];
+            }
+          }
+
+          if (pdfUrl) {
+            if (pdfUrl.startsWith("//")) pdfUrl = "https:" + pdfUrl;
+            else if (pdfUrl.startsWith("/")) pdfUrl = cleanMirror.replace(/\/$/, "") + pdfUrl;
+
+            const finalPdf = await fetchPdfBuffer(pdfUrl, 8000);
             if (finalPdf) return finalPdf;
           }
         }
@@ -403,12 +546,13 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    const defaultLanding = `https://doi.org/${doi}`;
     return NextResponse.json(
       {
         success: false,
         message: "Paper is paywalled by the publisher. Direct open access was not found across repositories.",
         doi,
-        landingUrl: `https://doi.org/${doi}`,
+        landingUrl: getLandingUrl(defaultLanding),
       },
       { status: 404 }
     );

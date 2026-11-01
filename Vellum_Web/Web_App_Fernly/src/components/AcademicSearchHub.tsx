@@ -543,7 +543,8 @@ export function AcademicSearchHub({
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder={`Search ${currentFieldObj.label.toLowerCase()} literature, author names, or paste DOI...`}
+            placeholder={`Search 250M+ global papers (${currentFieldObj.label}), authors, or DOIs...`}
+            title="Federated literature query across OpenAlex, arXiv, Semantic Scholar, and Crossref"
             className="fernly-input fernly-input-search w-full !pl-12 !pr-10 py-3 rounded-full text-xs sm:text-sm text-[var(--ink)] placeholder-[var(--ink-muted)] transition-all shadow-xs"
           />
           {query && (

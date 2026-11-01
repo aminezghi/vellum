@@ -14,6 +14,7 @@ import { CleanNotebooksModal } from "@/components/CleanNotebooksModal";
 import { BatchDownloaderHub } from "@/components/BatchDownloaderHub";
 import { ScreeningHub } from "@/components/ScreeningHub";
 import { ConnectedGraphHub } from "@/components/ConnectedGraphHub";
+import { DashboardBento } from "@/components/DashboardBento";
 import { Footer } from "@/components/Footer";
 import { db, Notebook, Source, initializeStorage } from "@/lib/db";
 import { AddablePaper } from "@/lib/paper";
@@ -21,14 +22,8 @@ import { AcademicPaperResult } from "@/app/api/search/route";
 import {
   Plus,
   Layers,
-  Sparkles,
-  Search,
-  Trash2,
-  ArrowUpRight,
-  Database,
-  FileText,
-  ShieldCheck,
-  TrendingUp,
+  CheckCircle2,
+  X,
 } from "lucide-react";
 
 /** Everything the page shell needs to know about the notebook index. */
@@ -60,6 +55,18 @@ export default function Home() {
   // Modal for adding a paper to a notebook
   const [paperForAddModal, setPaperForAddModal] = useState<AddablePaper | null>(null);
   const [connectedSeed, setConnectedSeed] = useState<string>("DeepFruits: A Fruit Detection System Using Deep Neural Networks");
+  const [toastNotification, setToastNotification] = useState<{
+    message: string;
+    notebookId?: string;
+    notebookTitle?: string;
+  } | null>(null);
+
+  const showToast = (message: string, notebookId?: string, notebookTitle?: string) => {
+    setToastNotification({ message, notebookId, notebookTitle });
+    setTimeout(() => {
+      setToastNotification(null);
+    }, 4500);
+  };
 
   const handleOpenConnectedGraph = (seed: string) => {
     setConnectedSeed(seed);
@@ -114,12 +121,52 @@ export default function Home() {
       year: paper.year,
       journal: paper.venue,
       doi: paper.doi,
+      abstract: paper.abstract,
       status: "ready",
       addedAt: Date.now(),
     };
 
     await db.notebooks.put(newNb);
     await db.sources.put(newSource);
+    await fetchNotebooks();
+    setActiveNotebook(newNb);
+  };
+
+  // 1-Click Preset Benchmark Loading (from Dashboard Bento)
+  const handleLoadSample = async (
+    title: string,
+    emoji: string,
+    category: string,
+    sampleDoi?: string
+  ) => {
+    const sampleId = `nb-sample-${Date.now()}`;
+    const newNb: Notebook = {
+      id: sampleId,
+      title,
+      emoji,
+      category,
+      description: `Demonstration systematic review on ${title}.`,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      sourcesCount: 1,
+      isFeatured: true,
+    };
+
+    const sampleSource: Source = {
+      id: `src-sample-${Date.now()}`,
+      notebookId: sampleId,
+      title,
+      authors: ["Lead Investigator et al."],
+      year: 2024,
+      journal: category,
+      doi: sampleDoi || "10.3390/s16070988",
+      abstract: `This systematic review investigates foundational methodology, benchmarking datasets, and quantitative appraisal protocols in ${category}.`,
+      status: "ready",
+      addedAt: Date.now(),
+    };
+
+    await db.notebooks.put(newNb);
+    await db.sources.put(sampleSource);
     await fetchNotebooks();
     setActiveNotebook(newNb);
   };
@@ -134,6 +181,10 @@ export default function Home() {
           fetchNotebooks();
         }}
         onUpdate={fetchNotebooks}
+        onOpenConnectedGraph={(seed) => {
+          setActiveNotebook(null);
+          handleOpenConnectedGraph(seed);
+        }}
       />
     );
   }
@@ -178,142 +229,22 @@ export default function Home() {
           </div>
         ) : (
           <>
-            {/* FERNLY BENTO HERO BOARD (Shown on All or My Notebooks) */}
+            {/* DASHBOARD TAB (Landing Mission Control with 3 Core Engines & Sample Presets) */}
             {activeTab === "all" && !searchQuery && (
-              <section className="space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="fernly-badge fernly-badge-leaf text-[11px] font-semibold">
-                        Systematic Literature Intelligence
-                      </span>
-                      <span className="text-[11px] text-[var(--ink-muted)] font-medium">
-                        v2.1 · Local-First Architecture
-                      </span>
-                    </div>
-                    <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--ink)] mt-1">
-                      Academic Research Studio
-                    </h1>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => {
-                        setActiveTab("search");
-                        window.scrollTo({ top: 300, behavior: "smooth" });
-                      }}
-                      className="btn-fernly-ghost flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold"
-                    >
-                      <Search className="h-3.5 w-3.5" />
-                      <span>Live Search</span>
-                    </button>
-                    <button
-                      onClick={() => setIsModalOpen(true)}
-                      className="btn-fernly-primary flex items-center gap-1.5 px-5 py-2 rounded-full text-xs font-semibold shadow-xs"
-                    >
-                      <Plus className="h-4 w-4" />
-                      <span>New Project</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* 4 Bento Stat Cards Row */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {/* Card 1: Stat Hero Deep Botanical */}
-                  <div
-                    onClick={() => setIsModalOpen(true)}
-                    className="fernly-stat-hero p-5 rounded-[1.75rem] flex flex-col justify-between cursor-pointer group min-h-[140px]"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-[var(--g-200)] tracking-wide">
-                        Active Reviews
-                      </span>
-                      <span className="fernly-arrow w-7 h-7 rounded-full bg-white/10 group-hover:bg-white/20 text-white flex items-center justify-center transition-all">
-                        <ArrowUpRight className="h-4 w-4" />
-                      </span>
-                    </div>
-                    <div className="mt-3">
-                      <div className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-                        {notebooks.length}
-                      </div>
-                      <div className="flex items-center gap-1.5 mt-1 text-[11px] text-[var(--g-200)]">
-                        <TrendingUp className="h-3.5 w-3.5" />
-                        <span>Systematic synthesis notebooks</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Card 2: Indexed Evidence */}
-                  <div className="fernly-card p-5 rounded-[1.75rem] flex flex-col justify-between min-h-[140px] group">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-[var(--ink-muted)]">
-                        Local Corpus
-                      </span>
-                      <span className="fernly-arrow w-7 h-7 rounded-full bg-[var(--panel)] text-[var(--ink)] group-hover:bg-[var(--g-800)] group-hover:text-white flex items-center justify-center transition-all">
-                        <Database className="h-3.5 w-3.5" />
-                      </span>
-                    </div>
-                    <div className="mt-3">
-                      <div className="text-3xl sm:text-4xl font-extrabold text-[var(--ink)] tracking-tight">
-                        {totalSourcesCount}
-                      </div>
-                      <div className="flex items-center gap-1.5 mt-1 text-[11px] text-[var(--ink-muted)]">
-                        <FileText className="h-3.5 w-3.5 text-[var(--g-600)] dark:text-[var(--g-400)]" />
-                        <span>Papers &amp; preprints stored</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Card 3: Academic Corpus */}
-                  <div
-                    onClick={() => setActiveTab("search")}
-                    className="fernly-card p-5 rounded-[1.75rem] flex flex-col justify-between min-h-[140px] cursor-pointer group"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-[var(--ink-muted)]">
-                        Global Corpus
-                      </span>
-                      <span className="fernly-arrow w-7 h-7 rounded-full bg-[var(--panel)] text-[var(--ink)] group-hover:bg-[var(--g-800)] group-hover:text-white flex items-center justify-center transition-all">
-                        <ArrowUpRight className="h-4 w-4" />
-                      </span>
-                    </div>
-                    <div className="mt-3">
-                      <div className="text-3xl sm:text-4xl font-extrabold text-[var(--ink)] tracking-tight">
-                        250M+
-                      </div>
-                      <div className="flex items-center gap-1.5 mt-1 text-[11px] text-[var(--ink-muted)]">
-                        <Sparkles className="h-3.5 w-3.5 text-[var(--g-600)] dark:text-[var(--g-400)]" />
-                        <span>OpenAlex · arXiv · Crossref</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Card 4: Local Privacy Guarantee */}
-                  <div className="fernly-card p-5 rounded-[1.75rem] flex flex-col justify-between min-h-[140px] group">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-[var(--ink-muted)]">
-                        Privacy &amp; Storage
-                      </span>
-                      <span className="w-7 h-7 rounded-full bg-[var(--panel)] text-[var(--g-600)] dark:text-[var(--g-400)] flex items-center justify-center">
-                        <ShieldCheck className="h-4 w-4" />
-                      </span>
-                    </div>
-                    <div className="mt-3">
-                      <div className="text-xl sm:text-2xl font-bold text-[var(--ink)] tracking-tight">
-                        100% Local
-                      </div>
-                      <div className="flex items-center gap-1.5 mt-1 text-[11px] text-[var(--ink-muted)]">
-                        <span>IndexedDB · Zero telemetry</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </section>
+              <DashboardBento
+                notebooksCount={notebooks.length}
+                totalSourcesCount={totalSourcesCount}
+                onNewProject={() => setIsModalOpen(true)}
+                onNavigateTab={(tab) => {
+                  setActiveTab(tab);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                onLoadSample={handleLoadSample}
+              />
             )}
 
-            {/* TOP ZONE: Academic Literature Search & Trending Radar */}
-            {/* ACADEMIC SEARCH HUB (With Boolean & Desktop Style Search) */}
-            {(activeTab === "all" || activeTab === "search") && (
+            {/* ACADEMIC SEARCH TAB */}
+            {activeTab === "search" && (
               <AcademicSearchHub
                 onAddToNotebook={(p) => setPaperForAddModal(p)}
                 onInspectPaper={handleInspectPaper}
@@ -321,7 +252,7 @@ export default function Home() {
               />
             )}
 
-            {/* CONNECTED PAPERS HUB (Interactive Citation Network Force Graph) */}
+            {/* CONNECTED PAPERS TAB */}
             {activeTab === "connected" && (
               <ConnectedGraphHub
                 initialSeed={connectedSeed}
@@ -329,7 +260,8 @@ export default function Home() {
               />
             )}
 
-            {(activeTab === "all" || activeTab === "trends") && (
+            {/* TRENDING RADAR TAB */}
+            {activeTab === "trends" && (
               <TrendingRadar
                 onAddToNotebook={(p) => setPaperForAddModal(p)}
                 onInspectPaper={handleInspectPaper}
@@ -337,19 +269,19 @@ export default function Home() {
               />
             )}
 
-            {/* BATCH DOWNLOADER HUB (Incorporated from Desktop Engine) */}
+            {/* BATCH DOWNLOADER TAB */}
             {activeTab === "downloader" && (
               <BatchDownloaderHub notebooks={notebooks} />
             )}
 
-            {/* ASREVIEW ACTIVE LEARNING SCREENING HUB */}
+            {/* ASREVIEW ACTIVE LEARNING SCREENING TAB */}
             {activeTab === "screening" && (
               <ScreeningHub notebooks={notebooks} />
             )}
 
             {/* BOTTOM ZONE: Research Notebooks & Collections */}
             {(activeTab === "all" || activeTab === "my-notebooks" || activeTab === "collections") && (
-              <div className="pt-2">
+              <div id="notebooks-section" className="pt-2">
                 {/* Consistent Section Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 pb-4 border-b border-[var(--card-bdr)] mb-6">
                   <div className="flex items-start sm:items-center gap-3">
@@ -375,23 +307,12 @@ export default function Home() {
 
                   {/* Notebook Action Buttons */}
                   <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
-                    {notebooks.length > 0 && (
-                      <button
-                        onClick={() => setIsCleanModalOpen(true)}
-                        className="flex items-center gap-1.5 px-3.5 py-2 rounded-full border border-red-200 dark:border-red-900/40 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 text-xs font-semibold transition-all cursor-pointer shadow-xs"
-                        title="Clean or reset notebooks from local storage"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                        <span>Clean Workspace</span>
-                      </button>
-                    )}
-
                     <button
                       onClick={() => setIsModalOpen(true)}
                       className="btn-fernly-primary flex items-center gap-2 px-4 sm:px-5 py-2 rounded-full text-xs font-semibold shadow-xs cursor-pointer"
                     >
                       <Plus className="h-4 w-4" />
-                      <span>New notebook</span>
+                      <span>New Project</span>
                     </button>
                   </div>
                 </div>
@@ -429,6 +350,10 @@ export default function Home() {
                         <FeaturedCarousel
                           notebooks={featuredNotebooks}
                           onSelectNotebook={handleSelectNotebook}
+                          onViewAll={() => {
+                            setActiveTab("collections");
+                            window.scrollTo({ top: 350, behavior: "smooth" });
+                          }}
                         />
                       </div>
                     )}
@@ -463,7 +388,6 @@ export default function Home() {
 
       {/* Authorship & Developer Footer */}
       <Footer
-        onClearAllNotebooks={() => setIsCleanModalOpen(true)}
         notebooksCount={notebooks.length}
       />
 
@@ -494,11 +418,46 @@ export default function Home() {
         onAdded={(nbId) => {
           fetchNotebooks();
           const target = notebooks.find((n) => n.id === nbId);
-          if (target) {
-            setActiveNotebook(target);
-          }
+          showToast(`✓ Added to "${target?.title || "Notebook"}"`, nbId, target?.title);
         }}
       />
+
+      {/* Non-intrusive Toast for Added Papers */}
+      {toastNotification && (
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-2xl bg-[var(--card)] border border-[var(--g-500)] text-[var(--ink)] shadow-2xl animate-in slide-in-from-bottom-5 duration-300 max-w-md">
+          <div className="h-8 w-8 rounded-full bg-[var(--g-100)] text-[var(--g-800)] flex items-center justify-center flex-shrink-0">
+            <CheckCircle2 className="h-4 w-4" />
+          </div>
+          <div className="flex flex-col text-xs flex-1 min-w-0">
+            <span className="font-semibold truncate">{toastNotification.message}</span>
+            {toastNotification.notebookTitle && (
+              <span className="text-[10px] text-[var(--muted)] truncate">
+                Saved in {toastNotification.notebookTitle} • Keep exploring or open project
+              </span>
+            )}
+          </div>
+          {toastNotification.notebookId && (
+            <button
+              onClick={() => {
+                const target = notebooks.find((n) => n.id === toastNotification.notebookId);
+                if (target) {
+                  setActiveNotebook(target);
+                  setToastNotification(null);
+                }
+              }}
+              className="px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-[var(--g-800)] text-white hover:bg-[var(--g-950)] cursor-pointer flex-shrink-0"
+            >
+              Open →
+            </button>
+          )}
+          <button
+            onClick={() => setToastNotification(null)}
+            className="p-1 rounded-full text-[var(--muted)] hover:text-[var(--ink)] cursor-pointer flex-shrink-0"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 180" width="720" height="180">
+  <title>Vellum Horizontal Lockup - by Amine</title>
+  <!-- Symbol -->
+  <g transform="translate(25, 25) scale(0.254)">
+    <polygon points="112,96 186,96 256,358 206,445 112,96" fill="#10B981"/>
+    <polygon points="400,96 326,96 256,358 306,445 400,96" fill="#059669"/>
+    <polygon points="256,176 326,96 256,358 186,96" fill="#34D399"/>
+  </g>
+
+  <!-- Elegant Vertical Divider -->
+  <line x1="180" y1="42" x2="180" y2="138" stroke="#334155" stroke-width="2"/>
+
+  <!-- Logotype Typography -->
+  <text x="215" y="94" font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="58" font-weight="900" fill="#FFFFFF" letter-spacing="-1">Vellum</text>
+  <text x="218" y="132" font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="600" fill="#94A3B8" letter-spacing="1">Academic Studio <tspan fill="#10B981">·</tspan> by Amine</text>
+</svg>

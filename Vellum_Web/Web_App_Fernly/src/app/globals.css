@@ -30,6 +30,18 @@
   --sky: #1f6fa8;
   --sky-bg: #e6f3fc;
 
+  /* Aliases & Complementary Scale */
+  --bg: var(--page);
+  --canvas: var(--page);
+  --card-bdr: var(--hair);
+  --ink-muted: var(--muted);
+
+  --g-900: #0f462a;
+  --g-500: #3eb077;
+  --g-300: #93d5b1;
+  --g-200: #c6e7d4;
+  --g-50: #f4f9f6;
+
   /* Sizing & Bento Radii */
   --r-xl: 32px;
   --r-lg: 26px;
@@ -47,86 +59,197 @@
   /* Tailwind UI Tokens */
   --background: var(--page);
   --foreground: var(--ink);
+  --font-plus-jakarta: "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-/* Fernly 4 Accent Themes */
-[data-accent="emerald"] {
+/* Fernly 4 Accent Themes (Light Mode) */
+[data-accent="emerald"],
+:root {
   --g-950: #0d3a23;
+  --g-900: #0f462a;
   --g-800: #155a37;
   --g-700: #1d7347;
   --g-600: #27865a;
+  --g-500: #3eb077;
   --g-400: #5dbd8b;
+  --g-300: #93d5b1;
+  --g-200: #c6e7d4;
   --g-100: #e3f2e9;
+  --g-50: #f4f9f6;
   --deep: #071a10;
   --swirl: rgba(93, 189, 139, 0.22);
 }
 
 [data-accent="ocean"] {
   --g-950: #0f2a5c;
+  --g-900: #133570;
   --g-800: #173f86;
   --g-700: #1f4fa8;
   --g-600: #2f66c9;
+  --g-500: #497ee0;
   --g-400: #6d9bec;
+  --g-300: #98baf3;
+  --g-200: #c4d7f9;
   --g-100: #e6eefc;
+  --g-50: #f2f6fe;
   --deep: #061530;
   --swirl: rgba(109, 155, 236, 0.22);
 }
 
 [data-accent="plum"] {
   --g-950: #331653;
+  --g-900: #3f1e66;
   --g-800: #4c2580;
   --g-700: #6a3fb0;
   --g-600: #7d52c4;
+  --g-500: #946dd9;
   --g-400: #ad8ce6;
+  --g-300: #c9b3f0;
+  --g-200: #e0d2f7;
   --g-100: #f0e9fb;
+  --g-50: #f8f4fd;
   --deep: #1d0933;
   --swirl: rgba(173, 140, 230, 0.22);
 }
 
 [data-accent="ember"] {
   --g-950: #4d1b08;
+  --g-900: #64240c;
   --g-800: #7c2e10;
   --g-700: #b1491d;
   --g-600: #c85a2a;
+  --g-500: #dc7140;
   --g-400: #ec9a6c;
+  --g-300: #f5bc9b;
+  --g-200: #f9d8c5;
   --g-100: #fcebe2;
+  --g-50: #fef5f0;
   --deep: #2a0b02;
   --swirl: rgba(236, 154, 108, 0.22);
 }
 
-/* Dark Mode (Nocturnal Deep Forest / Moss) */
+/* =========================================================================
+   DARK MODE — Sleek Obsidian / Slate Canvas with High Contrast & Vibrancy
+   ========================================================================= */
 html.dark,
-body.dark,
 [data-theme="dark"] {
-  --page: #08110b;          /* Nocturnal deep forest moss canvas */
-  --panel: #0d1a12;         /* Nocturnal forest panel */
-  --card: #122419;          /* Dark bento card */
-  --hair: #1a3324;          /* Dark minty border */
-  --ink: #f1f8f3;           /* Crisp glowing cream/white text */
-  --muted: #8fa194;         /* Soft sage secondary text */
-  --faint: #5b6f61;         /* Deep faint helper text */
+  --page: #0b0d12;          /* Deep neutral obsidian canvas */
+  --panel: #131620;         /* Sleek elevated slate container */
+  --card: #181d28;          /* Crisp elevated bento card */
+  --hair: rgba(255, 255, 255, 0.08); /* Crisp subtle border */
+  --ink: #f8fafc;           /* Crisp high-contrast white text */
+  --muted: #94a3b8;         /* Clear readable secondary slate */
+  --faint: #64748b;         /* Faint helper text (slate-500) */
 
-  --g-950: #040f08;
-  --g-800: #0a2717;
-  --g-700: #175e39;
-  --g-600: #238555;
-  --g-400: #55c78f;
-  --g-100: #143321;
-  --deep: #020704;
+  --bg: var(--page);
+  --canvas: var(--page);
+  --card-bdr: var(--hair);
+  --ink-muted: var(--muted);
 
-  --amber: #e8a317;
-  --amber-bg: #291e08;
-  --rose: #e05555;
-  --rose-bg: #2d1010;
-  --sky: #4ab6e8;
-  --sky-bg: #0d2331;
+  /* Emerald Dark Tokens (Default when no accent or emerald selected) */
+  --g-950: #022c22;
+  --g-900: #064e3b;
+  --g-800: #065f46;
+  --g-700: #047857;
+  --g-600: #10b981;
+  --g-500: #34d399;
+  --g-400: #6ee7b7;
+  --g-300: #a7f3d0;
+  --g-200: #d1fae5;
+  --g-100: rgba(16, 185, 129, 0.16);
+  --g-50: rgba(16, 185, 129, 0.08);
+  --deep: #050b08;
+  --swirl: rgba(52, 211, 153, 0.22);
 
-  --shadow-bento: 0 2px 6px rgba(0, 0, 0, 0.4), 0 16px 36px -12px rgba(0, 0, 0, 0.6);
-  --shadow-hero: 0 16px 40px -10px rgba(0, 0, 0, 0.7);
-  --focus: 0 0 0 3px var(--card), 0 0 0 5px var(--g-400);
+  --amber: #fbbf24;
+  --amber-bg: rgba(251, 191, 36, 0.12);
+  --rose: #f87171;
+  --rose-bg: rgba(248, 113, 113, 0.12);
+  --sky: #38bdf8;
+  --sky-bg: rgba(56, 189, 248, 0.12);
+
+  --shadow-bento: 0 4px 16px rgba(0, 0, 0, 0.45), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-hero: 0 16px 40px -10px rgba(0, 0, 0, 0.75);
+  --focus: 0 0 0 3px var(--card), 0 0 0 5px var(--g-500);
 
   --background: var(--page);
   --foreground: var(--ink);
+}
+
+/* Dark Mode Emerald Explicit */
+html.dark[data-accent="emerald"],
+body.dark[data-accent="emerald"],
+[data-theme="dark"][data-accent="emerald"] {
+  --g-950: #022c22;
+  --g-900: #064e3b;
+  --g-800: #065f46;
+  --g-700: #047857;
+  --g-600: #10b981;
+  --g-500: #34d399;
+  --g-400: #6ee7b7;
+  --g-300: #a7f3d0;
+  --g-200: #d1fae5;
+  --g-100: rgba(16, 185, 129, 0.16);
+  --g-50: rgba(16, 185, 129, 0.08);
+  --deep: #050b08;
+  --swirl: rgba(52, 211, 153, 0.22);
+}
+
+/* Dark Mode Ocean Accent */
+html.dark[data-accent="ocean"],
+body.dark[data-accent="ocean"],
+[data-theme="dark"][data-accent="ocean"] {
+  --g-950: #172554;
+  --g-900: #1e3a8a;
+  --g-800: #1e40af;
+  --g-700: #1d4ed8;
+  --g-600: #3b82f6;
+  --g-500: #60a5fa;
+  --g-400: #93c5fd;
+  --g-300: #bfdbfe;
+  --g-200: #dbeafe;
+  --g-100: rgba(59, 130, 246, 0.16);
+  --g-50: rgba(59, 130, 246, 0.08);
+  --deep: #080f1e;
+  --swirl: rgba(96, 165, 250, 0.22);
+}
+
+/* Dark Mode Plum Accent */
+html.dark[data-accent="plum"],
+body.dark[data-accent="plum"],
+[data-theme="dark"][data-accent="plum"] {
+  --g-950: #3b0764;
+  --g-900: #581c87;
+  --g-800: #6b21a8;
+  --g-700: #7e22ce;
+  --g-600: #a855f7;
+  --g-500: #c084fc;
+  --g-400: #d8b4fe;
+  --g-300: #e9d5ff;
+  --g-200: #f3e8ff;
+  --g-100: rgba(168, 85, 247, 0.16);
+  --g-50: rgba(168, 85, 247, 0.08);
+  --deep: #13061f;
+  --swirl: rgba(192, 132, 252, 0.22);
+}
+
+/* Dark Mode Ember Accent */
+html.dark[data-accent="ember"],
+body.dark[data-accent="ember"],
+[data-theme="dark"][data-accent="ember"] {
+  --g-950: #431407;
+  --g-900: #7c2d12;
+  --g-800: #9a3412;
+  --g-700: #c2410c;
+  --g-600: #f97316;
+  --g-500: #fb923c;
+  --g-400: #fdba74;
+  --g-300: #fed7aa;
+  --g-200: #ffedd5;
+  --g-100: rgba(249, 115, 22, 0.16);
+  --g-50: rgba(249, 115, 22, 0.08);
+  --deep: #180905;
+  --swirl: rgba(251, 146, 60, 0.22);
 }
 
 @theme inline {
@@ -291,6 +414,40 @@ html.dark ::selection {
   transform: scale(0.98);
 }
 
+/* Dark mode button overrides for high contrast and friendliness */
+html.dark .btn-fernly-primary,
+[data-theme="dark"] .btn-fernly-primary {
+  background: linear-gradient(180deg, var(--g-600), var(--g-700));
+  color: #ffffff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+html.dark .btn-fernly-primary:hover,
+[data-theme="dark"] .btn-fernly-primary:hover {
+  background: linear-gradient(180deg, var(--g-500), var(--g-600));
+  box-shadow: 0 4px 18px var(--swirl);
+}
+
+html.dark .btn-fernly-ghost,
+[data-theme="dark"] .btn-fernly-ghost {
+  background: var(--card);
+  border-color: var(--hair);
+  color: var(--ink);
+}
+
+html.dark .btn-fernly-ghost:hover,
+[data-theme="dark"] .btn-fernly-ghost:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--g-400);
+  color: #ffffff;
+}
+
+html.dark .fernly-card:hover,
+[data-theme="dark"] .fernly-card:hover {
+  border-color: var(--g-500);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
 /* Status Badges */
 .fernly-badge {
   display: inline-flex;
@@ -326,6 +483,47 @@ html.dark ::selection {
   color: var(--sky);
   background: var(--sky-bg);
   border-color: rgba(31, 111, 168, 0.2);
+}
+
+html.dark .badge-done,
+[data-theme="dark"] .badge-done {
+  color: var(--g-400);
+  background: var(--g-100);
+  border-color: var(--g-700);
+}
+
+html.dark .badge-prog,
+[data-theme="dark"] .badge-prog {
+  color: #fcd34d;
+  background: rgba(251, 191, 36, 0.15);
+  border-color: rgba(251, 191, 36, 0.3);
+}
+
+html.dark .badge-pend,
+[data-theme="dark"] .badge-pend {
+  color: #fca5a5;
+  background: rgba(248, 113, 113, 0.15);
+  border-color: rgba(248, 113, 113, 0.3);
+}
+
+html.dark .badge-sky,
+[data-theme="dark"] .badge-sky {
+  color: #7dd3fc;
+  background: rgba(56, 189, 248, 0.15);
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+.fernly-badge-leaf {
+  color: var(--g-700);
+  background: var(--g-100);
+  border-color: var(--g-200);
+}
+
+html.dark .fernly-badge-leaf,
+[data-theme="dark"] .fernly-badge-leaf {
+  color: var(--g-300);
+  background: var(--g-100);
+  border-color: var(--g-700);
 }
 
 /* ---------------------------------------------------------------------------

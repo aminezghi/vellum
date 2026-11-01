@@ -335,7 +335,7 @@ def build_pdf(filename="README_FOR_COLLEAGUES.pdf"):
          "Located under Academic Search. Allows researchers to build exact queries with an initial <code>WHERE</code> clause followed by <code>AND</code>, <code>OR</code>, and <code>NOT</code> connectors. Field dropdowns automatically map terms to target index tokens (<code>[Title/Abstract]</code>, <code>au:</code>, <code>year:</code>, <code>topic:</code>) with real-time compilation and 1-click execution."),
         
         ("🤖 ASReview Active-Learning Screening Hub:",
-         "Enables machine-learning assisted title and abstract screening. Accepts multi-file uploads (.csv, .ris, .bib) with automated deduplication across overlapping sources. Employs TF-IDF feature extraction with Naive Bayes probability ranking, keyboard hotkeys (<code>[I]</code> Include, <code>[E]</code> Exclude, <code>[U]</code> Uncertain), session saving/switching, and live recall stopping curves."),
+         "Enables machine-learning assisted title and abstract screening. Accepts multi-file uploads (.csv, .ris, .bib) with automated deduplication across overlapping sources. Employs TF-IDF feature extraction with Naive Bayes probability ranking, keyboard hotkeys (<code>[I]</code> Include, <code>[E]</code> Exclude, <code>[U]</code> Undo), session saving/switching, and live recall stopping curves."),
         
         ("📥 Multi-Tier Failover PDF Harvesting Engine:",
          "Integrated into both web and desktop versions. Automatically searches across Unpaywall, publisher Open Access APIs, Semantic Scholar, and academic mirrors while bypassing publisher paywall traps. Delivers binary PDFs directly into local browser memory and downloads folder."),

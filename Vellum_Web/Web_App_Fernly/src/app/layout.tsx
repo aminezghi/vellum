@@ -1,20 +1,16 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
 import { LEGACY_STORAGE_BOOT, STORAGE_KEYS } from "@/lib/storageNamespace";
 import "./globals.css";
 
-const plusJakartaSans = Plus_Jakarta_Sans({
-  variable: "--font-plus-jakarta",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  display: "swap",
-});
-
 export const metadata: Metadata = {
-  title: "Vellum — Fernly Botanical Bento Edition",
-  description: "A calm, organic botanical academic workspace that moves as one product. Systematic reviews, multi-source search across 250M+ papers, and deep appraisal.",
+  title: "Vellum by Amine — Academic Research Studio",
+  description: "A private, local-first academic research studio. Systematic reviews, multi-source search across 250M+ papers, citation mapping, and deep appraisal.",
   authors: [{ name: "Amine Zouaghi" }],
   creator: "Amine Zouaghi",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({
@@ -46,7 +42,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${plusJakartaSans.variable} font-sans antialiased min-h-screen transition-colors duration-250`}
+        className="font-sans antialiased min-h-screen transition-colors duration-250"
       >
         {children}
       </body>

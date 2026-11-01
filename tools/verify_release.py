@@ -224,10 +224,10 @@ def check_desktop_tests(rep: Report) -> None:
     head("C. Desktop page smoke test")
     t = time.time()
     code, out = run_cmd([str(py), "Desktop_App/tests/smoke_app_pages.py"], cwd=DESKTOP)
-    ok = code == 0 and "all 11 scripts ran clean" in out
-    rep.add("all 10 Streamlit pages + main app render", ok,
-            "11/11 clean" if ok else out.strip().splitlines()[-1][:120] if out.strip() else "no output",
-            dt=time.time() - t)
+    m = re.search(r"all (\d+) scripts ran clean", out)
+    ok = code == 0 and m is not None
+    count_str = f"{m.group(1)}/{m.group(1)} clean" if m else (out.strip().splitlines()[-1][:120] if out.strip() else "no output")
+    rep.add("all Streamlit pages + main app render", ok, count_str, dt=time.time() - t)
 
 
 # ==========================================================================

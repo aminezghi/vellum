@@ -37,27 +37,39 @@ def render() -> None:
                 st.rerun()
         with col_theme:
             is_dark = getattr(VT, "is_dark_mode", lambda: False)()
-            theme_icon = "☀️ Day" if is_dark else "🌙 Dark"
-            theme_tip = "Switch to Day (Lumen) Theme" if is_dark else "Switch to Dark (Vast) Theme"
+            theme_icon = "☀️ Light" if is_dark else "🌙 Dark"
+            theme_tip = "Switch to Apple Light Theme" if is_dark else "Switch to Apple Dark Theme"
             if st.button(theme_icon, key="_hub_top_theme_btn", help=theme_tip, use_container_width=True):
                 if hasattr(VT, "toggle_theme_mode"):
                     VT.toggle_theme_mode()
                 st.rerun()
 
-    # Header Banner in Wispr Flow Style
+    # Header Banner in Apple HIG & Landing Page Design Architecture
     st.markdown(
         """
-        <div style="text-align: center; padding: 20px 20px 14px 20px;">
-            <div style="font-size: 2.8rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 6px; font-family: 'EB Garamond', Garamond, Georgia, serif; color: var(--text-main);">
-                Welcome to Vellum
+        <div style="text-align: center; padding: 24px 20px 16px 20px; max-width: 840px; margin: 0 auto;">
+            <div style="display: inline-flex; align-items: center; gap: 8px; padding: 4px 14px; border-radius: 9999px; background: rgba(52, 199, 89, 0.12); border: 1px solid rgba(52, 199, 89, 0.35); color: #34c759; font-size: 0.78rem; font-weight: 600; margin-bottom: 14px; letter-spacing: 0.02em;">
+                <span style="width: 7px; height: 7px; border-radius: 50%; background: #34c759; display: inline-block;"></span>
+                <span>Systematic Literature Intelligence • 100% Local Filesystem Vault</span>
             </div>
-            <div style="font-size: 1.05rem; color: var(--wispr-flare, #ff6c4c); font-weight: 600; margin-bottom: 12px; letter-spacing: -0.01em;">
-                Academic Research Companion • 100% Local & Privacy-Preserving
+            <div style="font-size: 2.6rem; font-weight: 800; letter-spacing: -0.035em; line-height: 1.15; margin-bottom: 10px; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro', 'Segoe UI', sans-serif; color: var(--text-main);">
+                Welcome to Vellum by Amine
             </div>
-            <p style="max-width: 680px; margin: 0 auto 20px auto; color: var(--text-muted, #5f5f5f); font-size: 0.94rem; line-height: 1.55;">
-                Configure your researcher profile and local workspace. Vellum stores all your papers,
-                citation graphs, and screening data entirely on your machine.
+            <p style="max-width: 640px; margin: 0 auto 16px auto; color: var(--text-muted, #86868b); font-size: 0.95rem; line-height: 1.6; font-weight: 400;">
+                High-throughput PDF harvesting, interactive citation graphs, and active-learning systematic screening.
+                All files, notes, and evidence tables remain 100% private on your machine.
             </p>
+            <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 14px;">
+                <div style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 8px; background: var(--panel-bg); border: 1px solid var(--panel-border); font-size: 0.78rem; color: var(--text-muted); font-weight: 500;">
+                    <span>🏛️</span><span>250M+ OpenAlex Corpus</span>
+                </div>
+                <div style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 8px; background: var(--panel-bg); border: 1px solid var(--panel-border); font-size: 0.78rem; color: var(--text-muted); font-weight: 500;">
+                    <span>⚡</span><span>Multi-Tier Paywall Resolvers</span>
+                </div>
+                <div style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 8px; background: var(--panel-bg); border: 1px solid var(--panel-border); font-size: 0.78rem; color: var(--text-muted); font-weight: 500;">
+                    <span>🔒</span><span>Zero Cloud Sync &amp; Telemetry</span>
+                </div>
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -80,11 +92,12 @@ def render() -> None:
         with col_w1:
             st.markdown(
                 """
-                <div class="glass-panel" style="margin-bottom: 14px; padding: 16px 20px;">
-                    <div style="font-size: 1.15rem; font-weight: 700; color: var(--wispr-flare, #ff6c4c); margin-bottom: 4px;">
-                        Step 1 • Your Researcher Profile
+                <div class="glass-panel" style="margin-bottom: 14px; padding: 18px 20px; border-radius: 16px;">
+                    <div style="display: flex; align-items: center; gap: 8px; font-size: 1.12rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">
+                        <span style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 6px; background: rgba(52, 199, 89, 0.15); color: #34c759; font-size: 0.82rem; font-weight: 700;">1</span>
+                        <span>Researcher Profile</span>
                     </div>
-                    <p style="font-size: 0.85rem; color: var(--text-muted, #5f5f5f); margin-bottom: 0px;">
+                    <p style="font-size: 0.84rem; color: var(--text-muted, #86868b); margin-bottom: 0px; line-height: 1.4;">
                         Personalizes your workspace and seeds smart paper recommendations.
                     </p>
                 </div>
@@ -120,11 +133,12 @@ def render() -> None:
         with col_w2:
             st.markdown(
                 """
-                <div class="glass-panel" style="margin-bottom: 14px; padding: 16px 20px;">
-                    <div style="font-size: 1.15rem; font-weight: 700; color: var(--wispr-fathom, #034f46); margin-bottom: 4px;">
-                        Step 2 • Local Vault Storage
+                <div class="glass-panel" style="margin-bottom: 14px; padding: 18px 20px; border-radius: 16px;">
+                    <div style="display: flex; align-items: center; gap: 8px; font-size: 1.12rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">
+                        <span style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 6px; background: rgba(52, 199, 89, 0.15); color: #34c759; font-size: 0.82rem; font-weight: 700;">2</span>
+                        <span>Local Vault Storage</span>
                     </div>
-                    <p style="font-size: 0.85rem; color: var(--text-muted, #5f5f5f); margin-bottom: 0px;">
+                    <p style="font-size: 0.84rem; color: var(--text-muted, #86868b); margin-bottom: 0px; line-height: 1.4;">
                         Choose where all your projects, PDFs, and screening decisions are stored.
                     </p>
                 </div>
@@ -214,10 +228,10 @@ def render() -> None:
             st.markdown(
                 """
                 <div class="glass-panel" style="padding: 16px 20px; margin-bottom: 14px;">
-                    <div style="font-size: 1.15rem; font-weight: 700; color: var(--wispr-flare, #ff6c4c); margin-bottom: 4px;">
+                    <div style="font-size: 1.15rem; font-weight: 700; color: var(--apple-blue, #007aff); margin-bottom: 4px;">
                         📂 Select Existing Research Vault
                     </div>
-                    <p style="font-size: 0.85rem; color: var(--text-muted, #5f5f5f); margin-bottom: 0px;">
+                    <p style="font-size: 0.85rem; color: var(--text-muted, #86868b); margin-bottom: 0px;">
                         Point Vellum to an existing vault folder on this machine.
                     </p>
                 </div>

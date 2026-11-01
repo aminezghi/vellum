@@ -81,7 +81,9 @@ export function initializeAppearance(): void {
   document.body.classList.toggle("dark", theme === "dark");
 
   const savedAccent = localStorage.getItem(STORAGE_KEYS.accent);
-  root.setAttribute("data-accent", isAccent(savedAccent) ? savedAccent : "emerald");
+  const chosenAccent = isAccent(savedAccent) ? savedAccent : "emerald";
+  root.setAttribute("data-accent", chosenAccent);
+  document.body.setAttribute("data-accent", chosenAccent);
 
   notify();
 }
@@ -93,6 +95,7 @@ function isAccent(value: string | null): value is Accent {
 /** Switch the accent colourway. */
 export function setAccent(accent: Accent): void {
   document.documentElement.setAttribute("data-accent", accent);
+  document.body.setAttribute("data-accent", accent);
   localStorage.setItem(STORAGE_KEYS.accent, accent);
   notify();
 }

@@ -16,4 +16,5 @@ export interface AddablePaper {
   /** Journal or venue, under whichever name the producing screen uses. */
   venue?: string;
   journal?: string;
+  abstract?: string;
 }

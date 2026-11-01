@@ -60,56 +60,59 @@ def toggle_theme_mode() -> None:
 _DARK_CSS = """
 <style>
 :root {
-    --wispr-lumen: #ffffeb;
-    --wispr-lumen-dark: #e4e4d0;
-    --wispr-vast: #1a1a1a;
-    --wispr-flare: #ff6c4c;
-    --wispr-glow: #ffa946;
-    --wispr-dawn: #f0d7ff;
-    --wispr-fathom: #034f46;
-    --wispr-pulse: #7f1c34;
-    --wispr-signal: #ffbcf2;
+    --wispr-lumen: #f5f5f7;
+    --wispr-lumen-dark: #e5e5ea;
+    --wispr-vast: #1e1e1e;
+    --wispr-flare: #0a84ff;
+    --wispr-glow: #409cff;
+    --wispr-dawn: #bf5af2;
+    --wispr-fathom: #30d158;
+    --wispr-pulse: #ff453a;
+    --wispr-signal: #5e5ce6;
     
-    --bg-main: #111111;
-    --text-main: #ffffeb;
-    --text-muted: #a0a096;
-    --panel-bg: rgba(26, 26, 26, 0.88);
-    --panel-border: rgba(255, 255, 235, 0.12);
-    --metric-bg: rgba(30, 30, 30, 0.85);
-    --metric-num: #ffffeb;
-    --metric-label: #a0a096;
-    --pill-bg: rgba(255, 255, 235, 0.08);
-    --pill-border: rgba(255, 255, 235, 0.12);
-    --pill-text: #a0a096;
-    --pill-active-bg: #ff6c4c;
-    --pill-active-border: #ff6c4c;
+    --bg-main: #1e1e1e;
+    --text-main: #f5f5f7;
+    --text-muted: #8e8e93;
+    --panel-bg: rgba(36, 36, 38, 0.88);
+    --panel-border: rgba(255, 255, 255, 0.12);
+    --metric-bg: rgba(44, 44, 46, 0.82);
+    --metric-num: #ffffff;
+    --metric-label: #8e8e93;
+    --pill-bg: rgba(255, 255, 255, 0.08);
+    --pill-border: rgba(255, 255, 255, 0.12);
+    --pill-text: #aeaeb2;
+    --pill-active-bg: #0a84ff;
+    --pill-active-border: #0a84ff;
     --pill-active-text: #ffffff;
-    --card-bg: #1c1c1c;
-    --card-border: rgba(255, 255, 235, 0.12);
-    --apple-blue: #ff6c4c;
-    --apple-blue-hover: #ff856b;
-    --apple-emerald: #34d399;
-    --apple-amber: #ffa946;
-    --apple-rose: #ff6c4c;
-    --apple-purple: #f0d7ff;
+    --card-bg: rgba(36, 36, 38, 0.90);
+    --card-border: rgba(255, 255, 255, 0.10);
+    --apple-blue: #0a84ff;
+    --apple-blue-hover: #409cff;
+    --apple-emerald: #30d158;
+    --apple-amber: #ff9f0a;
+    --apple-rose: #ff453a;
+    --apple-purple: #bf5af2;
 }
 
-/* Global Wispr Vast Canvas */
+/* Apple macOS Sequoia Canvas (Dark Window) */
 .stApp {
-    background: radial-gradient(ellipse at 50% 0%, #1a1a1a 0%, #121212 65%, #0a0a0a 100%) !important;
-    color: #ffffeb !important;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+    background: radial-gradient(ellipse at 50% 0%, #252528 0%, #1c1c1e 100%) !important;
+    color: #f5f5f7 !important;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", "Segoe UI", Roboto, sans-serif !important;
     letter-spacing: -0.01em !important;
 }
 
 /* Base Headings & Typography */
 h1, h2, h3, h4, h5, h6 {
-    color: #ffffeb !important;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+    color: #f5f5f7 !important;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro", "Segoe UI", sans-serif !important;
     letter-spacing: -0.02em !important;
+    font-weight: 700 !important;
 }
 .display-title {
-    font-family: Georgia, Garamond, "Times New Roman", serif !important;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro", sans-serif !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.03em !important;
 }
 p, span, div {
     color: inherit;
@@ -144,34 +147,41 @@ div[data-testid="stTextArea"] div[data-baseweb="textarea"],
 div[data-testid="stNumberInput"] div[data-baseweb="input"],
 div[data-testid="stChatInput"] div[data-baseweb="textarea"],
 div[data-testid="stDateInput"] div[data-baseweb="input"],
-div[data-testid="stTimeInput"] div[data-baseweb="input"] {
-    background-color: #1a1a1a !important;
-    border: 1px solid rgba(255, 255, 235, 0.18) !important;
-    border-radius: 12px !important;
+div[data-testid="stTimeInput"] div[data-baseweb="input"],
+div[data-testid="stTextInput"] > div,
+div[data-testid="stTextInput"] > div > div,
+div[data-testid="stTextArea"] > div,
+div[data-testid="stTextArea"] > div > div,
+div[data-testid="stNumberInput"] > div,
+div[data-testid="stNumberInput"] > div > div,
+div[data-testid="stTextInput"] div[data-baseweb="base-input"],
+div[data-testid="stTextArea"] div[data-baseweb="base-input"] {
+    background-color: #242426 !important;
+    background: #242426 !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 10px !important;
     overflow: hidden !important;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4) !important;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35) !important;
     transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+    color: #f5f5f7 !important;
 }
 
 div[data-testid="stTextInput"] div[data-baseweb="input"]:hover,
 div[data-testid="stTextArea"] div[data-baseweb="textarea"]:hover,
 div[data-testid="stNumberInput"] div[data-baseweb="input"]:hover,
 div[data-testid="stChatInput"] div[data-baseweb="textarea"]:hover {
-    border-color: rgba(255, 255, 235, 0.35) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
 }
 
 div[data-testid="stTextInput"] div[data-baseweb="input"]:focus-within,
 div[data-testid="stTextArea"] div[data-baseweb="textarea"]:focus-within,
 div[data-testid="stNumberInput"] div[data-baseweb="input"]:focus-within,
-div[data-testid="stChatInput"] div[data-baseweb="textarea"]:focus-within {
-    border-color: #ffa946 !important;
-    box-shadow: 0 0 0 3px rgba(255, 169, 70, 0.25) !important;
+div[data-testid="stChatInput"] div[data-baseweb="textarea"]:focus-within,
+div[data-testid="stTextInput"] > div:focus-within {
+    border-color: #0a84ff !important;
+    box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.35) !important;
 }
 
-div[data-testid="stTextInput"] div[data-baseweb="base-input"],
-div[data-testid="stTextArea"] div[data-baseweb="base-input"],
-div[data-testid="stNumberInput"] div[data-baseweb="base-input"],
-div[data-testid="stChatInput"] div[data-baseweb="base-input"],
 div[data-testid="stTextInput"] input,
 div[data-testid="stTextArea"] textarea,
 div[data-testid="stNumberInput"] input,
@@ -183,10 +193,10 @@ div[data-testid="stChatInput"] textarea,
     border: none !important;
     outline: none !important;
     box-shadow: none !important;
-    color: #ffffeb !important;
+    color: #f5f5f7 !important;
     font-size: 0.92rem !important;
     font-weight: 500 !important;
-    caret-color: #ffa946 !important;
+    caret-color: #0a84ff !important;
 }
 
 div[data-testid="stTextInput"] input:focus,
@@ -206,7 +216,7 @@ div[data-testid="stNumberInput"] input::placeholder,
 div[data-testid="stChatInput"] textarea::placeholder,
 .stTextInput input::placeholder,
 .stTextArea textarea::placeholder {
-    color: #88887e !important;
+    color: #8e8e93 !important;
     opacity: 1 !important;
 }
 
@@ -320,11 +330,11 @@ div[data-testid="stMultiSelect"] span[data-baseweb="tag"] svg {
 
 /* Slider (Dark Mode) */
 div[data-testid="stSlider"] div[data-baseweb="slider"] {
-    color: #ffffeb !important;
+    color: #f5f5f7 !important;
 }
 div[data-testid="stSlider"] div[role="slider"] {
-    background-color: #ff6c4c !important;
-    border-color: #ff6c4c !important;
+    background-color: #0a84ff !important;
+    border-color: #0a84ff !important;
 }
 
 /* Top Nav & All Selectboxes (📁 Default_Project) */
@@ -362,84 +372,130 @@ ul[data-baseweb="menu"] li:hover, ul[data-baseweb="menu"] li[aria-selected="true
     background-color: rgba(255, 255, 235, 0.12) !important;
 }
 
-/* Segmented Navigation Bar & Subview Pills (Discover, Library, Evidence, etc.) */
+/* Apple macOS Segmented Navigation Bar (Dark Mode) */
 div[class*="st-key-_main_nav_segments"],
 div[class*="st-key-_main_nav_segments"] > div,
 div[class*="st-key-_main_nav_segments"] [data-testid="stButtonGroup"],
-div[data-testid="stButtonGroup"],
 div[data-testid="stSegmentedControl"],
-div[data-testid="stPills"],
-div[data-testid="stPills"] > div {
-    background: rgba(255, 255, 235, 0.08) !important;
-    background-color: rgba(255, 255, 235, 0.08) !important;
-    border: 1px solid rgba(255, 255, 235, 0.14) !important;
+div[data-testid="stSegmentedControl"] > div {
+    background: rgba(255, 255, 255, 0.08) !important;
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
     border-radius: 9999px !important;
     padding: 3px !important;
-    gap: 4px !important;
+    gap: 2px !important;
 }
+
 div[class*="st-key-_main_nav_segments"] button,
-div[data-testid="stButtonGroup"] button,
-div[data-testid="stSegmentedControl"] button,
-div[data-testid="stPills"] button {
+div[data-testid="stSegmentedControl"] button {
     background: transparent !important;
     background-color: transparent !important;
-    color: #a0a096 !important;
+    color: #aeaeb2 !important;
     border: none !important;
     border-radius: 9999px !important;
-    padding: 6px 14px !important;
-    font-weight: 550 !important;
+    padding: 5px 12px !important;
+    font-weight: 500 !important;
     font-size: 0.85rem !important;
     box-shadow: none !important;
     transition: all 0.15s ease !important;
 }
+
 div[class*="st-key-_main_nav_segments"] button *,
-div[data-testid="stButtonGroup"] button *,
-div[data-testid="stSegmentedControl"] button *,
-div[data-testid="stPills"] button * {
-    color: #a0a096 !important;
-    font-weight: 550 !important;
-}
-div[class*="st-key-_main_nav_segments"] button:hover,
-div[data-testid="stButtonGroup"] button:hover,
-div[data-testid="stPills"] button:hover {
-    background: rgba(255, 255, 235, 0.14) !important;
-    background-color: rgba(255, 255, 235, 0.14) !important;
+div[data-testid="stSegmentedControl"] button * {
+    color: #aeaeb2 !important;
+    font-weight: 500 !important;
 }
 
-/* UNMISTAKABLE ACTIVE HIGHLIGHT: Wispr Flare Coral Solid Pill */
+div[class*="st-key-_main_nav_segments"] button:hover,
+div[data-testid="stSegmentedControl"] button:hover {
+    background: rgba(255, 255, 255, 0.12) !important;
+    background-color: rgba(255, 255, 255, 0.12) !important;
+    color: #f5f5f7 !important;
+}
+
+/* Apple HIG Active Segment (Dark Mode) */
 div[class*="st-key-_main_nav_segments"] button[data-selected],
 div[class*="st-key-_main_nav_segments"] button[data-selected="true"],
 div[class*="st-key-_main_nav_segments"] button[aria-selected="true"],
-div[data-testid="stButtonGroup"] button[data-selected],
-div[data-testid="stButtonGroup"] button[data-selected="true"],
-div[data-testid="stButtonGroup"] button[aria-selected="true"],
 div[data-testid="stSegmentedControl"] button[data-selected],
 div[data-testid="stSegmentedControl"] button[data-selected="true"],
-div[data-testid="stSegmentedControl"] button[aria-selected="true"],
-div[data-testid="stPills"] button[data-selected],
-div[data-testid="stPills"] button[data-selected="true"],
-div[data-testid="stPills"] button[aria-selected="true"] {
-    background: #ff6c4c !important;
-    background-color: #ff6c4c !important;
+div[data-testid="stSegmentedControl"] button[aria-selected="true"] {
+    background: #0a84ff !important;
+    background-color: #0a84ff !important;
     color: #ffffff !important;
     border: none !important;
     border-radius: 9999px !important;
-    box-shadow: 0 3px 12px rgba(255, 108, 76, 0.45) !important;
-    font-weight: 700 !important;
+    box-shadow: 0 2px 8px rgba(10, 132, 255, 0.45) !important;
+    font-weight: 600 !important;
 }
-div[class*="st-key-_main_nav_segments"] button[data-selected] *,
+
 div[class*="st-key-_main_nav_segments"] button[data-selected="true"] *,
 div[class*="st-key-_main_nav_segments"] button[aria-selected="true"] *,
-div[data-testid="stButtonGroup"] button[data-selected] *,
-div[data-testid="stButtonGroup"] button[data-selected="true"] *,
-div[data-testid="stButtonGroup"] button[aria-selected="true"] *,
-div[data-testid="stSegmentedControl"] button[data-selected] *,
 div[data-testid="stSegmentedControl"] button[data-selected="true"] *,
-div[data-testid="stSegmentedControl"] button[aria-selected="true"] *,
-div[data-testid="stPills"] button[data-selected] *,
-div[data-testid="stPills"] button[data-selected="true"] *,
-div[data-testid="stPills"] button[aria-selected="true"] * {
+div[data-testid="stSegmentedControl"] button[aria-selected="true"] * {
     color: #ffffff !important;
+    font-weight: 600 !important;
+}
+
+/* Apple HIG Subview Pills (Dark Mode) */
+div[data-testid="stPills"],
+div[data-testid="stPills"] > div,
+div[class*="st-key-_subnav_"],
+div[class*="st-key-_subnav_"] > div {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    padding: 2px 0 !important;
+    gap: 6px !important;
+}
+
+div[data-testid="stPills"] button,
+div[class*="st-key-_subnav_"] button {
+    background: rgba(255, 255, 255, 0.08) !important;
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    color: #f5f5f7 !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 9999px !important;
+    padding: 4px 14px !important;
+    font-weight: 550 !important;
+    font-size: 0.83rem !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+    transition: all 0.15s ease !important;
+}
+
+div[data-testid="stPills"] button *,
+div[class*="st-key-_subnav_"] button * {
+    color: #f5f5f7 !important;
+    font-weight: 550 !important;
+}
+
+div[data-testid="stPills"] button:hover,
+div[class*="st-key-_subnav_"] button:hover {
+    background: rgba(255, 255, 255, 0.14) !important;
+    background-color: rgba(255, 255, 255, 0.14) !important;
+    border-color: #0a84ff !important;
+}
+
+div[data-testid="stPills"] button[data-selected="true"],
+div[data-testid="stPills"] button[aria-selected="true"],
+div[class*="st-key-_subnav_"] button[data-selected="true"],
+div[class*="st-key-_subnav_"] button[aria-selected="true"] {
+    background: #0a84ff !important;
+    background-color: #0a84ff !important;
+    color: #ffffff !important;
+    border: 1px solid #0a84ff !important;
+    border-radius: 9999px !important;
+    box-shadow: 0 2px 8px rgba(10, 132, 255, 0.45) !important;
+    font-weight: 600 !important;
+}
+
+div[data-testid="stPills"] button[data-selected="true"] *,
+div[data-testid="stPills"] button[aria-selected="true"] *,
+div[class*="st-key-_subnav_"] button[data-selected="true"] *,
+div[class*="st-key-_subnav_"] button[aria-selected="true"] * {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
     font-weight: 700 !important;
 }
 
@@ -466,14 +522,14 @@ div[data-testid="stTabs"] button:hover p {
 }
 div[data-testid="stTabs"] button[aria-selected="true"],
 div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] {
-    color: #ff6c4c !important;
-    border-bottom: 2.5px solid #ff6c4c !important;
+    color: var(--apple-blue, #0a84ff) !important;
+    border-bottom: 2.5px solid var(--apple-blue, #0a84ff) !important;
     background: transparent !important;
 }
 div[data-testid="stTabs"] button[aria-selected="true"] p,
 div[data-testid="stTabs"] button[aria-selected="true"] span,
 div[data-testid="stTabs"] button[aria-selected="true"] div {
-    color: #ff6c4c !important;
+    color: var(--apple-blue, #0a84ff) !important;
     font-weight: 700 !important;
 }
 
@@ -502,7 +558,7 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div {
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     border: 1px solid var(--panel-border);
-    border-radius: 16px;
+    border-radius: 12px;
     padding: 16px 20px;
     text-align: center;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
@@ -510,11 +566,11 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div {
 }
 .glass-metric:hover {
     transform: translateY(-2px);
-    border-color: #ff6c4c;
-    box-shadow: 0 6px 24px rgba(255, 108, 76, 0.25);
+    border-color: #0a84ff;
+    box-shadow: 0 6px 24px rgba(10, 132, 255, 0.25);
 }
 .glass-metric-num {
-    font-family: Georgia, Garamond, "Times New Roman", serif !important;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro", sans-serif !important;
     font-size: 2.2rem;
     font-weight: 700;
     letter-spacing: -0.02em;
@@ -583,9 +639,9 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    background: rgba(255, 108, 76, 0.22);
-    color: #ff8c70;
-    border: 1px solid rgba(255, 108, 76, 0.4);
+    background: rgba(255, 69, 58, 0.18);
+    color: #ff453a;
+    border: 1px solid rgba(255, 69, 58, 0.35);
     border-radius: 9999px;
     padding: 3px 10px;
     font-size: 0.74rem;
@@ -608,16 +664,16 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div {
 .paper-row-card {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
-    border-radius: 16px;
-    padding: 18px;
-    margin-bottom: 12px;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 10px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
     transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, box-shadow 0.2s ease;
 }
 .paper-row-card:hover {
-    border-color: #ff6c4c;
+    border-color: #0a84ff;
     transform: translateY(-1px);
-    box-shadow: 0 6px 24px rgba(255, 108, 76, 0.2);
+    box-shadow: 0 6px 24px rgba(10, 132, 255, 0.2);
 }
 
 /* Tactile Buttons Across Whole App (Dark Mode) */
@@ -684,14 +740,14 @@ div.stButton > button[kind="primary"],
 div.stDownloadButton > button[kind="primary"],
 button[data-testid="stBaseButton-primary"],
 a[data-testid="stBaseButton-primary"] {
-    background-color: #ff6c4c !important;
+    background-color: #0a84ff !important;
     color: #ffffff !important;
-    border: 1px solid #ff6c4c !important;
+    border: 1px solid #0a84ff !important;
     border-radius: 9999px !important;
     font-weight: 650 !important;
     font-size: 0.88rem !important;
     padding: 0.42rem 1.25rem !important;
-    box-shadow: 0 2px 10px rgba(255, 108, 76, 0.35) !important;
+    box-shadow: 0 2px 10px rgba(10, 132, 255, 0.35) !important;
     text-decoration: none !important;
 }
 div.stButton > button[kind="primary"] p,
@@ -710,10 +766,10 @@ div.stDownloadButton > button[kind="primary"]:hover,
 div.stLinkButton > a[kind="primary"]:hover,
 button[data-testid="stBaseButton-primary"]:hover,
 a[data-testid="stBaseButton-primary"]:hover {
-    background-color: #ff856b !important;
-    border-color: #ff856b !important;
+    background-color: #409cff !important;
+    border-color: #409cff !important;
     color: #ffffff !important;
-    box-shadow: 0 4px 16px rgba(255, 108, 76, 0.5) !important;
+    box-shadow: 0 4px 16px rgba(10, 132, 255, 0.5) !important;
     transform: translateY(-1px) !important;
 }
 div.stButton > button[kind="primary"]:hover p,
@@ -819,57 +875,60 @@ div[data-testid="stExpander"] div[data-testid="stExpanderDetails"] {
 _LIGHT_CSS = """
 <style>
 :root {
-    --wispr-lumen: #ffffeb;
-    --wispr-lumen-dark: #e4e4d0;
-    --wispr-vast: #1a1a1a;
-    --wispr-flare: #ff6c4c;
-    --wispr-glow: #ffa946;
-    --wispr-dawn: #f0d7ff;
-    --wispr-fathom: #034f46;
-    --wispr-pulse: #7f1c34;
-    --wispr-signal: #ffbcf2;
+    --wispr-lumen: #ffffff;
+    --wispr-lumen-dark: #f2f2f7;
+    --wispr-vast: #1d1d1f;
+    --wispr-flare: #007aff;
+    --wispr-glow: #0062cc;
+    --wispr-dawn: #af52de;
+    --wispr-fathom: #34c759;
+    --wispr-pulse: #ff3b30;
+    --wispr-signal: #5856d6;
 
-    --bg-main: #ffffeb;
-    --text-main: #1a1a1a;
-    --text-muted: #5f5f5f;
-    --panel-bg: #ffffff;
-    --panel-border: #e4e4d0;
-    --metric-bg: #ffffff;
-    --metric-num: #1a1a1a;
-    --metric-label: #666666;
-    --pill-bg: #eaead6;
-    --pill-border: #d8d8bf;
-    --pill-text: #1a1a1a;
-    --pill-active-bg: #ff6c4c;
-    --pill-active-border: #ff6c4c;
+    --bg-main: #f5f5f7;
+    --text-main: #1d1d1f;
+    --text-muted: #6e6e73;
+    --panel-bg: rgba(255, 255, 255, 0.88);
+    --panel-border: rgba(0, 0, 0, 0.08);
+    --metric-bg: rgba(255, 255, 255, 0.95);
+    --metric-num: #1d1d1f;
+    --metric-label: #86868b;
+    --pill-bg: rgba(0, 0, 0, 0.05);
+    --pill-border: rgba(0, 0, 0, 0.08);
+    --pill-text: #1d1d1f;
+    --pill-active-bg: #007aff;
+    --pill-active-border: #007aff;
     --pill-active-text: #ffffff;
     --card-bg: #ffffff;
-    --card-border: #e4e4d0;
-    --apple-blue: #ff6c4c;
-    --apple-blue-hover: #ff5530;
-    --apple-emerald: #034f46;
-    --apple-amber: #ffa946;
-    --apple-rose: #7f1c34;
-    --apple-purple: #8944ab;
+    --card-border: rgba(0, 0, 0, 0.08);
+    --apple-blue: #007aff;
+    --apple-blue-hover: #0062cc;
+    --apple-emerald: #34c759;
+    --apple-amber: #ff9500;
+    --apple-rose: #ff3b30;
+    --apple-purple: #af52de;
 }
 
-/* Global Wispr Lumen Canvas (Warm Rich Ivory) */
+/* Apple macOS Sequoia Canvas (Light Window) */
 .stApp {
-    background: #ffffeb !important;
-    background-color: #ffffeb !important;
-    color: #1a1a1a !important;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+    background: #f5f5f7 !important;
+    background-color: #f5f5f7 !important;
+    color: #1d1d1f !important;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", "Segoe UI", Roboto, sans-serif !important;
     letter-spacing: -0.01em !important;
 }
 
 /* Base Headings & Typography */
 h1, h2, h3, h4, h5, h6 {
-    color: #1a1a1a !important;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+    color: #1d1d1f !important;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro", "Segoe UI", sans-serif !important;
     letter-spacing: -0.02em !important;
+    font-weight: 700 !important;
 }
 .display-title {
-    font-family: Georgia, Garamond, "Times New Roman", serif !important;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro", sans-serif !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.03em !important;
 }
 p, span, div {
     color: inherit;
@@ -906,10 +965,10 @@ div[data-testid="stChatInput"] div[data-baseweb="textarea"],
 div[data-testid="stDateInput"] div[data-baseweb="input"],
 div[data-testid="stTimeInput"] div[data-baseweb="input"] {
     background-color: #ffffff !important;
-    border: 1.5px solid #e4e4d0 !important;
+    border: 1px solid rgba(0, 0, 0, 0.12) !important;
     border-radius: 12px !important;
     overflow: hidden !important;
-    box-shadow: 0 1px 2px rgba(26, 26, 26, 0.04) !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
     transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
 }
 
@@ -917,15 +976,15 @@ div[data-testid="stTextInput"] div[data-baseweb="input"]:hover,
 div[data-testid="stTextArea"] div[data-baseweb="textarea"]:hover,
 div[data-testid="stNumberInput"] div[data-baseweb="input"]:hover,
 div[data-testid="stChatInput"] div[data-baseweb="textarea"]:hover {
-    border-color: #cfcfb8 !important;
+    border-color: rgba(0, 0, 0, 0.25) !important;
 }
 
 div[data-testid="stTextInput"] div[data-baseweb="input"]:focus-within,
 div[data-testid="stTextArea"] div[data-baseweb="textarea"]:focus-within,
 div[data-testid="stNumberInput"] div[data-baseweb="input"]:focus-within,
 div[data-testid="stChatInput"] div[data-baseweb="textarea"]:focus-within {
-    border-color: #ff6c4c !important;
-    box-shadow: 0 0 0 3px rgba(255, 108, 76, 0.2) !important;
+    border-color: #007aff !important;
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2) !important;
 }
 
 div[data-testid="stTextInput"] div[data-baseweb="base-input"],
@@ -946,7 +1005,7 @@ div[data-testid="stChatInput"] textarea,
     color: #1a1a1a !important;
     font-size: 0.92rem !important;
     font-weight: 500 !important;
-    caret-color: #ff6c4c !important;
+    caret-color: #007aff !important;
 }
 
 div[data-testid="stTextInput"] input:focus,
@@ -987,10 +1046,10 @@ div[data-testid="stChatInput"] svg {
 div[data-testid="stNumberInput"] button,
 button[data-testid="stNumberInputStepDown"],
 button[data-testid="stNumberInputStepUp"] {
-    background-color: #faf8f2 !important;
-    color: #1a1a1a !important;
+    background-color: rgba(0, 0, 0, 0.02) !important;
+    color: #1d1d1f !important;
     border: none !important;
-    border-left: 1.5px solid #e4e4d0 !important;
+    border-left: 1px solid rgba(0, 0, 0, 0.1) !important;
     border-radius: 0 !important;
     transition: background-color 0.15s ease, color 0.15s ease !important;
 }
@@ -998,59 +1057,59 @@ button[data-testid="stNumberInputStepUp"] {
 div[data-testid="stNumberInput"] button:hover,
 button[data-testid="stNumberInputStepDown"]:hover,
 button[data-testid="stNumberInputStepUp"]:hover {
-    background-color: #f0ede0 !important;
-    color: #ff6c4c !important;
+    background-color: rgba(0, 0, 0, 0.06) !important;
+    color: #007aff !important;
 }
 
 div[data-testid="stNumberInput"] button svg,
 button[data-testid="stNumberInputStepDown"] svg,
 button[data-testid="stNumberInputStepUp"] svg {
-    fill: #1a1a1a !important;
-    color: #1a1a1a !important;
+    fill: #1d1d1f !important;
+    color: #1d1d1f !important;
 }
 
 /* File Uploader Across Whole App (Light Mode) */
 div[data-testid="stFileUploader"],
 section[data-testid="stFileUploaderDropzone"] {
     background-color: #ffffff !important;
-    border: 1.5px dashed #cfcfb8 !important;
-    border-radius: 14px !important;
-    color: #1a1a1a !important;
+    border: 1.5px dashed rgba(0, 0, 0, 0.18) !important;
+    border-radius: 12px !important;
+    color: #1d1d1f !important;
     transition: all 0.2s ease !important;
 }
 
 section[data-testid="stFileUploaderDropzone"]:hover {
-    background-color: #faf8ed !important;
-    border-color: #ff6c4c !important;
+    background-color: #f5f5f7 !important;
+    border-color: #007aff !important;
 }
 
 section[data-testid="stFileUploaderDropzone"] [data-testid="stFileUploaderDropzoneInstructions"] {
-    color: #1a1a1a !important;
+    color: #1d1d1f !important;
 }
 
 section[data-testid="stFileUploaderDropzone"] button,
 section[data-testid="stFileUploaderDropzone"] button[data-testid="stBaseButton-secondary"] {
-    background-color: #f7f6ed !important;
-    color: #1a1a1a !important;
-    border: 1.5px solid #e4e4d0 !important;
+    background-color: #ffffff !important;
+    color: #1d1d1f !important;
+    border: 1px solid rgba(0, 0, 0, 0.14) !important;
     border-radius: 9999px !important;
     font-weight: 600 !important;
-    box-shadow: 0 1px 3px rgba(26, 26, 26, 0.05) !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
 }
 
 section[data-testid="stFileUploaderDropzone"] button:hover {
-    background-color: #eaead6 !important;
-    color: #ff6c4c !important;
-    border-color: #ff6c4c !important;
+    background-color: #f5f5f7 !important;
+    color: #007aff !important;
+    border-color: #007aff !important;
 }
 
 section[data-testid="stFileUploaderDropzone"] button * {
-    color: #1a1a1a !important;
+    color: #1d1d1f !important;
 }
 
 section[data-testid="stFileUploaderDropzone"] small,
 section[data-testid="stFileUploaderDropzone"] span {
-    color: #5f5f5f !important;
+    color: #6e6e73 !important;
 }
 
 /* MultiSelect Across Whole App (Light Mode) */
@@ -1058,33 +1117,33 @@ div[data-testid="stMultiSelect"],
 div[data-testid="stMultiSelect"] div[data-baseweb="select"],
 div[data-testid="stMultiSelect"] div[data-baseweb="select"] > div {
     background-color: #ffffff !important;
-    border-color: #e4e4d0 !important;
+    border-color: rgba(0, 0, 0, 0.12) !important;
     border-radius: 12px !important;
-    color: #1a1a1a !important;
+    color: #1d1d1f !important;
 }
 
 div[data-testid="stMultiSelect"] span[data-baseweb="tag"] {
-    background-color: #f0ede0 !important;
-    color: #1a1a1a !important;
-    border: 1px solid #dcdcc8 !important;
+    background-color: rgba(0, 0, 0, 0.05) !important;
+    color: #1d1d1f !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
     border-radius: 9999px !important;
 }
 
 div[data-testid="stMultiSelect"] span[data-baseweb="tag"] * {
-    color: #1a1a1a !important;
+    color: #1d1d1f !important;
 }
 
 div[data-testid="stMultiSelect"] span[data-baseweb="tag"] svg {
-    fill: #1a1a1a !important;
+    fill: #1d1d1f !important;
 }
 
 /* Slider (Light Mode) */
 div[data-testid="stSlider"] div[data-baseweb="slider"] {
-    color: #1a1a1a !important;
+    color: #1d1d1f !important;
 }
 div[data-testid="stSlider"] div[role="slider"] {
-    background-color: #ff6c4c !important;
-    border-color: #ff6c4c !important;
+    background-color: #007aff !important;
+    border-color: #007aff !important;
 }
 
 /* Top Nav & All Selectboxes (📁 Default_Project) */
@@ -1094,104 +1153,158 @@ div[data-testid="stSelectbox"] div[data-baseweb="select"] > div,
 div[data-testid="stSelectbox"] div[data-baseweb="select"] span,
 div[data-testid="stSelectbox"] div[data-baseweb="select"] p {
     background-color: #ffffff !important;
-    color: #1a1a1a !important;
-    border-color: #e4e4d0 !important;
+    color: #1d1d1f !important;
+    border-color: rgba(0, 0, 0, 0.12) !important;
 }
 div[data-testid="stSelectbox"] div[data-baseweb="select"] > div {
-    border: 1.5px solid #e4e4d0 !important;
+    border: 1px solid rgba(0, 0, 0, 0.12) !important;
     border-radius: 9999px !important;
     padding-left: 8px !important;
-    box-shadow: 0 1px 3px rgba(26, 26, 26, 0.05) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
 }
 div[data-testid="stSelectbox"] svg {
-    fill: #1a1a1a !important;
-    color: #1a1a1a !important;
+    fill: #1d1d1f !important;
+    color: #1d1d1f !important;
 }
 
 /* Selectbox Dropdown Menu Options */
 ul[data-baseweb="menu"] {
     background-color: #ffffff !important;
-    border: 1.5px solid #e4e4d0 !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
     border-radius: 12px !important;
-    box-shadow: 0 8px 30px rgba(26, 26, 26, 0.12) !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1) !important;
 }
 ul[data-baseweb="menu"] li {
-    color: #1a1a1a !important;
+    color: #1d1d1f !important;
 }
 ul[data-baseweb="menu"] li:hover, ul[data-baseweb="menu"] li[aria-selected="true"] {
-    background-color: #faf8ed !important;
+    background-color: rgba(0, 0, 0, 0.04) !important;
 }
 
-/* Segmented Navigation Bar & Subview Pills (Discover, Library, Evidence, etc.) */
+/* Apple macOS Segmented Navigation Bar (Light Mode) */
 div[class*="st-key-_main_nav_segments"],
 div[class*="st-key-_main_nav_segments"] > div,
 div[class*="st-key-_main_nav_segments"] [data-testid="stButtonGroup"],
-div[data-testid="stButtonGroup"],
 div[data-testid="stSegmentedControl"],
-div[data-testid="stPills"],
-div[data-testid="stPills"] > div {
-    background: #eaead6 !important;
-    background-color: #eaead6 !important;
-    border: 1px solid #d8d8bf !important;
+div[data-testid="stSegmentedControl"] > div {
+    background: rgba(118, 118, 128, 0.12) !important;
+    background-color: rgba(118, 118, 128, 0.12) !important;
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
     border-radius: 9999px !important;
     padding: 3px !important;
-    gap: 4px !important;
+    gap: 2px !important;
 }
+
 div[class*="st-key-_main_nav_segments"] button,
-div[data-testid="stButtonGroup"] button,
-div[data-testid="stSegmentedControl"] button,
-div[data-testid="stPills"] button {
+div[data-testid="stSegmentedControl"] button {
     background: transparent !important;
     background-color: transparent !important;
-    color: #1a1a1a !important;
+    color: #1d1d1f !important;
     border: none !important;
     border-radius: 9999px !important;
-    padding: 6px 14px !important;
-    font-weight: 600 !important;
+    padding: 5px 12px !important;
+    font-weight: 500 !important;
     font-size: 0.85rem !important;
     box-shadow: none !important;
     transition: all 0.15s ease !important;
 }
+
 div[class*="st-key-_main_nav_segments"] button *,
-div[data-testid="stButtonGroup"] button *,
-div[data-testid="stSegmentedControl"] button *,
-div[data-testid="stPills"] button * {
-    color: #1a1a1a !important;
-    font-weight: 600 !important;
-}
-div[class*="st-key-_main_nav_segments"] button:hover,
-div[data-testid="stButtonGroup"] button:hover,
-div[data-testid="stPills"] button:hover {
-    background: rgba(255, 255, 255, 0.45) !important;
-    background-color: rgba(255, 255, 255, 0.45) !important;
+div[data-testid="stSegmentedControl"] button * {
+    color: #1d1d1f !important;
+    font-weight: 500 !important;
 }
 
-/* UNMISTAKABLE ACTIVE HIGHLIGHT: Wispr Flare Coral Solid Pill */
+div[class*="st-key-_main_nav_segments"] button:hover,
+div[data-testid="stSegmentedControl"] button:hover {
+    background: rgba(255, 255, 255, 0.6) !important;
+    background-color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Apple HIG Active Segment (Light Mode) */
 div[class*="st-key-_main_nav_segments"] button[data-selected],
 div[class*="st-key-_main_nav_segments"] button[data-selected="true"],
 div[class*="st-key-_main_nav_segments"] button[aria-selected="true"],
-div[data-testid="stButtonGroup"] button[data-selected],
-div[data-testid="stButtonGroup"] button[data-selected="true"],
-div[data-testid="stButtonGroup"] button[aria-selected="true"],
 div[data-testid="stSegmentedControl"] button[data-selected],
 div[data-testid="stSegmentedControl"] button[data-selected="true"],
-div[data-testid="stSegmentedControl"] button[aria-selected="true"],
-div[data-testid="stPills"] button[data-selected],
-div[data-testid="stPills"] button[data-selected="true"],
-div[data-testid="stPills"] button[aria-selected="true"] {
-    background: #ff6c4c !important;
-    background-color: #ff6c4c !important;
+div[data-testid="stSegmentedControl"] button[aria-selected="true"] {
+    background: #007aff !important;
+    background-color: #007aff !important;
     color: #ffffff !important;
     border: none !important;
     border-radius: 9999px !important;
-    box-shadow: 0 3px 10px rgba(255, 108, 76, 0.38) !important;
-    font-weight: 700 !important;
+    box-shadow: 0 2px 6px rgba(0, 122, 255, 0.3) !important;
+    font-weight: 600 !important;
 }
-div[class*="st-key-_main_nav_segments"] button[data-selected] *,
+
 div[class*="st-key-_main_nav_segments"] button[data-selected="true"] *,
 div[class*="st-key-_main_nav_segments"] button[aria-selected="true"] *,
-div[data-testid="stButtonGroup"] button[data-selected] *,
-div[data-testid="stButtonGroup"] button[data-selected="true"] *,
+div[data-testid="stSegmentedControl"] button[data-selected="true"] *,
+div[data-testid="stSegmentedControl"] button[aria-selected="true"] * {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+
+/* Apple HIG Subview Pills (Light Mode) */
+div[data-testid="stPills"],
+div[data-testid="stPills"] > div,
+div[class*="st-key-_subnav_"],
+div[class*="st-key-_subnav_"] > div {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    padding: 2px 0 !important;
+    gap: 6px !important;
+}
+
+div[data-testid="stPills"] button,
+div[class*="st-key-_subnav_"] button {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #1d1d1f !important;
+    border: 1px solid rgba(0, 0, 0, 0.12) !important;
+    border-radius: 9999px !important;
+    padding: 4px 14px !important;
+    font-weight: 550 !important;
+    font-size: 0.83rem !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+    transition: all 0.15s ease !important;
+}
+
+div[data-testid="stPills"] button *,
+div[class*="st-key-_subnav_"] button * {
+    color: #1d1d1f !important;
+    font-weight: 550 !important;
+}
+
+div[data-testid="stPills"] button:hover,
+div[class*="st-key-_subnav_"] button:hover {
+    background: #f5f5f7 !important;
+    background-color: #f5f5f7 !important;
+    border-color: #007aff !important;
+    color: #007aff !important;
+}
+
+div[data-testid="stPills"] button[data-selected="true"],
+div[data-testid="stPills"] button[aria-selected="true"],
+div[class*="st-key-_subnav_"] button[data-selected="true"],
+div[class*="st-key-_subnav_"] button[aria-selected="true"] {
+    background: #007aff !important;
+    background-color: #007aff !important;
+    color: #ffffff !important;
+    border: 1px solid #007aff !important;
+    border-radius: 9999px !important;
+    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.35) !important;
+    font-weight: 600 !important;
+}
+
+div[data-testid="stPills"] button[data-selected="true"] *,
+div[data-testid="stPills"] button[aria-selected="true"] *,
+div[class*="st-key-_subnav_"] button[data-selected="true"] *,
+div[class*="st-key-_subnav_"] button[aria-selected="true"] * {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
 div[data-testid="stButtonGroup"] button[aria-selected="true"] *,
 div[data-testid="stSegmentedControl"] button[data-selected] *,
 div[data-testid="stSegmentedControl"] button[data-selected="true"] *,
@@ -1208,7 +1321,7 @@ div[data-testid="stTabs"] {
     background: transparent !important;
 }
 div[data-testid="stTabs"] [role="tablist"] {
-    border-bottom: 1.5px solid #e4e4d0 !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
 }
 div[data-testid="stTabs"] button,
 div[data-testid="stTabs"] button[role="tab"],
@@ -1226,14 +1339,14 @@ div[data-testid="stTabs"] button:hover p {
 }
 div[data-testid="stTabs"] button[aria-selected="true"],
 div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] {
-    color: #ff6c4c !important;
-    border-bottom: 2.5px solid #ff6c4c !important;
+    color: #007aff !important;
+    border-bottom: 2.5px solid #007aff !important;
     background: transparent !important;
 }
 div[data-testid="stTabs"] button[aria-selected="true"] p,
 div[data-testid="stTabs"] button[aria-selected="true"] span,
 div[data-testid="stTabs"] button[aria-selected="true"] div {
-    color: #ff6c4c !important;
+    color: #007aff !important;
     font-weight: 700 !important;
 }
 
@@ -1242,18 +1355,18 @@ div[data-testid="stTabs"] button[aria-selected="true"] div {
     background: #ffffff;
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1.5px solid #e4e4d0;
-    border-radius: 16px;
-    box-shadow: 0 2px 12px rgba(26, 26, 26, 0.04), 0 1px 3px rgba(26, 26, 26, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
     padding: 20px;
     margin-bottom: 16px;
     width: 100%;
 }
 div[data-testid="stVerticalBlockBorderWrapper"] > div {
     background-color: #ffffff !important;
-    border: 1.5px solid #e4e4d0 !important;
-    box-shadow: 0 2px 12px rgba(26, 26, 26, 0.04) !important;
-    border-radius: 16px !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04) !important;
+    border-radius: 12px !important;
 }
 
 /* Wispr Metric Tile */
@@ -1261,24 +1374,24 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div {
     background: #ffffff;
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1.5px solid #e4e4d0;
-    border-radius: 16px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
     padding: 16px 20px;
     text-align: center;
-    box-shadow: 0 2px 8px rgba(26, 26, 26, 0.04);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, box-shadow 0.2s ease;
 }
 .glass-metric:hover {
     transform: translateY(-2px);
-    border-color: #ff6c4c;
-    box-shadow: 0 6px 20px rgba(255, 108, 76, 0.15);
+    border-color: #007aff;
+    box-shadow: 0 6px 20px rgba(0, 122, 255, 0.15);
 }
 .glass-metric-num {
-    font-family: Georgia, Garamond, "Times New Roman", serif !important;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro", sans-serif !important;
     font-size: 2.2rem;
     font-weight: 700;
     letter-spacing: -0.02em;
-    color: #1a1a1a;
+    color: #1d1d1f;
     line-height: 1.1;
     margin-bottom: 4px;
 }
@@ -1355,9 +1468,9 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    background: #ebebe0;
-    color: #444444;
-    border: 1px solid #d5d5c5;
+    background: rgba(142, 142, 147, 0.12);
+    color: #636366;
+    border: 1px solid rgba(142, 142, 147, 0.25);
     border-radius: 9999px;
     padding: 3px 10px;
     font-size: 0.74rem;
@@ -1367,17 +1480,17 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div {
 /* Wispr Paper Row Card */
 .paper-row-card {
     background: #ffffff;
-    border: 1.5px solid #e4e4d0;
-    border-radius: 16px;
-    padding: 18px;
-    margin-bottom: 12px;
-    box-shadow: 0 1px 4px rgba(26, 26, 26, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
     transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, box-shadow 0.2s ease;
 }
 .paper-row-card:hover {
-    border-color: #ff6c4c;
+    border-color: #007aff;
     transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(255, 108, 76, 0.12);
+    box-shadow: 0 6px 20px rgba(0, 122, 255, 0.12);
 }
 
 /* Tactile Buttons Across Whole App (Light Mode - Crystal Clear & High Contrast) */
@@ -1389,13 +1502,13 @@ div.stDownloadButton > button[kind="secondary"],
 button[data-testid="stBaseButton-secondary"],
 a[data-testid="stBaseButton-secondary"] {
     background-color: #ffffff !important;
-    color: #1a1a1a !important;
-    border: 1.5px solid #e4e4d0 !important;
+    color: #1d1d1f !important;
+    border: 1px solid rgba(0, 0, 0, 0.14) !important;
     border-radius: 9999px !important;
     font-weight: 600 !important;
     font-size: 0.88rem !important;
     padding: 0.42rem 1.15rem !important;
-    box-shadow: 0 1px 3px rgba(26, 26, 26, 0.06) !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
     transition: all 120ms ease !important;
     white-space: nowrap !important;
     text-decoration: none !important;
@@ -1418,9 +1531,9 @@ div.stButton > button[kind="secondary"]:hover,
 div.stDownloadButton > button[kind="secondary"]:hover,
 button[data-testid="stBaseButton-secondary"]:hover,
 a[data-testid="stBaseButton-secondary"]:hover {
-    background-color: #faf8ed !important;
-    border-color: #1a1a1a !important;
-    color: #1a1a1a !important;
+    background-color: #f5f5f7 !important;
+    border-color: rgba(0, 0, 0, 0.3) !important;
+    color: #1d1d1f !important;
     transform: translateY(-1px) !important;
     box-shadow: 0 3px 8px rgba(26, 26, 26, 0.1) !important;
 }
@@ -1470,10 +1583,10 @@ div.stDownloadButton > button[kind="primary"]:hover,
 div.stLinkButton > a[kind="primary"]:hover,
 button[data-testid="stBaseButton-primary"]:hover,
 a[data-testid="stBaseButton-primary"]:hover {
-    background-color: #ff6c4c !important;
-    border-color: #ff6c4c !important;
+    background-color: #0062cc !important;
+    border-color: #0062cc !important;
     color: #ffffff !important;
-    box-shadow: 0 4px 14px rgba(255, 108, 76, 0.35) !important;
+    box-shadow: 0 4px 14px rgba(0, 122, 255, 0.35) !important;
     transform: translateY(-1px) !important;
 }
 div.stButton > button[kind="primary"]:hover p,
@@ -1488,9 +1601,9 @@ div[data-testid="stDataFrame"],
 div[data-testid="stTable"],
 div[data-testid="stDataFrameGlideDataGrid"] {
     background-color: #ffffff !important;
-    border: 1.5px solid #e4e4d0 !important;
-    border-radius: 14px !important;
-    box-shadow: 0 2px 10px rgba(26, 26, 26, 0.04) !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04) !important;
     overflow: hidden !important;
 }
 
@@ -1511,8 +1624,8 @@ div[data-testid="stColumn"] div[class*="st-key-_tool_btn_"] button {
     white-space: nowrap !important;
     background: #ffffff !important;
     background-color: #ffffff !important;
-    border: 1.5px solid #e4e4d0 !important;
-    color: #1a1a1a !important;
+    border: 1px solid rgba(0, 0, 0, 0.12) !important;
+    color: #1d1d1f !important;
     box-shadow: 0 1px 3px rgba(26, 26, 26, 0.05) !important;
     transition: all 120ms ease !important;
 }
@@ -1523,54 +1636,55 @@ div[data-testid="stColumn"] div[class*="st-key-_tool_btn_"] button span {
     font-weight: 600 !important;
 }
 div[data-testid="stColumn"] div[class*="st-key-_tool_btn_"] button:hover {
-    background: #faf8ed !important;
-    background-color: #faf8ed !important;
-    border-color: #ff6c4c !important;
-    color: #ff6c4c !important;
+    background: #f5f5f7 !important;
+    background-color: #f5f5f7 !important;
+    border-color: #007aff !important;
+    color: #007aff !important;
     transform: translateY(-1px) !important;
 }
 div[data-testid="stColumn"] div[class*="st-key-_tool_btn_"] button:hover p,
 div[data-testid="stColumn"] div[class*="st-key-_tool_btn_"] button:hover span {
-    color: #ff6c4c !important;
+    color: #007aff !important;
 }
 
-/* Wispr Expanders & Accordions in Light Mode */
+/* Apple macOS Expanders & Accordions in Light Mode */
 div[data-testid="stExpander"],
 details[data-testid="stExpander"] {
     background-color: #ffffff !important;
-    border: 1.5px solid #e4e4d0 !important;
-    border-radius: 14px !important;
-    box-shadow: 0 2px 10px rgba(26, 26, 26, 0.04) !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
     overflow: hidden !important;
 }
 div[data-testid="stExpander"] summary,
 details[data-testid="stExpander"] summary {
-    background: #faf8f2 !important;
-    background-color: #faf8f2 !important;
-    color: #1a1a1a !important;
-    border-radius: 14px !important;
-    padding: 12px 16px !important;
+    background: rgba(0, 0, 0, 0.02) !important;
+    background-color: rgba(0, 0, 0, 0.02) !important;
+    color: #1d1d1f !important;
+    border-radius: 12px !important;
+    padding: 10px 14px !important;
     font-weight: 600 !important;
     border: none !important;
+    transition: background-color 0.15s ease, color 0.15s ease !important;
 }
 div[data-testid="stExpander"] summary:hover,
 details[data-testid="stExpander"] summary:hover {
-    background-color: #f2efe4 !important;
-    color: #ff6c4c !important;
+    background-color: rgba(0, 0, 0, 0.05) !important;
+    color: #007aff !important;
 }
 div[data-testid="stExpander"] summary p,
 div[data-testid="stExpander"] summary span,
 div[data-testid="stExpander"] summary svg {
-    color: #1a1a1a !important;
-    fill: #1a1a1a !important;
+    color: #1d1d1f !important;
+    fill: #1d1d1f !important;
 }
 /* Modal Dialogs */
 div[role="dialog"] {
-    background-color: #ffffeb !important;
-    color: #1a1a1a !important;
-    border: 1.5px solid #e4e4d0 !important;
-    border-radius: 20px !important;
-    box-shadow: 0 20px 60px rgba(26, 26, 26, 0.2) !important;
+    background-color: #ffffff !important;
+    color: #1d1d1f !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.16) !important;
 }
 </style>
 """
@@ -1597,16 +1711,16 @@ def inject_theme() -> None:
 @st.dialog("About Vellum & Developer Credits")
 def show_about_dialog() -> None:
     dark = is_dark_mode()
-    title_color = "#ffffeb" if dark else "#1a1a1a"
-    accent_color = "#ffa946" if dark else "#ff6c4c"
-    muted_color = "#a0a096" if dark else "#5f5f5f"
+    title_color = "#ffffff" if dark else "#1d1d1f"
+    accent_color = "#0a84ff" if dark else "#007aff"
+    muted_color = "#8e8e93" if dark else "#86868b"
 
     st.markdown(
         f"""
         <div style="text-align: center; margin-bottom: 18px;">
-            <div style="font-size: 2.4rem; font-weight: 800; letter-spacing: -0.03em; color: {title_color}; font-family: Georgia, serif;">Vellum</div>
-            <div style="color: {accent_color}; font-size: 0.95rem; font-weight: 600; margin-top: 2px;">Academic Research Companion</div>
-            <div style="margin-top: 6px;"><span class="badge-slate" style="border-radius: 9999px; padding: 3px 12px; font-weight: 500;">Version 2.0 • 2026 Edition</span></div>
+            <div style="font-size: 2.2rem; font-weight: 800; letter-spacing: -0.03em; color: {title_color}; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro', sans-serif;">Vellum</div>
+            <div style="color: {accent_color}; font-size: 0.95rem; font-weight: 600; margin-top: 2px;">Academic Research Suite • macOS Sequoia Edition</div>
+            <div style="margin-top: 6px;"><span class="badge-slate" style="border-radius: 9999px; padding: 3px 12px; font-weight: 500;">Version 2.1 • 2026 Edition</span></div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -1636,13 +1750,9 @@ def show_about_dialog() -> None:
 
 def render_top_nav(active_url: str = "overview") -> None:
     """
-    Renders the Top Horizontal Glass Navigation Bar.
-    Includes active project/notebook selector on the left, section tabs in center,
-    quick controls (Vault, Theme, About, Reset), and live metrics pill on the right.
-
-    ``active_url`` is the url_path of the screen being shown. Selecting a
-    different section navigates to that section's landing screen, and a section
-    that holds more than one screen gets a secondary row of pills.
+    Renders the Apple HIG Top Glass Navigation Bar.
+    Includes active project selector and live stats on left, quick controls on right,
+    and native full-width macOS segmented navigation with subview pills.
     """
     inject_theme()
 
@@ -1655,78 +1765,47 @@ def render_top_nav(active_url: str = "overview") -> None:
     stats = VW.get_project_stats()
     dark = is_dark_mode()
 
-    # Top Navigation Row with balanced spacing
-    c_proj, c_nav, c_tools, c_stat = st.columns([1.4, 5.4, 2.2, 1.2], vertical_alignment="center")
+    # ── Row 1: Workspace & Tool Controls ──
+    c_left, c_right = st.columns([3.2, 1.8], vertical_alignment="center")
 
-    with c_proj:
-        sel = st.selectbox(
-            "Project / Notebook",
-            projects,
-            index=idx,
-            label_visibility="collapsed",
-            key="_top_proj_sel",
-            help="Active systematic review project / notebook workspace",
-            format_func=lambda x: f"📁 {x}",
-        )
-        if sel != active_proj:
-            VW.set_active_project(sel)
-            st.rerun()
+    with c_left:
+        sub_c1, sub_c2 = st.columns([1.5, 2.2], vertical_alignment="center")
+        with sub_c1:
+            sel = st.selectbox(
+                "Project / Notebook",
+                projects,
+                index=idx,
+                label_visibility="collapsed",
+                key="_top_proj_sel",
+                help="Active systematic review project / notebook workspace",
+                format_func=lambda x: f"📁 {x}",
+            )
+            if sel != active_proj:
+                VW.set_active_project(sel)
+                st.rerun()
 
-    with c_nav:
-        # Botanical Bento Native Segmented Control Bar
-        section_labels = [s["label"] for s in VP.SECTIONS]
-        active_section = VP.section_of(active_url) or section_labels[0]
+        with sub_c2:
+            st.markdown(
+                f"""
+                <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap;">
+                    <span class="badge-sky" title="Search Records">🔍 {stats.get('search_records', 0)}</span>
+                    <span class="badge-emerald" title="Included Papers">⭐ {stats.get('included', 0)}</span>
+                    <span class="badge-amber" title="Notes">📝 {stats.get('noted', 0)}</span>
+                    <span class="badge-violet" title="Downloaded PDFs">📥 {stats.get('pdfs', 0)}</span>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
-        # Ensure widget key is synchronized whenever the section changes programmatically:
-        last_tab = st.session_state.get("_last_synced_tab")
-        if active_section != last_tab:
-            st.session_state["_main_nav_segments"] = active_section
-            st.session_state["_last_synced_tab"] = active_section
-
-        sel_nav = st.segmented_control(
-            "Navigation",
-            section_labels,
-            default=active_section,
-            label_visibility="collapsed",
-            key="_main_nav_segments",
-        )
-        if sel_nav and sel_nav != active_section:
-            # Navigating for real means the URL follows, the browser's Back
-            # button works, and the screen can be linked to directly.
-            VP.go(VP.DEFAULT_PAGE[sel_nav])
-
-    # ── Secondary navigation for sections that hold more than one screen ──
-    section = next((s for s in VP.SECTIONS if s["label"] == active_section), None)
-    if section and len(section["pages"]) > 1:
-        sub_options = [f"{p[2]} {p[1]}" for p in section["pages"]]
-        sub_paths = {f"{p[2]} {p[1]}": p[0] for p in section["pages"]}
-        cur_sub = next(
-            (f"{p[2]} {p[1]}" for p in section["pages"] if p[0] == active_url),
-            sub_options[0],
-        )
-        sub_key = f"_subnav_{active_section}"
-        if st.session_state.get(sub_key) != cur_sub:
-            st.session_state[sub_key] = cur_sub
-        sel_sub = st.pills(
-            f"{active_section} Section",
-            sub_options,
-            default=cur_sub,
-            label_visibility="collapsed",
-            key=sub_key,
-        )
-        if sel_sub and sub_paths.get(sel_sub) != active_url:
-            VP.go(sub_paths[sel_sub])
-
-    with c_tools:
-        # Matching Pill Capsules with Icon + Short Label
+    with c_right:
         t1, t2, t3, t4 = st.columns(4, gap="small")
         with t1:
             if st.button("⚙️ Vault", help="Manage Profile & Research Vaults", key="_tool_btn_vault", use_container_width=True):
                 st.session_state["_show_welcome_hub"] = True
                 st.rerun()
         with t2:
-            theme_label = "☀️ Day" if dark else "🌙 Dark"
-            theme_tip = "Switch to Day (Lumen) Theme" if dark else "Switch to Dark (Vast) Theme"
+            theme_label = "☀️ Light" if dark else "🌙 Dark"
+            theme_tip = "Switch to Apple Light Theme" if dark else "Switch to Apple Dark Theme"
             if st.button(theme_label, help=theme_tip, key="_tool_btn_theme", use_container_width=True):
                 toggle_theme_mode()
                 st.rerun()
@@ -1740,18 +1819,39 @@ def render_top_nav(active_url: str = "overview") -> None:
                         st.session_state.pop(k, None)
                 st.rerun()
 
-    with c_stat:
-        st.markdown(
-            f"""
-            <div style="display: flex; justify-content: flex-end; align-items: center; gap: 5px; white-space: nowrap;">
-                <span class="badge-sky" title="Search Records">🔍 {stats.get('search_records', 0)}</span>
-                <span class="badge-emerald" title="Included Papers">⭐ {stats.get('included', 0)}</span>
-                <span class="badge-amber" title="Notes">📝 {stats.get('noted', 0)}</span>
-                <span class="badge-violet" title="Downloaded PDFs">📥 {stats.get('pdfs', 0)}</span>
-            </div>
-            """,
-            unsafe_allow_html=True,
+    # ── Row 2: Primary macOS Segmented Navigation ──
+    section_labels = [s["label"] for s in VP.SECTIONS]
+    active_section = VP.section_of(active_url) or section_labels[0]
+
+    sel_nav = st.segmented_control(
+        "Navigation",
+        section_labels,
+        default=active_section,
+        label_visibility="collapsed",
+        key=f"_nav_seg_{active_url}",
+    )
+    if sel_nav and sel_nav != active_section:
+        VP.go(VP.DEFAULT_PAGE[sel_nav])
+
+    # ── Row 3: Secondary Subview Pills (Unified Paper Pool vs PDF Downloader, etc.) ──
+    section = next((s for s in VP.SECTIONS if s["label"] == active_section), None)
+    if section and len(section["pages"]) > 1:
+        sub_options = [f"{p[2]} {p[1]}" for p in section["pages"]]
+        sub_paths = {f"{p[2]} {p[1]}": p[0] for p in section["pages"]}
+        cur_sub = next(
+            (f"{p[2]} {p[1]}" for p in section["pages"] if p[0] == active_url),
+            sub_options[0],
         )
 
-    border_color = "rgba(255, 255, 235, 0.12)" if dark else "#e4e4d0"
-    st.markdown(f"<hr style='margin: 8px 0 20px 0; border: none; border-bottom: 1px solid {border_color};'>", unsafe_allow_html=True)
+        sel_sub = st.pills(
+            f"{active_section} Section",
+            sub_options,
+            default=cur_sub,
+            label_visibility="collapsed",
+            key=f"_subnav_pills_{active_url}",
+        )
+        if sel_sub and sub_paths.get(sel_sub) and sub_paths.get(sel_sub) != active_url:
+            VP.go(sub_paths[sel_sub])
+
+    border_color = "rgba(255, 255, 255, 0.10)" if dark else "rgba(0, 0, 0, 0.08)"
+    st.markdown(f"<hr style='margin: 8px 0 16px 0; border: none; border-bottom: 1px solid {border_color};'>", unsafe_allow_html=True)

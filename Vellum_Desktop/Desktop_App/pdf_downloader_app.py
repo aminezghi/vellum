@@ -38,9 +38,10 @@ import pandas as pd
 _meta_frame = VA.meta_frame
 find_duplicates = VA.find_duplicates
 extract_all_metadata = VA.extract_all_metadata
+_icon_path = os.path.join(os.path.dirname(__file__), "downloader.png")
 st.set_page_config(
-    page_title="Vellum",
-    page_icon="📥",
+    page_title="Vellum by Amine",
+    page_icon=_icon_path if os.path.exists(_icon_path) else "📄",
     layout="wide",
 )
 
@@ -2782,7 +2783,23 @@ def render_downloader():
         if stats["duplicates_removed"] > 0:
             st.success(f"✅ Loaded **{len(recs)} unique article(s)** from `{uploaded.name}` (filtered {stats['duplicates_removed']} duplicates).")
 
-    # 3. Incorporate pending queue from Literature Check
+    # 3. Incorporate canonical project.json download queue & pending queue
+    import vellum_workspace as VW
+    import vellum_direct_download as VDD
+    proj_queue = VW.load_project_data().get("download_queue", [])
+    if proj_queue:
+        for item in proj_queue:
+            if isinstance(item, dict):
+                k = item.get("doi") or item.get("title") or "item"
+                d_val = item.get("doi") or (str(k).strip() if str(k).strip().startswith("10.") else "")
+                t_val = item.get("title") or ""
+                pd_.append({
+                    "key": str(k).strip(),
+                    "doi": d_val,
+                    "pdf_url": item.get("pdf_url", ""),
+                    "title": t_val if _is_real_title(t_val, d_val) else "",
+                })
+
     if st.session_state.get("pending_dois"):
         for item in st.session_state["pending_dois"]:
             if isinstance(item, dict):
@@ -2835,6 +2852,7 @@ def render_downloader():
                 st.caption(f"…and {len(pd_)-200} more.")
             if st.button(":material/delete: Clear Queue", key="_clear_curr_queue_btn"):
                 st.session_state["pending_dois"] = []
+                VDD.clear_download_queue()
                 st.rerun()
 
     st.divider()
@@ -3309,51 +3327,6 @@ def render_literature():
     except Exception as exc:
         st.error(f"Literature Check failed to render: {type(exc).__name__}: {exc}")
 
-
-def render_portfolio():
-    try:
-        from app_pages import portfolio
-        portfolio.render()
-    except Exception as exc:
-        st.error(f"Portfolio failed to render: {type(exc).__name__}: {exc}")
-
-
-def _render_module(module_name, label):
-    """Shared wrapper for the standalone pages under app_pages/.
-
-    Each page owns its own imports, so a failure in one page (a missing
-    optional dependency, say) must not take the rest of the app down with it.
-    """
-    try:
-        from app_pages import __name__ as _pkg  # noqa: F401
-        import importlib
-        importlib.import_module(f"app_pages.{module_name}").render()
-    except Exception as exc:
-        st.error(f"{label} failed to render: {type(exc).__name__}: {exc}")
-
-
-def render_analysis():
-    _render_module("analysis", "Analysis & evidence")
-
-
-def render_library():
-    _render_module("library", "Library")
-
-
-def render_export():
-    _render_module("export_center", "Export")
-
-
-def render_help():
-    try:
-        from app_pages import help_page
-        help_page.render()
-    except Exception as exc:
-        st.error(f"Help failed to render: {type(exc).__name__}: {exc}")
-
-
-def render_citation_graph():
-    _render_module("citation_graph", "Citation graph")
 
 
 # ══════════════════════════════════════════════════════════════════════════════

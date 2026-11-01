@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Notebook, Source, db } from "@/lib/db";
+import React, { useState, useEffect, useCallback } from "react";
+import { Notebook, Source, EvidenceExtraction, db } from "@/lib/db";
 import { initializeAppearance, setTheme, useTheme } from "@/lib/theme";
 import { Modal } from "@/components/Modal";
 import { fetchAndStorePaperPdf } from "@/lib/pdfDownloader";
@@ -26,12 +26,15 @@ import {
   Sun,
   Moon,
   BookmarkPlus,
+  Upload,
+  Share2,
 } from "lucide-react";
 
 interface NotebookWorkspaceProps {
   notebook: Notebook;
   onBack: () => void;
   onUpdate: () => void;
+  onOpenConnectedGraph?: (seed: string) => void;
 }
 
 /**
@@ -55,6 +58,7 @@ async function addPaperToNotebook(
     year: paper.year,
     journal: paper.venue,
     doi: paper.doi,
+    abstract: paper.abstract,
     status: "ready",
     addedAt: now,
   };
@@ -65,7 +69,12 @@ async function addPaperToNotebook(
   return source;
 }
 
-export function NotebookWorkspace({ notebook, onBack, onUpdate }: NotebookWorkspaceProps) {
+export function NotebookWorkspace({
+  notebook,
+  onBack,
+  onUpdate,
+  onOpenConnectedGraph,
+}: NotebookWorkspaceProps) {
   const [sources, setSources] = useState<Source[]>([]);
   const [selectedSource, setSelectedSource] = useState<Source | null>(null);
   const [activeTab, setActiveTab] = useState<"evidence" | "notes" | "export">("evidence");
@@ -81,6 +90,15 @@ export function NotebookWorkspace({ notebook, onBack, onUpdate }: NotebookWorksp
     message: string;
     landingUrl?: string;
   } | null>(null);
+
+  // In-Workspace Dynamic Evidence State
+  const [evidenceItems, setEvidenceItems] = useState<EvidenceExtraction[]>([]);
+  const [evidenceFilter, setEvidenceFilter] = useState<"current" | "all">("current");
+  const [isAddClaimOpen, setIsAddClaimOpen] = useState(false);
+  const [newClaimText, setNewClaimText] = useState("");
+  const [newClaimQuote, setNewClaimQuote] = useState("");
+  const [newClaimCategory, setNewClaimCategory] = useState<"method" | "sampling" | "statistics" | "rigour">("method");
+  const [newClaimPage, setNewClaimPage] = useState<number | "">("");
 
   // In-Workspace Academic Search & Add Modal
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
@@ -101,6 +119,71 @@ export function NotebookWorkspace({ notebook, onBack, onUpdate }: NotebookWorksp
 
   const toggleTheme = () => {
     setTheme(isDarkMode ? "light" : "dark");
+  };
+
+  // Paper Management & Action Handlers (Delete, Replace PDF, Connected Papers)
+  const replaceFileInputRef = React.useRef<HTMLInputElement>(null);
+  const [sourceToReplaceId, setSourceToReplaceId] = useState<string | null>(null);
+
+  const handleDeleteSource = async (e: React.MouseEvent, sourceId: string) => {
+    e.stopPropagation();
+    const sourceToDelete = sources.find((s) => s.id === sourceId);
+    if (!sourceToDelete) return;
+
+    if (!confirm(`Are you sure you want to remove "${sourceToDelete.title.slice(0, 50)}..." from this notebook?`)) {
+      return;
+    }
+
+    await db.sources.delete(sourceId);
+    await db.evidence.where("sourceId").equals(sourceId).delete();
+
+    const remaining = sources.filter((s) => s.id !== sourceId);
+    setSources(remaining);
+    if (selectedSource?.id === sourceId) {
+      setSelectedSource(remaining[0] || null);
+    }
+    const count = await db.sources.where("notebookId").equals(notebook.id).count();
+    await db.notebooks.update(notebook.id, { sourcesCount: count, updatedAt: Date.now() });
+    onUpdate();
+  };
+
+  const handleOpenReplaceDialog = (e: React.MouseEvent, sourceId: string) => {
+    e.stopPropagation();
+    setSourceToReplaceId(sourceId);
+    replaceFileInputRef.current?.click();
+  };
+
+  const handleExecuteReplacePdf = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !sourceToReplaceId) return;
+
+    const arrayBuffer = await file.arrayBuffer();
+    const blob = new Blob([arrayBuffer], { type: "application/pdf" });
+
+    await db.sources.update(sourceToReplaceId, {
+      pdfBlob: blob,
+      sizeBytes: file.size,
+      status: "ready",
+    });
+
+    const refreshed = await db.sources.where("notebookId").equals(notebook.id).toArray();
+    setSources(refreshed);
+
+    const updatedSource = refreshed.find((s) => s.id === sourceToReplaceId);
+    if (updatedSource && selectedSource?.id === sourceToReplaceId) {
+      setSelectedSource(updatedSource);
+      setViewMode("pdf");
+    }
+
+    setSourceToReplaceId(null);
+    e.target.value = "";
+    onUpdate();
+  };
+
+  const handleOpenConnectedPapers = (e: React.MouseEvent, source: Source) => {
+    e.stopPropagation();
+    const seed = source.doi ? `https://doi.org/${source.doi}` : source.title;
+    onOpenConnectedGraph?.(seed);
   };
 
   const handleFetchPdfForSource = async () => {
@@ -169,13 +252,26 @@ export function NotebookWorkspace({ notebook, onBack, onUpdate }: NotebookWorksp
     }
   };
 
+  const reloadEvidence = useCallback(async () => {
+    if (!notebook.id) return;
+    const items = await db.evidence.where("notebookId").equals(notebook.id).toArray();
+    setEvidenceItems(items);
+  }, [notebook.id]);
+
   useEffect(() => {
+    let isMounted = true;
     async function loadData() {
       const loadedSources = await db.sources.where("notebookId").equals(notebook.id).toArray();
+      if (!isMounted) return;
       setSources(loadedSources);
       setSelectedSource(loadedSources.length > 0 ? loadedSources[0] : null);
 
+      const items = await db.evidence.where("notebookId").equals(notebook.id).toArray();
+      if (!isMounted) return;
+      setEvidenceItems(items);
+
       const note = await db.notes.where("notebookId").equals(notebook.id).first();
+      if (!isMounted) return;
       if (note) {
         setNotesContent(note.content);
       } else {
@@ -190,6 +286,9 @@ export function NotebookWorkspace({ notebook, onBack, onUpdate }: NotebookWorksp
       }
     }
     loadData();
+    return () => {
+      isMounted = false;
+    };
   }, [notebook.id, notebook.title]);
 
   const handleSaveNotes = async (newContent: string) => {
@@ -209,23 +308,70 @@ export function NotebookWorkspace({ notebook, onBack, onUpdate }: NotebookWorksp
     setActiveTab("notes");
   };
 
+  const handleAddEvidenceClaim = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!newClaimText.trim() || !notebook.id || !selectedSource) return;
+
+    const newClaim: EvidenceExtraction = {
+      id: `evi-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      notebookId: notebook.id,
+      sourceId: selectedSource.id,
+      category: newClaimCategory,
+      claim: newClaimText.trim(),
+      quote: newClaimQuote.trim() || undefined,
+      pageNumber: typeof newClaimPage === "number" ? newClaimPage : 1,
+      confidence: 95,
+      createdAt: Date.now(),
+    };
+
+    await db.evidence.put(newClaim);
+    await reloadEvidence();
+    setNewClaimText("");
+    setNewClaimQuote("");
+    setNewClaimPage("");
+    setIsAddClaimOpen(false);
+  };
+
+  const handleDeleteEvidenceClaim = async (claimId: string) => {
+    await db.evidence.delete(claimId);
+    await reloadEvidence();
+  };
+
+  const handleExtractClaimFromText = async (text: string, sourceId: string) => {
+    const summary = text.length > 200 ? text.substring(0, 197) + "..." : text;
+    const newClaim: EvidenceExtraction = {
+      id: `evi-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      notebookId: notebook.id,
+      sourceId,
+      category: "method",
+      claim: summary,
+      quote: text.length > 500 ? text.substring(0, 497) + "..." : text,
+      pageNumber: 1,
+      confidence: 95,
+      createdAt: Date.now(),
+    };
+    await db.evidence.put(newClaim);
+    await reloadEvidence();
+    setActiveTab("evidence");
+  };
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
     const newFiles = Array.from(e.target.files);
     const total = newFiles.length;
+    const now = Date.now();
 
-    for (let i = 0; i < total; i++) {
-      const f = newFiles[i];
-      setUploadProgress({ current: i + 1, total, name: f.name });
+    setUploadProgress({ current: 0, total, name: `Preparing ${total} file(s)...` });
 
+    const newSources: Source[] = newFiles.map((f, i) => {
       // Clean title from filename
       const cleanTitle = f.name
         .replace(/\.pdf$/i, "")
         .replace(/^[a-zA-Z0-9_\-]+ - \d{4} - /, "") // remove Zotero prefix if present
         .replace(/_/g, " ");
 
-      const newSource: Source = {
-        id: `src-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      return {
+        id: `src-${now}-${i}-${Math.random().toString(36).substring(2, 6)}`,
         notebookId: notebook.id,
         title: cleanTitle,
         authors: [f.name.includes(" - ") ? f.name.split(" - ")[0] : "Author"],
@@ -233,10 +379,12 @@ export function NotebookWorkspace({ notebook, onBack, onUpdate }: NotebookWorksp
         pdfBlob: f,
         sizeBytes: f.size,
         status: "ready",
-        addedAt: Date.now(),
+        addedAt: now + i,
       };
-      await db.sources.put(newSource);
-    }
+    });
+
+    setUploadProgress({ current: total, total, name: `Saving ${total} file(s) to vault...` });
+    await db.sources.bulkPut(newSources);
 
     setUploadProgress(null);
     const count = await db.sources.where("notebookId").equals(notebook.id).count();
@@ -364,6 +512,7 @@ export function NotebookWorkspace({ notebook, onBack, onUpdate }: NotebookWorksp
                 await db.notebooks.delete(notebook.id);
                 await db.sources.where("notebookId").equals(notebook.id).delete();
                 await db.notes.where("notebookId").equals(notebook.id).delete();
+                await db.evidence.where("notebookId").equals(notebook.id).delete();
                 onBack();
               }
             }}
@@ -454,6 +603,15 @@ export function NotebookWorkspace({ notebook, onBack, onUpdate }: NotebookWorksp
             </div>
           </div>
 
+          {/* Hidden File Input for PDF Replacement / Direct Upload */}
+          <input
+            type="file"
+            accept="application/pdf"
+            ref={replaceFileInputRef}
+            onChange={handleExecuteReplacePdf}
+            className="hidden"
+          />
+
           {/* Sources List */}
           <div className="flex-1 overflow-y-auto p-2.5 space-y-2">
             {filteredSources.length === 0 ? (
@@ -488,15 +646,44 @@ export function NotebookWorkspace({ notebook, onBack, onUpdate }: NotebookWorksp
                       setSelectedSource(s);
                       if (s.pdfBlob) setViewMode("pdf");
                     }}
-                    className={`p-3 rounded-2xl border transition-all cursor-pointer flex flex-col gap-1.5 ${
+                    className={`group relative p-3 rounded-2xl border transition-all cursor-pointer flex flex-col gap-1.5 ${
                       isSelected
                         ? "bg-[var(--g-50)] dark:bg-[var(--g-950)] border-[var(--g-600)] dark:border-[var(--g-400)] text-[var(--ink)] shadow-xs"
                         : "bg-[var(--card)] border-[var(--card-bdr)] hover:border-[var(--g-400)] text-[var(--ink)]"
                     }`}
                   >
-                    <div className="flex items-start gap-2">
-                      <FileText className={`h-4 w-4 mt-0.5 flex-shrink-0 ${isSelected ? "text-[var(--g-600)] dark:text-[var(--g-400)]" : "text-[var(--ink-muted)]"}`} />
-                      <span className="text-xs font-bold line-clamp-2 leading-tight">{s.title}</span>
+                    <div className="flex items-start justify-between gap-1.5">
+                      <div className="flex items-start gap-2 flex-1 min-w-0">
+                        <FileText className={`h-4 w-4 mt-0.5 flex-shrink-0 ${isSelected ? "text-[var(--g-600)] dark:text-[var(--g-400)]" : "text-[var(--ink-muted)]"}`} />
+                        <span className="text-xs font-bold line-clamp-2 leading-tight">{s.title}</span>
+                      </div>
+                      {/* Action buttons on card */}
+                      <div className="flex items-center gap-0.5 opacity-80 group-hover:opacity-100 flex-shrink-0">
+                        <button
+                          type="button"
+                          onClick={(e) => handleOpenConnectedPapers(e, s)}
+                          className="p-1 rounded-md text-[var(--ink-muted)] hover:text-[var(--g-600)] dark:hover:text-[var(--g-400)] hover:bg-[var(--panel)] transition-colors cursor-pointer"
+                          title="Explore Connected Papers Graph"
+                        >
+                          <Share2 className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => handleOpenReplaceDialog(e, s.id)}
+                          className="p-1 rounded-md text-[var(--ink-muted)] hover:text-[var(--g-600)] dark:hover:text-[var(--g-400)] hover:bg-[var(--panel)] transition-colors cursor-pointer"
+                          title="Replace or upload PDF document"
+                        >
+                          <Upload className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => handleDeleteSource(e, s.id)}
+                          className="p-1 rounded-md text-[var(--ink-muted)] hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
+                          title="Remove paper from notebook"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
                     </div>
                     <div className="flex items-center justify-between text-[10px] text-[var(--ink-muted)] pl-6">
                       <span>{s.authors?.[0] || "Author"} · {s.year || "2023"}</span>
@@ -523,6 +710,35 @@ export function NotebookWorkspace({ notebook, onBack, onUpdate }: NotebookWorksp
             </div>
 
             <div className="flex items-center gap-3">
+              {/* Paper Quick Actions */}
+              {selectedSource && (
+                <div className="flex items-center gap-1.5 mr-2 border-r border-[var(--card-bdr)] pr-3">
+                  <button
+                    onClick={(e) => handleOpenConnectedPapers(e, selectedSource)}
+                    className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-[var(--panel)] hover:bg-[var(--card-bdr)] text-[var(--ink)] border border-[var(--card-bdr)] transition-all cursor-pointer shadow-xs"
+                    title="Open Connected Papers Graph for this paper"
+                  >
+                    <Share2 className="h-3.5 w-3.5 text-[var(--g-600)] dark:text-[var(--g-400)]" />
+                    <span className="hidden lg:inline">Connected Graph</span>
+                  </button>
+                  <button
+                    onClick={(e) => handleOpenReplaceDialog(e, selectedSource.id)}
+                    className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-[var(--panel)] hover:bg-[var(--card-bdr)] text-[var(--ink)] border border-[var(--card-bdr)] transition-all cursor-pointer shadow-xs"
+                    title="Replace or attach PDF file"
+                  >
+                    <Upload className="h-3.5 w-3.5 text-[var(--ink-muted)]" />
+                    <span className="hidden lg:inline">Replace PDF</span>
+                  </button>
+                  <button
+                    onClick={(e) => handleDeleteSource(e, selectedSource.id)}
+                    className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900 transition-all cursor-pointer shadow-xs"
+                    title="Delete paper from this notebook"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    <span className="hidden lg:inline">Remove</span>
+                  </button>
+                </div>
+              )}
               {/* Dual View Toggle with Fernly Pill */}
               <div className="flex items-center bg-[var(--panel)] border border-[var(--card-bdr)] rounded-full p-1 text-xs">
                 <button
@@ -626,6 +842,24 @@ export function NotebookWorkspace({ notebook, onBack, onUpdate }: NotebookWorksp
                         <Zap className="h-4 w-4" />
                         <span>Fetch PDF via Multi-Source Protocol</span>
                       </button>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={(e) => selectedSource && handleOpenReplaceDialog(e, selectedSource.id)}
+                          className="btn-fernly-ghost flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-full text-xs font-semibold cursor-pointer"
+                        >
+                          <Upload className="h-3.5 w-3.5" />
+                          <span>Attach Local PDF</span>
+                        </button>
+                        <button
+                          onClick={(e) => selectedSource && handleOpenConnectedPapers(e, selectedSource)}
+                          className="btn-fernly-ghost flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-full text-xs font-semibold cursor-pointer"
+                        >
+                          <Share2 className="h-3.5 w-3.5 text-[var(--g-600)] dark:text-[var(--g-400)]" />
+                          <span>Connected Graph</span>
+                        </button>
+                      </div>
+
                       <p className="text-[11px] text-[var(--ink-muted)]">
                         Queries Springer, Nature, Unpaywall, Semantic Scholar, Europe PMC &amp; Academic Mirrors
                       </p>
@@ -688,65 +922,143 @@ export function NotebookWorkspace({ notebook, onBack, onUpdate }: NotebookWorksp
                 style={{ transform: `scale(${zoomLevel / 100})`, transformOrigin: "top center" }}
               >
                 <div className="border-b border-[var(--card-bdr)] pb-5 mb-6">
-                  <span className="fernly-badge fernly-badge-leaf text-[10px] font-bold tracking-wider uppercase">
-                    {selectedSource?.journal || "The Lancet Global Health"} · Research Articles
-                  </span>
-                  <h1 className="text-xl font-bold text-[var(--ink)] mt-2 leading-snug">
+                  <div className="flex flex-wrap items-center gap-2 mb-2">
+                    <span className="fernly-badge fernly-badge-leaf text-[10px] font-bold tracking-wider uppercase">
+                      {[selectedSource?.journal, selectedSource?.year ? String(selectedSource.year) : null]
+                        .filter(Boolean)
+                        .join(" · ") || "Scholarly Publication"}
+                    </span>
+                    {selectedSource?.pdfBlob && (
+                      <span className="fernly-badge fernly-badge-mint text-[9px] font-semibold">
+                        PDF Attached ({Math.round((selectedSource.sizeBytes || 0) / 1024)} KB)
+                      </span>
+                    )}
+                  </div>
+                  <h1 className="text-xl font-bold text-[var(--ink)] leading-snug">
                     {selectedSource?.title}
                   </h1>
                   <p className="text-xs text-[var(--ink-muted)] mt-2 font-medium">
-                    {selectedSource?.authors?.join(", ")}
+                    {selectedSource?.authors?.length ? selectedSource.authors.join(", ") : "Unknown Author(s)"}
                   </p>
                   {selectedSource?.doi && (
-                    <p className="text-[10px] text-[var(--g-600)] dark:text-[var(--g-400)] mt-1.5 font-mono">
-                      https://doi.org/{selectedSource?.doi}
-                    </p>
+                    <a
+                      href={`https://doi.org/${selectedSource.doi}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 text-[10px] text-[var(--g-600)] dark:text-[var(--g-400)] hover:underline mt-1.5 font-mono"
+                    >
+                      <span>https://doi.org/{selectedSource.doi}</span>
+                      <ExternalLink className="h-2.5 w-2.5" />
+                    </a>
                   )}
                 </div>
 
-                {/* Research In Context Callout */}
-                <div className="p-5 rounded-2xl bg-[var(--panel)] border-l-4 border-[var(--g-600)] mb-6 text-xs text-[var(--ink)] space-y-2 font-sans">
-                  <h3 className="font-bold text-[var(--g-700)] dark:text-[var(--g-300)]">Research in Context</h3>
-                  <p className="leading-relaxed text-[var(--ink-muted)]">
-                    <strong className="text-[var(--ink)]">Evidence before this study:</strong> Non-communicable disease (NCD) policy implementation
-                    was monitored across 194 countries from 2014 to 2021 using repeated cross-sectional surveillance.
-                  </p>
-                  <p className="leading-relaxed text-[var(--ink-muted)]">
-                    <strong className="text-[var(--ink)]">Added value of this study:</strong> We estimated the own- and cross-price elasticities
-                    controlling for corporate financial influence and deprivation indexes.
-                  </p>
-                  <button
-                    onClick={() =>
-                      handleInsertQuote(
-                        "Non-communicable disease policy implementation was monitored across 194 countries from 2014 to 2021 using repeated cross-sectional surveillance.",
-                        1
-                      )
-                    }
-                    className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[var(--g-800)] dark:text-[var(--g-200)] hover:text-[var(--g-950)] bg-[var(--g-100)] dark:bg-[var(--g-900)] px-3 py-1 rounded-full cursor-pointer mt-1"
-                  >
-                    <Quote className="h-3 w-3" /> Quote to Review Notes
-                  </button>
+                {/* Real Abstract & Synthesized Overview Section */}
+                <div className="p-6 rounded-2xl bg-[var(--panel)] border-l-4 border-[var(--g-600)] mb-6 text-xs text-[var(--ink)] space-y-3 font-sans">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-bold text-[var(--g-700)] dark:text-[var(--g-300)] text-xs flex items-center gap-1.5">
+                      <BookOpen className="h-3.5 w-3.5 text-[var(--g-600)]" />
+                      Abstract &amp; Grounded Evidence
+                    </h3>
+                    {selectedSource?.abstract && (
+                      <span className="text-[10px] text-[var(--ink-muted)] font-mono">
+                        {selectedSource.abstract.split(/\s+/).filter(Boolean).length} words
+                      </span>
+                    )}
+                  </div>
+
+                  {selectedSource?.abstract ? (
+                    <>
+                      <p className="leading-relaxed text-[var(--ink-muted)] text-xs whitespace-pre-line selection:bg-[var(--g-200)] selection:text-[var(--g-950)]">
+                        {selectedSource.abstract}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-[var(--card-bdr)]">
+                        <button
+                          onClick={() => handleInsertQuote(selectedSource.abstract!, 1)}
+                          className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[var(--g-800)] dark:text-[var(--g-200)] hover:text-[var(--g-950)] bg-[var(--g-100)] dark:bg-[var(--g-900)] px-3 py-1 rounded-full cursor-pointer transition-colors"
+                        >
+                          <Quote className="h-3 w-3" /> Quote Abstract to Review Notes
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (!selectedSource) return;
+                            handleExtractClaimFromText(selectedSource.abstract!, selectedSource.id);
+                          }}
+                          className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[var(--ink)] hover:text-[var(--g-800)] bg-[var(--card)] border border-[var(--card-bdr)] hover:border-[var(--g-500)] px-3 py-1 rounded-full cursor-pointer transition-colors"
+                        >
+                          <Plus className="h-3 w-3 text-[var(--g-600)]" /> Extract as Evidence Claim
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="py-4 text-center space-y-2">
+                      <p className="text-xs text-[var(--ink-muted)] italic">
+                        No abstract available in bibliographic metadata for this source.
+                      </p>
+                      <div className="flex items-center justify-center gap-2 pt-1">
+                        {selectedSource?.pdfBlob ? (
+                          <button
+                            onClick={() => setViewMode("pdf")}
+                            className="btn-fernly-primary px-3 py-1.5 rounded-full text-xs font-semibold cursor-pointer"
+                          >
+                            Open Local PDF Reader
+                          </button>
+                        ) : selectedSource?.doi ? (
+                          <button
+                            onClick={handleFetchPdfForSource}
+                            className="btn-fernly-primary px-3 py-1.5 rounded-full text-xs font-semibold cursor-pointer flex items-center gap-1.5"
+                          >
+                            <Zap className="h-3.5 w-3.5" />
+                            Fetch PDF Full Text
+                          </button>
+                        ) : (
+                          <span className="text-[11px] text-[var(--ink-muted)]">
+                            Upload a PDF or query academic databases to attach full text.
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                {/* Methodology Paragraph */}
-                <div className="space-y-3 text-xs leading-relaxed text-[var(--ink-muted)]">
-                  <h2 className="text-sm font-bold text-[var(--ink)]">Methods</h2>
-                  <p>
-                    The linear approximate almost ideal demand system was estimated across a panel representative
-                    of 3,694 households. The Own-price elasticity for animal-welfare and certified organic foods was
-                    computed at -1.42 (p &lt; 0.01).
-                  </p>
-                  <button
-                    onClick={() =>
-                      handleInsertQuote(
-                        "The linear approximate almost ideal demand system was estimated across a panel representative of 3,694 households (p < 0.01).",
-                        2
-                      )
-                    }
-                    className="btn-fernly-ghost inline-flex items-center gap-1.5 text-[11px] font-semibold text-[var(--ink)] px-3 py-1 rounded-full cursor-pointer"
-                  >
-                    <Quote className="h-3 w-3" /> Quote Methodology (p. 2)
-                  </button>
+                {/* Bibliographic Context & Citation Quick Actions */}
+                <div className="p-4 rounded-2xl bg-[var(--card)] border border-[var(--card-bdr)] space-y-2.5 text-xs text-[var(--ink-muted)]">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-[var(--ink)]">Bibliographic Record</span>
+                    <span className="text-[10px] font-mono text-[var(--ink-muted)]">ID: {selectedSource?.id}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-[11px]">
+                    <div>
+                      <span className="text-[var(--ink-muted)]">Status: </span>
+                      <span className="font-semibold text-[var(--ink)] capitalize">{selectedSource?.status || "ready"}</span>
+                    </div>
+                    <div>
+                      <span className="text-[var(--ink-muted)]">Format: </span>
+                      <span className="font-semibold text-[var(--ink)]">{selectedSource?.pdfBlob ? "Full-text PDF" : "Metadata record"}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 pt-2 border-t border-[var(--card-bdr)] flex-wrap">
+                    <button
+                      onClick={(e) => selectedSource && handleOpenConnectedPapers(e, selectedSource)}
+                      className="inline-flex items-center gap-1 text-[11px] font-semibold text-[var(--g-700)] dark:text-[var(--g-300)] hover:underline cursor-pointer"
+                    >
+                      <Share2 className="h-3 w-3" /> Explore Connected Papers Graph
+                    </button>
+                    <span className="text-[var(--card-bdr)]">•</span>
+                    <button
+                      onClick={(e) => selectedSource && handleOpenReplaceDialog(e, selectedSource.id)}
+                      className="inline-flex items-center gap-1 text-[11px] font-semibold text-[var(--ink-muted)] hover:text-[var(--ink)] cursor-pointer"
+                    >
+                      <Upload className="h-3 w-3" /> Replace PDF
+                    </button>
+                    <span className="text-[var(--card-bdr)]">•</span>
+                    <button
+                      onClick={(e) => selectedSource && handleDeleteSource(e, selectedSource.id)}
+                      className="inline-flex items-center gap-1 text-[11px] font-semibold text-rose-600 dark:text-rose-400 hover:underline cursor-pointer"
+                    >
+                      <Trash2 className="h-3 w-3" /> Delete from Notebook
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -793,52 +1105,191 @@ export function NotebookWorkspace({ notebook, onBack, onUpdate }: NotebookWorksp
           {activeTab === "evidence" && (
             <div className="flex-1 overflow-y-auto p-4 space-y-3.5">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-[var(--ink)]">Grounded Extraction</span>
-                <span className="fernly-badge fernly-badge-mint text-[10px] font-semibold">
-                  Zero Hallucinations
-                </span>
-              </div>
-
-              {/* Methodology Card */}
-              <div className="fernly-card p-4 rounded-2xl space-y-2">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-[var(--g-700)] dark:text-[var(--g-300)]">📐 Methodology</span>
-                  <span className="text-[10px] text-[var(--ink-muted)] font-medium">Page 2</span>
+                <div>
+                  <span className="text-xs font-bold text-[var(--ink)]">Grounded Extraction</span>
+                  <p className="text-[10px] text-[var(--ink-muted)]">
+                    {evidenceItems.length} claim(s) across {sources.length} source(s)
+                  </p>
                 </div>
-                <p className="text-xs text-[var(--ink-muted)] leading-relaxed italic">
-                  &quot;Linear approximate almost ideal demand system estimated on scanner data.&quot;
-                </p>
                 <button
-                  onClick={() =>
-                    handleInsertQuote("Linear approximate almost ideal demand system estimated on scanner data.", 2)
-                  }
-                  className="text-[11px] text-[var(--g-600)] dark:text-[var(--g-400)] hover:underline flex items-center gap-1 font-semibold cursor-pointer"
+                  onClick={() => setIsAddClaimOpen(!isAddClaimOpen)}
+                  disabled={!selectedSource}
+                  className="btn-fernly-primary text-[11px] font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 cursor-pointer disabled:opacity-40"
+                  title={!selectedSource ? "Select a source to add claims" : "Add new grounded claim"}
                 >
-                  <Plus className="h-3 w-3" /> Insert into Review Notes
+                  <Plus className="h-3 w-3" /> Add Claim
                 </button>
               </div>
 
-              {/* Sample Size Card */}
-              <div className="fernly-card p-4 rounded-2xl space-y-2">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-[var(--ink)]">👥 Sample Size (N)</span>
-                  <span className="text-[10px] text-[var(--ink-muted)] font-medium">Page 3</span>
+              {/* Source Filter Pill: Current Paper vs All Notebook Papers */}
+              {sources.length > 1 && (
+                <div className="flex items-center bg-[var(--card)] border border-[var(--card-bdr)] rounded-full p-0.5 text-[10px]">
+                  <button
+                    onClick={() => setEvidenceFilter("current")}
+                    className={`flex-1 py-1 px-2 rounded-full font-semibold transition-all cursor-pointer truncate ${
+                      evidenceFilter === "current"
+                        ? "bg-[var(--g-800)] text-white shadow-xs"
+                        : "text-[var(--ink-muted)] hover:text-[var(--ink)]"
+                    }`}
+                  >
+                    Current Paper ({selectedSource ? evidenceItems.filter((e) => e.sourceId === selectedSource.id).length : 0})
+                  </button>
+                  <button
+                    onClick={() => setEvidenceFilter("all")}
+                    className={`flex-1 py-1 px-2 rounded-full font-semibold transition-all cursor-pointer ${
+                      evidenceFilter === "all"
+                        ? "bg-[var(--g-800)] text-white shadow-xs"
+                        : "text-[var(--ink-muted)] hover:text-[var(--ink)]"
+                    }`}
+                  >
+                    All Papers ({evidenceItems.length})
+                  </button>
                 </div>
-                <p className="text-xs text-[var(--ink-muted)] leading-relaxed">
-                  <strong className="text-[var(--ink)]">Cohort:</strong> 3,694 households (representative scanner panel).
-                </p>
-              </div>
+              )}
 
-              {/* Statistics Card */}
-              <div className="fernly-card p-4 rounded-2xl space-y-2">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-[var(--g-700)] dark:text-[var(--g-300)]">📊 Statistics &amp; Rigour</span>
-                  <span className="text-[10px] text-[var(--ink-muted)] font-medium">Page 6</span>
-                </div>
-                <p className="text-xs text-[var(--ink-muted)] leading-relaxed">
-                  <strong className="text-[var(--ink)]">Estimates:</strong> Price elasticity = -1.42 (p &lt; 0.01). Significant cross-substitution detected.
-                </p>
-              </div>
+              {/* Inline Add Claim Form */}
+              {isAddClaimOpen && selectedSource && (
+                <form
+                  onSubmit={handleAddEvidenceClaim}
+                  className="p-3.5 bg-[var(--card)] border border-[var(--g-500)] rounded-2xl space-y-2.5 animate-in fade-in duration-150"
+                >
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-bold text-[var(--ink)]">New Grounded Claim</span>
+                    <button
+                      type="button"
+                      onClick={() => setIsAddClaimOpen(false)}
+                      className="text-[var(--ink-muted)] hover:text-[var(--ink)] text-xs cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <select
+                      value={newClaimCategory}
+                      onChange={(e) =>
+                        setNewClaimCategory(e.target.value as "method" | "sampling" | "statistics" | "rigour")
+                      }
+                      className="fernly-input py-1 px-2 text-xs rounded-lg"
+                    >
+                      <option value="method">📐 Methodology</option>
+                      <option value="sampling">👥 Sample Size (N)</option>
+                      <option value="statistics">📊 Statistics &amp; Rigour</option>
+                      <option value="rigour">🛡️ Findings &amp; Outcomes</option>
+                    </select>
+                    <input
+                      type="number"
+                      placeholder="Page #"
+                      value={newClaimPage}
+                      onChange={(e) => setNewClaimPage(e.target.value ? parseInt(e.target.value, 10) : "")}
+                      className="fernly-input py-1 px-2 text-xs rounded-lg"
+                    />
+                  </div>
+                  <textarea
+                    placeholder="Enter synthesized claim statement..."
+                    value={newClaimText}
+                    onChange={(e) => setNewClaimText(e.target.value)}
+                    rows={2}
+                    className="fernly-input w-full p-2 text-xs rounded-lg resize-none"
+                    required
+                  />
+                  <textarea
+                    placeholder="Optional: verbatim quote excerpt..."
+                    value={newClaimQuote}
+                    onChange={(e) => setNewClaimQuote(e.target.value)}
+                    rows={2}
+                    className="fernly-input w-full p-2 text-xs rounded-lg resize-none font-mono"
+                  />
+                  <button
+                    type="submit"
+                    className="btn-fernly-primary w-full py-1.5 rounded-full text-xs font-semibold cursor-pointer"
+                  >
+                    Save Evidence Claim
+                  </button>
+                </form>
+              )}
+
+              {/* Dynamic Claim List */}
+              {(() => {
+                const displayed = evidenceFilter === "current" && selectedSource
+                  ? evidenceItems.filter((e) => e.sourceId === selectedSource.id)
+                  : evidenceItems;
+
+                if (displayed.length === 0) {
+                  return (
+                    <div className="p-6 text-center text-xs text-[var(--ink-muted)] bg-[var(--card)] border border-[var(--card-bdr)] rounded-2xl space-y-2">
+                      <Sparkles className="h-6 w-6 text-[var(--g-600)] dark:text-[var(--g-400)] mx-auto opacity-40" />
+                      <p className="font-semibold text-[var(--ink)]">No evidence claims extracted yet</p>
+                      <p className="text-[11px] leading-relaxed max-w-xs mx-auto">
+                        {selectedSource
+                          ? "Extract claims from the abstract or click '+ Add Claim' to record methodology, sample size, or outcomes."
+                          : "Select a source to view or extract grounded evidence."}
+                      </p>
+                    </div>
+                  );
+                }
+
+                const categoryLabels: Record<string, { label: string; icon: string }> = {
+                  method: { label: "Methodology", icon: "📐" },
+                  sampling: { label: "Sample Size (N)", icon: "👥" },
+                  statistics: { label: "Statistics & Rigour", icon: "📊" },
+                  rigour: { label: "Findings & Outcomes", icon: "🛡️" },
+                };
+
+                return displayed.map((item) => {
+                  const cat = categoryLabels[item.category] || { label: item.category, icon: "📌" };
+                  const source = sources.find((s) => s.id === item.sourceId);
+
+                  return (
+                    <div key={item.id} className="fernly-card p-4 rounded-2xl space-y-2 relative group transition-all">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-bold text-[var(--g-700)] dark:text-[var(--g-300)] flex items-center gap-1.5">
+                          <span>{cat.icon}</span>
+                          <span>{cat.label}</span>
+                        </span>
+                        <div className="flex items-center gap-1.5">
+                          {item.pageNumber ? (
+                            <span className="text-[10px] text-[var(--ink-muted)] font-medium">
+                              Page {item.pageNumber}
+                            </span>
+                          ) : null}
+                          <button
+                            onClick={() => handleDeleteEvidenceClaim(item.id)}
+                            title="Delete this claim"
+                            className="text-[var(--ink-muted)] hover:text-red-500 opacity-60 hover:opacity-100 p-0.5 transition-colors cursor-pointer"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {evidenceFilter === "all" && source && (
+                        <p className="text-[10px] font-semibold text-[var(--ink-muted)] truncate">
+                          📄 {source.title}
+                        </p>
+                      )}
+
+                      <p className="text-xs text-[var(--ink)] leading-relaxed">
+                        {item.claim}
+                      </p>
+
+                      {item.quote && (
+                        <p className="text-xs text-[var(--ink-muted)] leading-relaxed italic border-l-2 border-[var(--g-500)] pl-2.5 py-0.5">
+                          &quot;{item.quote}&quot;
+                        </p>
+                      )}
+
+                      <button
+                        onClick={() =>
+                          handleInsertQuote(item.quote || item.claim, item.pageNumber || 1)
+                        }
+                        className="text-[11px] text-[var(--g-600)] dark:text-[var(--g-400)] hover:underline flex items-center gap-1 font-semibold cursor-pointer pt-0.5"
+                      >
+                        <Plus className="h-3 w-3" /> Insert into Review Notes
+                      </button>
+                    </div>
+                  );
+                });
+              })()}
             </div>
           )}
 

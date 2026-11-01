@@ -1,0 +1,59 @@
+# Vellum by Amine — Launch & Promo Copy Kit
+# High-Converting Copy for X / Twitter, LinkedIn, Reddit, YouTube Shorts, Reels, and TikTok
+
+================================================================================
+HOOK OPTION A: THE PAYWALL & PRIVACY SOVEREIGNTY HOOK (Recommended)
+================================================================================
+Trapped behind publisher paywalls? 250M+ research papers should be free. 📚✨
+
+No subscriptions. No $42 fees. No cloud tracking.
+
+Introducing Vellum by Amine — your 100% local-first Academic Research Studio.
+
+Watch the 24s walkthrough 👇
+
+[VIDEO: vellum-promo-horizontal.mp4 or vellum-promo-vertical.mp4]
+
+Everything you need for systematic literature reviews on your own hardware:
+
+1/ ⚡ AI Title & Abstract Screening
+Rapidly screen candidate papers against structured inclusion/exclusion criteria with real-time PRISMA tracking and relevance confidence scores.
+
+2/ 🧹 Cross-Database Duplicate Removal
+Import from PubMed, Scopus, IEEE Xplore, and arXiv. Vellum auto-detects overlaps with fuzzy title and DOI matching and merges them into clean canonical records.
+
+3/ 🕸️ Connected Citation Graphs
+Turn any seed paper into an interactive citation landscape (Connected Papers style). Uncover seminal ancestors, derivative works, and high-impact clusters.
+
+4/ 📥 3-Worker Parallel Multi-Tier PDF Downloader
+Parallel download engine resolving Unpaywall, OpenAccess, arXiv e-Prints, and Europe PMC mirrors directly to your local workstation.
+
+5/ 📓 Grounded Evidence Notebooks
+Clip empirical findings and quotes directly into synthesis notebooks. Instant 1-click citation exports (BibTeX, APA 7th, RIS).
+
+🔒 Pure Local-First: Runs on your local machine with IndexedDB. Zero cloud telemetry.
+
+Built with craft for academic rigor at University of Parma.
+
+🔗 GitHub / 1-Click Launch: [Insert Link]
+💻 Available as Web Studio & Windows Desktop (.exe)
+
+================================================================================
+HOOK OPTION B: SHORT-FORM VIDEO CAPTION (Instagram Reels, TikTok, YouTube Shorts)
+================================================================================
+$42 for ONE research paper? Never again. 🙅‍♂️📚
+
+Trapped behind academic paywalls while doing your literature review? 
+Meet Vellum by Amine — the 100% free, private research studio that runs on your computer.
+
+✨ 250M+ Open Scholarly Search ($0)
+⚡ AI Abstract Screening with PRISMA criteria
+🧹 Auto Duplicate Removal (PubMed + Scopus + IEEE)
+🕸️ Interactive Citation Graphs & Seminal Seeds
+📥 3-Worker Parallel Batch PDF Downloader
+🔒 Pure Local Storage (zero tracking!)
+
+Available as a 1-click Web Studio & Windows Desktop app (.exe).
+Download free in bio! 👇
+
+#SystematicReview #PhDLife #AcademicTwitter #ResearchTools #LiteratureReview #OpenAccess #MedTwitter #EdTech #OpenSource

@@ -89,14 +89,33 @@ def render_paper_card(
     elif note_info.get("notes") or note_info.get("takeaway"):
         note_badge = "<span class='badge-amber'>📝 NOTED</span>"
 
+    import vellum_theme as VT
+    dark = VT.is_dark_mode() if hasattr(VT, "is_dark_mode") else True
+    if dark:
+        card_bg = "rgba(36, 36, 38, 0.70)"
+        card_border = "rgba(255, 255, 255, 0.08)"
+        card_shadow = "0 2px 8px rgba(0, 0, 0, 0.25)"
+        title_color = "#f5f5f7"
+        meta_color = "#8e8e93"
+        abs_bg = "rgba(0, 0, 0, 0.25)"
+        abs_color = "#d1d1d6"
+    else:
+        card_bg = "#ffffff"
+        card_border = "rgba(0, 0, 0, 0.08)"
+        card_shadow = "0 1px 3px rgba(0, 0, 0, 0.04)"
+        title_color = "#1d1d1f"
+        meta_color = "#86868b"
+        abs_bg = "rgba(0, 0, 0, 0.03)"
+        abs_color = "#3a3a3c"
+
     # Flattened HTML to prevent any markdown code block formatting
     raw_html = f"""
-<div style="background: rgba(18, 24, 38, 0.65); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 14px 16px; margin-bottom: 6px;">
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 6px;">
-        <div style="font-size: 0.98rem; font-weight: 700; color: #f8fafc; line-height: 1.35; flex: 1;">
+<div style="background: {card_bg}; border: 1px solid {card_border}; border-radius: 12px; padding: 14px 16px; margin-bottom: 6px; box-shadow: {card_shadow}; backdrop-filter: blur(20px); box-sizing: border-box; overflow: hidden;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; margin-bottom: 6px;">
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; font-size: 1.02rem; font-weight: 700; color: {title_color}; line-height: 1.35; flex: 1; min-width: 200px;">
             {title}
         </div>
-        <div style="display: flex; gap: 6px; flex-shrink: 0; flex-wrap: wrap;">
+        <div style="display: flex; gap: 6px; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; max-width: 50%;">
             {screen_badge}
             {note_badge}
             {oa_badge}
@@ -104,7 +123,7 @@ def render_paper_card(
             {cite_badge}
         </div>
     </div>
-    <div style="font-size: 0.82rem; color: #94a3b8; line-height: 1.4;">
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif; font-size: 0.82rem; color: {meta_color}; line-height: 1.4;">
         👥 {author_str or 'Unknown Authors'} &nbsp;•&nbsp; 🏛️ <i>{venue}</i> &nbsp;•&nbsp; 📅 <b>{year}</b>
     </div>
 </div>
@@ -116,7 +135,7 @@ def render_paper_card(
     with st.expander(expander_title, expanded=False):
         if paper.get("abstract"):
             st.markdown(
-                f"<div style='font-size: 0.88rem; color: #cbd5e1; line-height: 1.6; margin-bottom: 12px; background: rgba(0,0,0,0.25); padding: 12px; border-radius: 8px;'>"
+                f"<div style='font-size: 0.88rem; color: {abs_color}; line-height: 1.6; margin-bottom: 12px; background: {abs_bg}; padding: 12px; border-radius: 8px;'>"
                 f"{paper['abstract']}</div>",
                 unsafe_allow_html=True,
             )
@@ -246,10 +265,12 @@ def render_paper_pool(
                 st.markdown(f"📥 **Download Queue:** `{len(queue)}` papers waiting for batch retrieval")
             with qc2:
                 if st.button(f"🚀 Download All in Queue ({len(queue)})", type="primary", width="stretch", key="_pool_dl_all_btn"):
-                    with st.spinner(f"Downloading {len(queue)} papers..."):
-                        res = VDD.download_all_in_queue()
-                        st.toast(f"Downloaded {res['success']} PDFs! (Remaining: {res['remaining']})", icon="✅")
-                        st.rerun()
+                    prog_bar = st.progress(0, text=f"Downloading {len(queue)} papers...")
+                    def _prog(done, total):
+                        prog_bar.progress(int((done / max(1, total)) * 100), text=f"Downloaded {done} of {total} papers...")
+                    res = VDD.download_all_in_queue(progress_callback=_prog)
+                    st.toast(f"Downloaded {res['success']} PDFs! (Remaining: {res['remaining']})", icon="✅")
+                    st.rerun()
             with qc3:
                 if st.button("🗑️ Clear", width="stretch", key="_pool_clear_q_btn", help="Clear the queue"):
                     VDD.clear_download_queue()

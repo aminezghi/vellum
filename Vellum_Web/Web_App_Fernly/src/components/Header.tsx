@@ -9,8 +9,6 @@ import {
   Plus,
   Moon,
   Sun,
-  LayoutGrid,
-  List,
   Flame,
   Trash2,
   DownloadCloud,
@@ -36,8 +34,8 @@ interface HeaderProps {
   onNewNotebook: () => void;
   onClearNotebooks: () => void;
   totalNotebooks: number;
-  viewMode: "grid" | "list";
-  setViewMode: (mode: "grid" | "list") => void;
+  viewMode?: "grid" | "list";
+  setViewMode?: (mode: "grid" | "list") => void;
 }
 
 export function Header({
@@ -48,8 +46,6 @@ export function Header({
   onNewNotebook,
   onClearNotebooks,
   totalNotebooks,
-  viewMode,
-  setViewMode,
 }: HeaderProps) {
   // Theme and accent live in one place (see lib/theme); the DOM is the source
   // of truth, so neither needs to be mirrored into component state.
@@ -96,72 +92,45 @@ export function Header({
 
   return (
     <header className="sticky top-0 z-40 w-full bg-[var(--panel)]/95 backdrop-blur-md border-b border-[var(--hair)] transition-all duration-200">
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-between gap-2 sm:gap-4 overflow-hidden">
-        
-        {/* Brand Logo & Section Navigation */}
-        <div className="flex items-center gap-3 lg:gap-6 min-w-0 flex-shrink">
-          <div
-            className="flex items-center gap-2.5 cursor-pointer group flex-shrink-0"
-            onClick={() => setActiveTab("all")}
-          >
-            {/* Fernly SVG Logo Mark */}
-            <div className="flex h-9 w-9 items-center justify-center rounded-[12px] bg-[var(--g-100)] text-[var(--g-700)] border border-[var(--g-400)]/30 shadow-xs transition-transform group-hover:scale-105">
-              <svg className="w-4.5 h-4.5 stroke-[2.2px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <rect x="3" y="3" width="18" height="18" rx="6" />
-                <path d="M12 17V8" />
-                <path d="M12 12c0-3 2-5 5-5 0 3-2 5-5 5Z" />
-                <path d="M12 14c0-2.5-1.8-4-4.2-4 0 2.5 1.8 4 4.2 4Z" />
-              </svg>
-            </div>
-            <div className="flex flex-col">
-              <div className="flex items-center gap-1.5">
-                <span className="text-lg font-bold tracking-tight text-[var(--ink)]">
-                  Vellum
-                </span>
-                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-[var(--g-100)] text-[var(--g-800)] border border-[var(--g-400)]/40 tracking-tight">
-                  Fernly
-                </span>
-              </div>
+      {/* Top Toolbar Row */}
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-between gap-3">
+        {/* Brand Logo */}
+        <div
+          className="flex items-center gap-2.5 cursor-pointer group flex-shrink-0"
+          onClick={() => setActiveTab("all")}
+        >
+          {/* Vellum Folded Folio Logo Mark */}
+          <div className="flex h-9 w-9 items-center justify-center rounded-[12px] bg-[#0B0F19] border border-emerald-500/30 shadow-xs transition-transform group-hover:scale-105 overflow-hidden">
+            <svg className="w-5 h-5" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <polygon points="112,96 186,96 256,358 206,445 112,96" fill="#10B981" />
+              <polygon points="400,96 326,96 256,358 306,445 400,96" fill="#059669" />
+              <polygon points="256,176 326,96 256,358 186,96" fill="#34D399" />
+            </svg>
+          </div>
+          <div className="flex flex-col">
+            <div className="flex items-center gap-1.5">
+              <span className="text-lg font-bold tracking-tight text-[var(--ink)]">
+                Vellum <span className="text-xs font-normal text-[var(--muted)]">by Amine</span>
+              </span>
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-[var(--g-100)] text-[var(--g-800)] border border-[var(--g-400)]/40 tracking-tight">
+                Studio
+              </span>
             </div>
           </div>
-
-          {/* Fernly Stretchy Nav Capsule (Responsive labels to prevent any overlap) */}
-          <nav className="hidden md:flex items-center bg-[var(--card)] p-1 rounded-full border border-[var(--hair)] shadow-xs flex-shrink-0 overflow-x-auto no-scrollbar">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  title={tab.label}
-                  className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
-                    isActive
-                      ? "text-[#f1f8f3] bg-gradient-to-b from-[var(--g-700)] to-[var(--g-950)] shadow-xs"
-                      : "text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--panel)]"
-                  }`}
-                >
-                  <Icon className={`h-3.5 w-3.5 ${isActive ? "text-[#5dbd8b]" : "text-[var(--faint)]"}`} />
-                  <span className="hidden xl:inline">{tab.label}</span>
-                  <span className="xl:hidden">{tab.shortLabel}</span>
-                </button>
-              );
-            })}
-          </nav>
         </div>
 
-        {/* Right Tools: Search, 4-Accent Palette Switcher, Theme Mode, View Mode, Clean, New Notebook */}
-        <div className="flex items-center gap-1.5 sm:gap-2.5 flex-shrink-0">
-          
-          {/* Fernly Search input with ⌘K badge (explicit padding so icon never overlaps text) */}
-          <div className="relative w-32 sm:w-40 md:w-44 lg:w-52">
+        {/* Right Tools: Search, 4-Accent Palette Switcher, Theme Mode, View Mode, Clean, New Project */}
+        <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap justify-end">
+          {/* Fernly Search input with ⌘K badge */}
+          <div className="relative w-36 sm:w-44 md:w-56">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--faint)] pointer-events-none" />
             <input
               ref={searchInputRef}
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search library..."
+              placeholder="Search local notebooks (⌘K)..."
+              title="Filter local systematic review notebooks in your browser vault"
               className="w-full !pl-8.5 pr-10 py-1.5 text-xs bg-[var(--card)] border border-[var(--hair)] rounded-full text-[var(--ink)] placeholder-[var(--faint)] focus:outline-none focus:border-[var(--g-600)] focus:ring-2 focus:ring-[var(--g-400)]/20 transition-all shadow-xs"
             />
             <kbd className="hidden sm:inline-flex absolute right-2.5 top-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded text-[9px] font-mono text-[var(--faint)] bg-[var(--panel)] border border-[var(--hair)] pointer-events-none">
@@ -169,7 +138,7 @@ export function Header({
             </kbd>
           </div>
 
-          {/* Fernly accent colourway - one control, four options */}
+          {/* Fernly accent colourway */}
           <div className="hidden sm:block">
             <AccentPicker value={activeAccent} onChange={handleAccentChange} />
           </div>
@@ -187,32 +156,6 @@ export function Header({
             )}
           </button>
 
-          {/* Grid / List View Toggle */}
-          <div className="hidden md:flex items-center bg-[var(--card)] p-0.5 rounded-full border border-[var(--hair)]">
-            <button
-              onClick={() => setViewMode("grid")}
-              className={`p-1.5 rounded-full transition-colors cursor-pointer ${
-                viewMode === "grid"
-                  ? "bg-[var(--g-700)] text-[#f1f8f3] shadow-xs"
-                  : "text-[var(--faint)] hover:text-[var(--ink)]"
-              }`}
-              title="Grid View"
-            >
-              <LayoutGrid className="h-3.5 w-3.5" />
-            </button>
-            <button
-              onClick={() => setViewMode("list")}
-              className={`p-1.5 rounded-full transition-colors cursor-pointer ${
-                viewMode === "list"
-                  ? "bg-[var(--g-700)] text-[#f1f8f3] shadow-xs"
-                  : "text-[var(--faint)] hover:text-[var(--ink)]"
-              }`}
-              title="List View"
-            >
-              <List className="h-3.5 w-3.5" />
-            </button>
-          </div>
-
           {/* Clean / Reset Workspace Button */}
           {totalNotebooks > 0 && (
             <button
@@ -227,12 +170,37 @@ export function Header({
           {/* Primary Action Button: New Notebook */}
           <button
             onClick={onNewNotebook}
-            className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs font-semibold text-[#f1f8f3] bg-gradient-to-b from-[var(--g-700)] to-[var(--g-950)] hover:from-[var(--g-600)] hover:to-[var(--g-800)] shadow-xs transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+            className="btn-fernly-primary !h-auto !py-1.5 sm:!py-2 !px-3 sm:!px-4 !text-xs !shadow-xs hover:scale-[1.02] active:scale-[0.98]"
           >
             <Plus className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Add Project</span>
+            <span className="hidden sm:inline">New Project</span>
           </button>
         </div>
+      </div>
+
+      {/* Row 2: Dedicated Segmented Navigation Toolbar */}
+      <div className="w-full px-4 sm:px-6 lg:px-8 pb-2 pt-0.5 border-t border-[var(--hair)]/40 overflow-x-auto no-scrollbar">
+        <nav className="flex items-center gap-1.5 bg-[var(--card)] p-1 rounded-full border border-[var(--hair)] shadow-xs w-max min-w-full sm:min-w-0 sm:w-fit">
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                title={tab.label}
+                className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                  isActive
+                    ? "text-white bg-gradient-to-b from-[var(--g-600)] to-[var(--g-800)] shadow-xs"
+                    : "text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--panel)]"
+                }`}
+              >
+                <Icon className={`h-3.5 w-3.5 ${isActive ? "text-[var(--g-300)]" : "text-[var(--faint)]"}`} />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
+        </nav>
       </div>
     </header>
   );

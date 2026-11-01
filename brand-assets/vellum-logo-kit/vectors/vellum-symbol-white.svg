@@ -1,0 +1,13 @@
+<svg fill="#ffffff" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512"><title>Vellum Logo Symbol</title>
+  
+  <g id="vellum-mark">
+    <!-- Left Manuscript Blade (Illuminated Emerald) -->
+    <polygon points="112,96 186,96 256,358 206,445 112,96" fill="#ffffff"/>
+    
+    <!-- Right Manuscript Blade (Deep Botanical Emerald) -->
+    <polygon points="400,96 326,96 256,358 306,445 400,96" fill="#ffffff"/>
+
+    <!-- Central Turned Leaf Facet (High-Contrast Mint Highlight) -->
+    <polygon points="256,176 326,96 256,358 186,96" fill="#ffffff"/>
+  </g>
+</svg>

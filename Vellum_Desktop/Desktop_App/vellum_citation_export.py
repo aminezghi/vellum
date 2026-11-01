@@ -13,6 +13,7 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -20,12 +21,25 @@ import vellum_workspace as VW
 
 
 def get_user_downloads_dir() -> Path:
-    """Return standard user Downloads directory across platforms."""
-    home = Path.home()
-    dl = home / "Downloads"
-    if dl.exists():
-        return dl
-    return home
+    """Return standard user Downloads directory across platforms, supporting VELLUM_DOWNLOADS_DIR override."""
+    env_dl = os.environ.get("VELLUM_DOWNLOADS_DIR")
+    if env_dl:
+        p = Path(env_dl).resolve()
+        p.mkdir(parents=True, exist_ok=True)
+        return p
+
+    try:
+        home = Path.home()
+        dl = home / "Downloads"
+        if dl.exists():
+            return dl
+        return home
+    except (PermissionError, OSError, RuntimeError):
+        pass
+
+    fallback = Path(tempfile.gettempdir()) / "Downloads"
+    fallback.mkdir(parents=True, exist_ok=True)
+    return fallback
 
 
 def save_citation_export(
@@ -37,6 +51,7 @@ def save_citation_export(
     Saves citation export to:
       1) <vault>/<project>/exports/<filename>
       2) User's standard Downloads folder (<home>/Downloads/<filename>)
+    Catches PermissionError gracefully and falls back to vault exports folder.
     Returns (vault_file_path, downloads_file_path).
     """
     proj_dir = VW.get_project_dir(project_name)
@@ -49,10 +64,14 @@ def save_citation_export(
     try:
         user_dl = get_user_downloads_dir()
         if user_dl.exists():
-            dl_path = user_dl / filename
-            dl_path.write_text(content, encoding="utf-8", errors="replace")
+            target_dl = user_dl / filename
+            target_dl.write_text(content, encoding="utf-8", errors="replace")
+            dl_path = target_dl
+    except (PermissionError, OSError):
+        # Graceful fallback: downloads folder restricted, vault_path remains canonical
+        dl_path = None
     except Exception:
-        pass
+        dl_path = None
 
     return vault_path, dl_path
 
@@ -252,12 +271,12 @@ def render_export_bar(
 
     proj_name = VW.get_active_project_name()
 
-    c1, c2, c3 = st.columns(3)
+    c1, c2, c3, _ = st.columns([1.6, 1.6, 1.6, 3.2], vertical_alignment="center")
 
     with c1:
         if st.button(
             f"📥 Zotero (.ris) {label_suffix}".strip(),
-            width="stretch",
+            use_container_width=True,
             key=f"{key_prefix}_btn_ris",
             help="Export to Zotero, Mendeley, or Paperpile",
         ):
@@ -277,7 +296,7 @@ def render_export_bar(
     with c2:
         if st.button(
             f"📥 EndNote (.enw) {label_suffix}".strip(),
-            width="stretch",
+            use_container_width=True,
             key=f"{key_prefix}_btn_enw",
             help="Direct import into Clarivate EndNote",
         ):
@@ -297,7 +316,7 @@ def render_export_bar(
     with c3:
         if st.button(
             f"📥 BibTeX (.bib) {label_suffix}".strip(),
-            width="stretch",
+            use_container_width=True,
             key=f"{key_prefix}_btn_bib",
             help="Export LaTeX BibTeX bibliography",
         ):
@@ -321,9 +340,14 @@ def render_export_bar(
         with st.container(border=True):
             s1, s2, s3, s4 = st.columns([3, 1.3, 1.3, 0.6], vertical_alignment="center")
             with s1:
-                st.markdown(
-                    f"✅ **Saved `{info['name']}` to your Downloads folder and Project Vault!**"
-                )
+                if info.get("dl_path") and info.get("dl_path") != info.get("vault_path"):
+                    st.markdown(
+                        f"✅ **Saved `{info['name']}` to your Downloads folder and Project Vault!**"
+                    )
+                else:
+                    st.markdown(
+                        f"📁 **Saved `{info['name']}` to Project Vault exports** *(Downloads folder was restricted)*"
+                    )
             with s2:
                 if st.button("📂 Open in Explorer", key=f"{key_prefix}_open_exp_folder", width="stretch", help="Reveal file in Windows Explorer"):
                     target = info.get("dl_path") or info.get("vault_path")

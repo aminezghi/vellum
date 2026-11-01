@@ -22,9 +22,18 @@ export function NotebookGrid({
   const handleDelete = async (e: React.MouseEvent, id: string, title?: string) => {
     e.stopPropagation();
     if (confirm(`Delete project "${title || id}" and all its saved evidence sources?`)) {
-      await db.notebooks.delete(id);
-      await db.sources.where("notebookId").equals(id).delete();
-      await db.notes.where("notebookId").equals(id).delete();
+      try {
+        // One transaction so a failure part-way never leaves orphaned rows.
+        await db.transaction("rw", [db.notebooks, db.sources, db.notes, db.evidence], async () => {
+          await db.notebooks.delete(id);
+          await db.sources.where("notebookId").equals(id).delete();
+          await db.notes.where("notebookId").equals(id).delete();
+          await db.evidence.where("notebookId").equals(id).delete();
+        });
+      } catch (err) {
+        console.error("Failed to delete project:", err);
+        alert("Could not delete this project. Please try again.");
+      }
       onRefresh();
     }
     setActiveMenuId(null);
@@ -129,19 +138,11 @@ export function NotebookGrid({
               </span>
 
               <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                {/* Direct quick delete icon on hover */}
-                <button
-                  onClick={(e) => handleDelete(e, nb.id, nb.title)}
-                  className="p-1.5 rounded-full text-[var(--faint)] hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer"
-                  title="Delete project"
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </button>
-
                 <div className="relative">
                   <button
                     onClick={() => setActiveMenuId(isMenuOpen ? null : nb.id)}
                     className="p-1.5 rounded-full text-[var(--faint)] hover:text-[var(--ink)] hover:bg-[var(--panel)] transition-colors cursor-pointer"
+                    title="Project actions"
                   >
                     <MoreVertical className="h-4 w-4" />
                   </button>

@@ -7,15 +7,13 @@ import {
   Award,
   UserCheck,
   ArrowUp,
-  Trash2,
 } from "lucide-react";
 
 interface FooterProps {
-  onClearAllNotebooks?: () => void;
   notebooksCount?: number;
 }
 
-export function Footer({ onClearAllNotebooks, notebooksCount = 0 }: FooterProps) {
+export function Footer({ notebooksCount = 0 }: FooterProps) {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -33,15 +31,15 @@ export function Footer({ onClearAllNotebooks, notebooksCount = 0 }: FooterProps)
               </div>
               <div>
                 <span className="text-base font-bold tracking-tight text-[var(--ink)]">
-                  Vellum
+                  Vellum by Amine
                 </span>
                 <span className="ml-2 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[var(--g-100)] text-[var(--g-800)] border border-[var(--g-400)]/30">
-                  Fernly Bento Edition
+                  Research Studio
                 </span>
               </div>
             </div>
             <p className="text-xs text-[var(--muted)] leading-relaxed font-medium">
-              A calm, organic botanical academic workspace that moves as one product. Local-first systematic reviews, multi-database discovery, and multi-tier PDF retrieval.
+              A private, local-first academic research workstation. Systematic literature reviews, multi-database discovery across 250M+ papers, citation graphs, and heavy PDF retrieval.
             </p>
             <div className="flex items-center gap-2 text-[11px] text-[var(--g-800)]">
               <ShieldCheck className="h-3.5 w-3.5 text-[var(--g-700)]" />
@@ -112,16 +110,7 @@ export function Footer({ onClearAllNotebooks, notebooksCount = 0 }: FooterProps)
               </div>
             </div>
 
-            <div className="flex items-center gap-2 pt-1">
-              {onClearAllNotebooks && notebooksCount > 0 && (
-                <button
-                  onClick={onClearAllNotebooks}
-                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-full border border-red-200 text-red-600 hover:bg-red-50 text-xs font-semibold transition-all cursor-pointer shadow-xs"
-                >
-                  <Trash2 className="h-3 w-3" />
-                  <span>Clean Storage</span>
-                </button>
-              )}
+            <div className="flex items-center justify-end pt-1">
               <button
                 onClick={scrollToTop}
                 className="p-2 rounded-full bg-[var(--card)] border border-[var(--hair)] text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--panel)] transition-all cursor-pointer shadow-xs"
@@ -135,7 +124,7 @@ export function Footer({ onClearAllNotebooks, notebooksCount = 0 }: FooterProps)
 
         {/* Bottom Copyright */}
         <div className="flex flex-col sm:flex-row items-center justify-between text-xs text-[var(--faint)] font-medium gap-3">
-          <p>© 2026 Vellum — Fernly Botanical Bento Edition. All research data remains on your workstation.</p>
+          <p>© 2026 Vellum by Amine. All research data remains private on your workstation.</p>
           <div className="flex items-center gap-4">
             <span>Client-Side Local-First</span>
             <span>•</span>

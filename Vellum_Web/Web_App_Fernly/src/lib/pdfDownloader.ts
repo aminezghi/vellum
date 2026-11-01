@@ -10,6 +10,13 @@ export interface DownloadProgressCallback {
   (status: "starting" | "resolving" | "saving" | "success" | "paywalled" | "error", details?: string): void;
 }
 
+export interface ResolverSettings {
+  email?: string;
+  elsevierApiKey?: string;
+  customMirror?: string;
+  ezproxyUrl?: string;
+}
+
 export async function fetchAndStorePaperPdf(
   params: {
     doi?: string;
@@ -17,11 +24,12 @@ export async function fetchAndStorePaperPdf(
     pdfUrl?: string;
     sourceId?: string;
     notebookId?: string;
+    settings?: ResolverSettings;
   },
   onProgress?: DownloadProgressCallback
 ): Promise<{ success: boolean; blob?: Blob; sourceName?: string; landingUrl?: string }> {
   try {
-    onProgress?.("resolving", "Running Vellum Multi-Tier Protocol (Direct OA, Springer/Nature, Unpaywall, Semantic Scholar, Europe PMC, Mirrors)...");
+    onProgress?.("resolving", "Running Vellum Multi-Tier Protocol (Direct OA, Unpaywall, OpenAlex, Semantic Scholar, Sci-Hub)...");
 
     const response = await fetch("/api/download-pdf", {
       method: "POST",
@@ -30,11 +38,15 @@ export async function fetchAndStorePaperPdf(
         doi: params.doi,
         title: params.title,
         pdfUrl: params.pdfUrl,
+        email: params.settings?.email,
+        elsevierApiKey: params.settings?.elsevierApiKey,
+        customMirror: params.settings?.customMirror,
+        ezproxyUrl: params.settings?.ezproxyUrl,
       }),
     });
 
     if (response.ok && response.headers.get("content-type")?.includes("application/pdf")) {
-      onProgress?.("saving", "Validating PDF binary signature and writing to Local IndexedDB Vault...");
+      onProgress?.("saving", "Validating PDF binary signature and writing to Local Vault...");
       const blob = await response.blob();
       const resolvedSource = response.headers.get("x-vellum-resolved-source") || "Academic Protocol";
 

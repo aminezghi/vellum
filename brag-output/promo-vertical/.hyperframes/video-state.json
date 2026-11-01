@@ -1,0 +1,324 @@
+{
+  "version": 1,
+  "historyId": "56c0ef59-2b44-469f-a208-944364370d00",
+  "currentRevision": "c5c1f50a-a8be-43d1-a720-8096bb330f60",
+  "pendingChanges": false,
+  "files": {
+    "index.html": {
+      "hash": "0191ef3e4dfb563b1a73fa1cfa71a4bbe89641d7690c5cc505cb76d9c0162573",
+      "content": "C:\\Users\\azoua\\.cache\\hyperframes\\history\\56c0ef59-2b44-469f-a208-944364370d00\\blobs\\01\\0191ef3e4dfb563b1a73fa1cfa71a4bbe89641d7690c5cc505cb76d9c0162573"
+    },
+    "meta.json": {
+      "hash": "e0473474185db7743d3721ee31a482b2141d5a6db3350a658baadee4e869a81c",
+      "content": "C:\\Users\\azoua\\.cache\\hyperframes\\history\\56c0ef59-2b44-469f-a208-944364370d00\\blobs\\e0\\e0473474185db7743d3721ee31a482b2141d5a6db3350a658baadee4e869a81c"
+    },
+    "package.json": {
+      "hash": "612eb5881b2e4a73e9e1b6daebfa4063f09ecd00408def5260d01c9ba49c035d",
+      "content": "C:\\Users\\azoua\\.cache\\hyperframes\\history\\56c0ef59-2b44-469f-a208-944364370d00\\blobs\\61\\612eb5881b2e4a73e9e1b6daebfa4063f09ecd00408def5260d01c9ba49c035d"
+    },
+    "assets/audio/music.mp3": {
+      "hash": "aa56ab1cdcbef6b05566c6a7c114323078580ccf6a740a9e6c6b6c4b40b4389f",
+      "content": "C:\\Users\\azoua\\.cache\\hyperframes\\history\\56c0ef59-2b44-469f-a208-944364370d00\\blobs\\aa\\aa56ab1cdcbef6b05566c6a7c114323078580ccf6a740a9e6c6b6c4b40b4389f"
+    }
+  },
+  "revisions": {
+    "692852a4-f757-4d2c-83dc-46f0b87f529d": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1793388854081,
+      "endedAt": 1793388854083,
+      "files": {
+        "index.html": {
+          "before": "C:\\Users\\azoua\\.cache\\hyperframes\\history\\56c0ef59-2b44-469f-a208-944364370d00\\blobs\\89\\8916f91e3352af3ca8c24f7b069eb7420e41de629d22b89a3d6f14b42e285dc4",
+          "after": "C:\\Users\\azoua\\.cache\\hyperframes\\history\\56c0ef59-2b44-469f-a208-944364370d00\\blobs\\dd\\dd379158d6bc7a09de34b5ecea770519cf5e3209d8af7071d1a6285674e416c0"
+        }
+      }
+    },
+    "3d528bc6-9b4d-4de5-b042-fe3c6461848d": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1793388931209,
+      "endedAt": 1793388931211,
+      "files": {
+        "index.html": {
+          "before": "C:\\Users\\azoua\\.cache\\hyperframes\\history\\56c0ef59-2b44-469f-a208-944364370d00\\blobs\\dd\\dd379158d6bc7a09de34b5ecea770519cf5e3209d8af7071d1a6285674e416c0",
+          "after": "C:\\Users\\azoua\\.cache\\hyperframes\\history\\56c0ef59-2b44-469f-a208-944364370d00\\blobs\\c6\\c62a2c05dc0aeb1a4a8a2b9f9f0251b764e96858c82136b4b206cea42ba4c5ac"
+        }
+      }
+    },
+    "145a9b26-aeb0-46b2-a626-14f5019ad01d": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1793389301129,
+      "endedAt": 1793389301313,
+      "files": {
+        "index.html": {
+          "before": "C:\\Users\\azoua\\.cache\\hyperframes\\history\\56c0ef59-2b44-469f-a208-944364370d00\\blobs\\c6\\c62a2c05dc0aeb1a4a8a2b9f9f0251b764e96858c82136b4b206cea42ba4c5ac",
+          "after": "C:\\Users\\azoua\\.cache\\hyperframes\\history\\56c0ef59-2b44-469f-a208-944364370d00\\blobs\\34\\34773c97b9b063ade197fac430b2e6f32efb3cf2f9b624dc17a7184dd5478986"
+        },
+        "meta.json": {
+          "before": "C:\\Users\\azoua\\.cache\\hyperframes\\history\\56c0ef59-2b44-469f-a208-944364370d00\\blobs\\99\\994bddb92a1dfec10b5432d3885932db487b7ff331287c9f05f545b29141288c",
+          "after": "C:\\Users\\azoua\\.cache\\hyperframes\\history\\56c0ef59-2b44-469f-a208-944364370d00\\blobs\\e0\\e0473474185db7743d3721ee31a482b2141d5a6db3350a658baadee4e869a81c"
+        }
+      }
+    },
+    "7a1395c9-8ce8-443a-8b54-f24387291a75": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1793389333425,
+      "endedAt": 1793389333426,
+      "files": {
+        "index.html": {
+          "before": "C:\\Users\\azoua\\.cache\\hyperframes\\history\\56c0ef59-2b44-469f-a208-944364370d00\\blobs\\34\\34773c97b9b063ade197fac430b2e6f32efb3cf2f9b624dc17a7184dd5478986",
+          "after": "C:\\Users\\azoua\\.cache\\hyperframes\\history\\56c0ef59-2b44-469f-a208-944364370d00\\blobs\\01\\010575e5922a21053419c8b603bbfed80697d35cea11cbb465269a60b4e5879e"
+        }
+      }
+    },
+    "ba04cc30-8ecb-4d07-bb56-6e26a3cde3ce": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1793390184672,
+      "endedAt": 1793390184676,
+      "files": {
+        "index.html": {
+          "before": "C:\\Users\\azoua\\.cache\\hyperframes\\history\\56c0ef59-2b44-469f-a208-944364370d00\\blobs\\01\\010575e5922a21053419c8b603bbfed80697d35cea11cbb465269a60b4e5879e",
+          "after": "C:\\Users\\azoua\\.cache\\hyperframes\\history\\56c0ef59-2b44-469f-a208-944364370d00\\blobs\\f7\\f715e23e5a34ca3bcf9c2507968279c7191efe0fac9679b1a6f31d321bbebce7"
+        }
+      }
+    },
+    "c5c1f50a-a8be-43d1-a720-8096bb330f60": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1793391702547,
+      "endedAt": 1793391702549,
+      "files": {
+        "index.html": {
+          "before": "C:\\Users\\azoua\\.cache\\hyperframes\\history\\56c0ef59-2b44-469f-a208-944364370d00\\blobs\\f7\\f715e23e5a34ca3bcf9c2507968279c7191efe0fac9679b1a6f31d321bbebce7",
+          "after": "C:\\Users\\azoua\\.cache\\hyperframes\\history\\56c0ef59-2b44-469f-a208-944364370d00\\blobs\\01\\0191ef3e4dfb563b1a73fa1cfa71a4bbe89641d7690c5cc505cb76d9c0162573"
+        }
+      }
+    }
+  },
+  "checks": {
+    "latest": {
+      "revision": "c5c1f50a-a8be-43d1-a720-8096bb330f60",
+      "id": "3a74b850-76f7-485c-ba5f-0dcc9ce021bd"
+    },
+    "revisions": {
+      "692852a4-f757-4d2c-83dc-46f0b87f529d": [
+        {
+          "id": "0745aeaf-731c-4031-be23-f10ec324bf3d",
+          "scope": "project",
+          "metadata": {
+            "ok": true,
+            "browserSkipped": false,
+            "options": {
+              "samples": 9,
+              "atTransitions": false,
+              "maxIssues": 80,
+              "collapseStatic": true,
+              "tolerance": 2,
+              "timeout": 10000,
+              "contrast": true,
+              "strict": false,
+              "snapshots": false,
+              "browserGpuMode": "auto"
+            }
+          },
+          "createdAt": 1793388865700,
+          "contentHash": "38253a37a23da644aba2c775f61fc0a925228ffb89f68cc3b4503033871798e6",
+          "revision": "692852a4-f757-4d2c-83dc-46f0b87f529d",
+          "inputFingerprint": "e1f764c0d04152d4f750d6aed9e5382ff6882b12bd5e5ed49773f798ce562f19",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision",
+          "status": "cleaned",
+          "cleanedAfterRender": "6ed30d8a-551d-4b48-90a3-c5de85fce36c"
+        }
+      ],
+      "3d528bc6-9b4d-4de5-b042-fe3c6461848d": [
+        {
+          "id": "ced80e32-9d72-4cd1-b4c2-67bed1f0c482",
+          "scope": "project",
+          "metadata": {
+            "ok": true,
+            "browserSkipped": false,
+            "options": {
+              "samples": 9,
+              "atTransitions": false,
+              "maxIssues": 80,
+              "collapseStatic": true,
+              "tolerance": 2,
+              "timeout": 10000,
+              "contrast": true,
+              "strict": false,
+              "snapshots": false,
+              "browserGpuMode": "auto"
+            }
+          },
+          "createdAt": 1793388939299,
+          "contentHash": "399b657c1b0b716e298f2a979d1a9d7674acfccfcfb33107e74480b55c7d37d2",
+          "revision": "3d528bc6-9b4d-4de5-b042-fe3c6461848d",
+          "inputFingerprint": "6f0c8c843d9eeb38ecc05a91b498dac136604958b78e14edc42f1fc4252b8520",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision",
+          "status": "cleaned",
+          "cleanedAfterRender": "97b79db0-932e-47eb-87eb-90ee10ffc92d"
+        }
+      ],
+      "145a9b26-aeb0-46b2-a626-14f5019ad01d": [
+        {
+          "id": "eedd8dfb-8869-485e-b783-f9ca98c8d2c8",
+          "scope": "project",
+          "metadata": {
+            "ok": true,
+            "browserSkipped": false,
+            "options": {
+              "samples": 9,
+              "atTransitions": false,
+              "maxIssues": 80,
+              "collapseStatic": true,
+              "tolerance": 2,
+              "timeout": 10000,
+              "contrast": true,
+              "strict": false,
+              "snapshots": false,
+              "browserGpuMode": "auto"
+            }
+          },
+          "createdAt": 1793389310223,
+          "contentHash": "6e45e9bd40a790ab7b52f7c5a0ae104136ea3b6f37270be8de790cb95dab9751",
+          "revision": "145a9b26-aeb0-46b2-a626-14f5019ad01d",
+          "inputFingerprint": "5ea30dfb55704c21638769385ce08f1f908e5874278cb3739432e8f359f6c0f1",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision",
+          "status": "cleaned",
+          "cleanedAfterRender": "024b127b-2ee5-4097-ae13-fa059c651aec"
+        }
+      ],
+      "ba04cc30-8ecb-4d07-bb56-6e26a3cde3ce": [
+        {
+          "id": "70e94ed2-4475-4c9a-a3ad-384bb7269f08",
+          "scope": "project",
+          "report": "C:\\Users\\azoua\\Documents\\PDF_Downloader_Dual_Pack\\brag-output\\promo-vertical\\.hyperframes\\artifacts\\checks\\70e94ed2-4475-4c9a-a3ad-384bb7269f08.json",
+          "metadata": {
+            "ok": true,
+            "browserSkipped": false,
+            "options": {
+              "samples": 9,
+              "atTransitions": false,
+              "maxIssues": 80,
+              "collapseStatic": true,
+              "tolerance": 2,
+              "timeout": 10000,
+              "contrast": true,
+              "strict": false,
+              "snapshots": false,
+              "browserGpuMode": "auto"
+            }
+          },
+          "createdAt": 1793390193864,
+          "contentHash": "b2b4ed4da9e82f5ec29743c792ba0b317014d7d68aa50de1e4bbab681dd735b1",
+          "revision": "ba04cc30-8ecb-4d07-bb56-6e26a3cde3ce",
+          "inputFingerprint": "d316c8062566b7e7d71f3b25527bc5fcc43ca4d0951955345cc99f23fcf01f94",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        }
+      ],
+      "c5c1f50a-a8be-43d1-a720-8096bb330f60": [
+        {
+          "id": "3a74b850-76f7-485c-ba5f-0dcc9ce021bd",
+          "scope": "project",
+          "report": "C:\\Users\\azoua\\Documents\\PDF_Downloader_Dual_Pack\\brag-output\\promo-vertical\\.hyperframes\\artifacts\\checks\\3a74b850-76f7-485c-ba5f-0dcc9ce021bd.json",
+          "metadata": {
+            "ok": true,
+            "browserSkipped": false,
+            "options": {
+              "samples": 9,
+              "atTransitions": false,
+              "maxIssues": 80,
+              "collapseStatic": true,
+              "tolerance": 2,
+              "timeout": 10000,
+              "contrast": true,
+              "strict": false,
+              "snapshots": false,
+              "browserGpuMode": "auto"
+            }
+          },
+          "createdAt": 1793391709725,
+          "contentHash": "ae4dd8f8926ca086750f58353f64c82b6add904d95c250083d9e08cecf224e98",
+          "revision": "c5c1f50a-a8be-43d1-a720-8096bb330f60",
+          "inputFingerprint": "34a2fa1a3f89fd0a443bd3de294f81cfb5033df5df776867dc7c4f015545a606",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        }
+      ]
+    },
+    "unversioned": [
+      {
+        "id": "fcbcdb94-2d47-4d59-ac34-000ca66366dc",
+        "scope": "project",
+        "report": "C:\\Users\\azoua\\Documents\\PDF_Downloader_Dual_Pack\\brag-output\\promo-vertical\\.hyperframes\\artifacts\\checks\\fcbcdb94-2d47-4d59-ac34-000ca66366dc.json",
+        "metadata": {
+          "ok": false,
+          "browserSkipped": true,
+          "options": {
+            "samples": 9,
+            "atTransitions": false,
+            "maxIssues": 80,
+            "collapseStatic": true,
+            "tolerance": 2,
+            "timeout": 10000,
+            "contrast": true,
+            "strict": false,
+            "snapshots": false,
+            "browserGpuMode": "auto"
+          }
+        },
+        "createdAt": 1793388841911,
+        "contentHash": "31231c3560d0283c238479789e694f21abaca8933cee883473b6bd1c781af781",
+        "revision": null,
+        "inputFingerprint": "3156303c4b842f2e9884df3b25730dc509fbe3554ef0244de1de2fcbd992ac8b",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      }
+    ]
+  },
+  "snapshots": {
+    "latest": null,
+    "revisions": {},
+    "unversioned": []
+  },
+  "renders": {
+    "latest": {
+      "id": "f86931fb-ab65-49dd-8dcb-73da7395720f",
+      "completedAt": 1793391832139,
+      "output": "C:\\Users\\azoua\\Documents\\PDF_Downloader_Dual_Pack\\brag-output\\vellum-promo-vertical.mp4",
+      "status": "completed",
+      "revision": "c5c1f50a-a8be-43d1-a720-8096bb330f60"
+    },
+    "retainedRevisions": [
+      "c5c1f50a-a8be-43d1-a720-8096bb330f60",
+      "ba04cc30-8ecb-4d07-bb56-6e26a3cde3ce"
+    ]
+  },
+  "pendingArtifactCleanup": []
+}

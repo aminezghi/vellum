@@ -6,20 +6,16 @@ headless = false
 gatherUsageStats = false
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Theme modelled on Wispr Flow (https://wisprflow.ai).
-# Tokens:
-#   lumen      #FFFFEB warm ivory cream canvas
-#   lumen-dark #E4E4D0 warm cream border and card outlines
-#   vast       #1A1A1A deep rich charcoal black
-#   flare      #FF6C4C signature vibrant terracotta coral
-#   glow       #FFA946 sunset amber highlight
-#   dawn       #F0D7FF lilac accent
-#   fathom     #034F46 deep forest teal
+# Apple Human Interface Guidelines (macOS Sequoia Design Tokens)
+# Canvas: #f5f5f7 (System Gray 6 / Window Background)
+# Primary: #007aff (Apple System Blue)
+# Surface: #ffffff (Pure White Card / Control Fill)
+# Text:    #1d1d1f (System Primary Label)
 # ─────────────────────────────────────────────────────────────────────────────
 [theme]
 base = "light"
-primaryColor = "#ff6c4c"
-backgroundColor = "#ffffeb"
+primaryColor = "#007aff"
+backgroundColor = "#f5f5f7"
 secondaryBackgroundColor = "#ffffff"
-textColor = "#1a1a1a"
+textColor = "#1d1d1f"
 font = "sans serif"

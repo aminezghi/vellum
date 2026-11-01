@@ -112,14 +112,13 @@ class TestVellumWorkflow(unittest.TestCase):
         self.assertTrue(VT.is_dark_mode())
         dark_css = VT.get_theme_css(dark=True)
         self.assertIn("#1a1a1a", dark_css)
-        self.assertIn("#ff6c4c", dark_css)
+        self.assertIn("#0a84ff", dark_css)
         self.assertIn("button[data-selected]", dark_css)
 
         VT.toggle_theme_mode()
         self.assertFalse(VT.is_dark_mode())
         light_css = VT.get_theme_css(dark=False)
-        self.assertIn("#ffffeb", light_css)
-        self.assertIn("#ff6c4c", light_css)
+        self.assertIn("#007aff", light_css)
         self.assertIn("button[data-selected]", light_css)
 
         # Restore dark

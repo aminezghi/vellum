@@ -204,3 +204,22 @@ Vellum_Web/Vellum_Web_Fernly_SHARE/
 !Vellum_Web/Web_App_Fernly/downloader.ico
 !Vellum_Web/Web_App_Fernly/downloader.png
 !Vellum_Web/Web_App_Fernly/src/app/favicon.ico
+!Vellum_Web/Web_App_Fernly/public/favicon.ico
+!Vellum_Web/Web_App_Fernly/public/apple-touch-icon.png
+!Vellum_Web/Web_App_Fernly/public/vellum-logo.svg
+!Vellum_Web/Web_App_Fernly/public/logo-mark.svg
+!Vellum_Desktop/Desktop_App/vellum-symbol.svg
+!brand-assets/**
+!brag-output/vellum-promo-horizontal.jpg
+!brag-output/vellum-promo-vertical.jpg
+
+# Development & local scratch tools
+.agents/
+logo-design-skill-repo/
+DISTRIBUTABLES/Vellum_Desktop_Installer_Windows_x64/
+DISTRIBUTABLES/Vellum_Desktop_macOS/
+DISTRIBUTABLES/Vellum_Web_macOS/
+README_MACOS_INSTRUCTIONS.pdf
+brag-output/**/node_modules/
+brag-output/**/*.mp4
+brag-output/*.mp4

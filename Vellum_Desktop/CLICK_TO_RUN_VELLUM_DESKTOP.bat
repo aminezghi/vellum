@@ -1,11 +1,11 @@
 @echo off
 setlocal enabledelayedexpansion
-title Vellum Desktop V2.0 - Botanical Bento Edition
+title Vellum Desktop V2.1 - Botanical Bento Edition
 cd /d "%~dp0"
 
 cls
 echo =====================================================================
-echo       VELLUM DESKTOP V2.0 (FERNLY BOTANICAL BENTO EDITION)
+echo       VELLUM DESKTOP V2.1 (FERNLY BOTANICAL BENTO EDITION)
 echo       ASReview Active Learning Screening + Connected Papers Hub
 echo =====================================================================
 echo.
@@ -57,7 +57,7 @@ if !errorlevel! neq 0 (
     )
 )
 
-echo [*] Initializing Vellum Desktop V2.0 server...
+echo [*] Initializing Vellum Desktop V2.1 server...
 echo [*] Opening interface at http://localhost:8501 ...
 echo.
 
@@ -65,7 +65,7 @@ echo.
 start "Vellum Desktop Server" "%PY_BIN%" -m streamlit run pdf_downloader_app.py --server.port=8501 --server.headless=false --browser.gatherUsageStats=false
 
 echo =====================================================================
-echo [SUCCESS] Vellum Desktop V2.0 is now running!
+echo [SUCCESS] Vellum Desktop V2.1 is now running!
 echo Interface URL: http://localhost:8501
 echo =====================================================================
 ping 127.0.0.1 -n 3 >nul

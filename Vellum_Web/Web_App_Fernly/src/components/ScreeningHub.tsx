@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Notebook, db, ScreeningSession, ScreeningItem } from "@/lib/db";
+import { Notebook, Source, db, ScreeningSession, ScreeningItem } from "@/lib/db";
 import { STORAGE_KEYS } from "@/lib/storageNamespace";
 import { Modal } from "@/components/Modal";
 import {
@@ -258,7 +258,7 @@ export function ScreeningHub({ notebooks }: ScreeningHubProps) {
       sessionId: activeSession.id,
     }));
 
-    await db.screeningItems.where("sessionId").equals(activeSession.id).delete();
+    // Bulk upsert candidate records without destructive table purging
     await db.screeningItems.bulkPut(itemsToStore as ScreeningItem[]);
     await db.screeningSessions.put(updatedSession);
 
@@ -513,37 +513,71 @@ export function ScreeningHub({ notebooks }: ScreeningHubProps) {
 
   // 16. Decision Handler (Include / Exclude)
   const handleDecision = useCallback(async (decision: "included" | "excluded") => {
-    if (!currentCandidate) return;
+    if (!currentCandidate || !activeSession) return;
 
     setFeedbackAnimation(decision);
     setTimeout(() => setFeedbackAnimation(null), 300);
 
+    const targetItemId = currentCandidate.id;
+    const now = Date.now();
+
     const updatedCandidate: ScreeningCandidate = {
       ...currentCandidate,
       decision,
-      screenedAt: Date.now(),
+      screenedAt: now,
     };
 
     const newConsecutive = decision === "excluded" ? consecutiveExcludes + 1 : 0;
     setConsecutiveExcludes(newConsecutive);
-    setHistory((prev) => [...prev, { id: currentCandidate.id, decision }]);
+    setHistory((prev) => [...prev, { id: targetItemId, decision }]);
 
     const updatedCandidates = candidates.map((c) =>
-      c.id === currentCandidate.id ? updatedCandidate : c
+      c.id === targetItemId ? updatedCandidate : c
     );
 
     const reranked = classifier.retrainAndRank(updatedCandidates);
     setCandidates(reranked);
-    await syncCandidatesToDb(reranked, { consecutiveExcludes: newConsecutive });
-  }, [currentCandidate, consecutiveExcludes, candidates, classifier, syncCandidatesToDb]);
+
+    // Compute updated session counts
+    const newIncluded = updatedCandidates.filter((c) => c.decision === "included").length;
+    const newExcluded = updatedCandidates.filter((c) => c.decision === "excluded").length;
+    const newScreened = newIncluded + newExcluded;
+
+    const updatedSession: ScreeningSession = {
+      ...activeSession,
+      screenedCount: newScreened,
+      includedCount: newIncluded,
+      excludedCount: newExcluded,
+      consecutiveExcludes: newConsecutive,
+      updatedAt: now,
+    };
+
+    // Atomic single-item update in Dexie — NO table wiping or bulk churning!
+    await db.screeningItems.update(targetItemId, {
+      decision,
+      screenedAt: now,
+    });
+    await db.screeningSessions.update(activeSession.id, {
+      screenedCount: newScreened,
+      includedCount: newIncluded,
+      excludedCount: newExcluded,
+      consecutiveExcludes: newConsecutive,
+      updatedAt: now,
+    });
+
+    setActiveSession(updatedSession);
+    setSessions((prev) => prev.map((s) => (s.id === updatedSession.id ? updatedSession : s)));
+  }, [currentCandidate, activeSession, consecutiveExcludes, candidates, classifier]);
 
   // 17. Undo Last Decision
   const handleUndo = useCallback(async () => {
-    if (history.length === 0) return;
+    if (history.length === 0 || !activeSession) return;
     const lastAction = history[history.length - 1];
+    const targetItemId = lastAction.id;
+    const now = Date.now();
 
     const updatedCandidates = candidates.map((c) =>
-      c.id === lastAction.id
+      c.id === targetItemId
         ? { ...c, decision: "pending" as const, screenedAt: undefined }
         : c
     );
@@ -551,8 +585,34 @@ export function ScreeningHub({ notebooks }: ScreeningHubProps) {
     setHistory((prev) => prev.slice(0, -1));
     const reranked = classifier.retrainAndRank(updatedCandidates);
     setCandidates(reranked);
-    await syncCandidatesToDb(reranked);
-  }, [history, candidates, classifier, syncCandidatesToDb]);
+
+    const newIncluded = updatedCandidates.filter((c) => c.decision === "included").length;
+    const newExcluded = updatedCandidates.filter((c) => c.decision === "excluded").length;
+    const newScreened = newIncluded + newExcluded;
+
+    const updatedSession: ScreeningSession = {
+      ...activeSession,
+      screenedCount: newScreened,
+      includedCount: newIncluded,
+      excludedCount: newExcluded,
+      updatedAt: now,
+    };
+
+    // Atomic single-item rollback in Dexie — NO table wiping!
+    await db.screeningItems.update(targetItemId, {
+      decision: "pending",
+      screenedAt: undefined,
+    });
+    await db.screeningSessions.update(activeSession.id, {
+      screenedCount: newScreened,
+      includedCount: newIncluded,
+      excludedCount: newExcluded,
+      updatedAt: now,
+    });
+
+    setActiveSession(updatedSession);
+    setSessions((prev) => prev.map((s) => (s.id === updatedSession.id ? updatedSession : s)));
+  }, [history, activeSession, candidates, classifier]);
 
   // 18. Keyboard Shortcuts (I = Include, E = Exclude, U = Undo)
   useEffect(() => {
@@ -589,25 +649,27 @@ export function ScreeningHub({ notebooks }: ScreeningHubProps) {
     const included = candidates.filter((c) => c.decision === "included");
     if (included.length === 0) return;
 
-    for (const item of included) {
-      await db.sources.put({
-        id: `src-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
-        notebookId: selectedNotebookId,
-        title: item.title,
-        abstract: item.abstract,
-        authors: item.authors,
-        year: item.year,
-        journal: item.journal,
-        doi: item.doi,
-        status: "ready",
-        addedAt: Date.now(),
-      });
-    }
+    const now = Date.now();
+    const newSources: Source[] = included.map((item, idx) => ({
+      id: `src-${now}-${idx}-${Math.random().toString(36).substring(2, 6)}`,
+      notebookId: selectedNotebookId,
+      title: item.title,
+      abstract: item.abstract,
+      authors: item.authors,
+      year: item.year,
+      journal: item.journal,
+      doi: item.doi,
+      status: "ready" as const,
+      addedAt: now,
+    }));
+
+    // Single atomic bulk transaction
+    await db.sources.bulkPut(newSources);
 
     const count = await db.sources.where("notebookId").equals(selectedNotebookId).count();
     await db.notebooks.update(selectedNotebookId, {
       sourcesCount: count,
-      updatedAt: Date.now(),
+      updatedAt: now,
     });
 
     alert(`Successfully transferred ${included.length} screened papers to selected notebook!`);

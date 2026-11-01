@@ -144,17 +144,30 @@ None of these are touched by the uninstaller.
 4. Automatic fuzzy deduplication flags matching titles and DOIs before screening begins.
 5. Provide 2–5 seed inclusions (relevant controls) and exclusions (irrelevant controls).
 6. Train the active-learning model (TF-IDF vectoriser + Naive Bayes prior ranker).
-7. Review records sequentially with hotkeys (`[I]` Include, `[E]` Exclude, `[U]` Uncertain).
+7. Review records sequentially with hotkeys (`[I]` Include, `[E]` Exclude, `[U]` Undo last decision).
    The ranker bubbles the highest-probability relevant papers to the top of the queue.
 8. Monitor the real-time **Recall & Stopping Curve** to conclude screening once the relevant
    literature has been exhausted.
 9. Export final decisions as PRISMA-compliant CSV or RIS.
 
-#### Phase 4 — High-Throughput PDF Retrieval
-- **In the browser:** use the **Batch Downloader** tab on port 3002.
-- **For 1 000+ bulk files:** launch **`Vellum_Desktop\1_launch_desktop_app.bat`**, paste the DOI list, set the
+#### Phase 4 — High-Throughput PDF Retrieval & Paywall Bypass
+- **In the Web Studio (Batch Downloader tab on port 3002):**
+  - **Multi-Format Input:** Upload `.bib` (BibTeX), `.ris` (Zotero/EndNote), `.csv`, or `.tsv` files, or paste raw text. The parser strictly filters valid DOIs (`10.xxxx/...`) and deduplicates entries automatically without inflating counts.
+  - **Paywall Bypass & Resolver Settings:** Configure custom Unpaywall email, Sci-Hub mirrors (`sci-hub.se`, `sci-hub.st`, `sci-hub.ru`), Elsevier Scopus API key, and University EZProxy prefix (`https://login.ezproxy.univ.edu/login?url=`).
+  - **Concurrent Queue Execution:** Stream downloads with concurrent worker queues, live progress bars, instant single-file saving, and **`Save All`** archive bundling.
+  - **Export Resolution Reports:** Export comprehensive resolution manifests in Markdown and CSV formats for PRISMA documentation.
+- **For 10 000+ heavy bulk files:** launch **`Vellum_Desktop\1_launch_desktop_app.bat`**, paste the DOI list, set the
   output folder, and run the multi-threaded extraction with automated paywall detection and
   naming conventions.
+
+#### Phase 5 — Visual Experience & Apple HIG Aesthetics
+- **Apple HIG Styling:** Fluid translucent surfaces, refined typography, and segmented navigation.
+- **Dynamic Dark Mode & Tinting:** Full high-contrast Dark Mode with 4 curated accent palettes:
+  - **Emerald** (Botanical forest green)
+  - **Ocean** (Deep academic maritime cyan/blue)
+  - **Plum** (Scholarly imperial amethyst)
+  - **Ember** (Warm research terracotta)
+- Accent palettes switch instantly and persist seamlessly across both Day and Night modes.
 
 ---
 

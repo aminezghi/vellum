@@ -408,8 +408,15 @@ export async function GET(req: NextRequest) {
   }
 
   if (!effectiveTerm) {
-    // Default fallback to DeepFruits graph
-    return NextResponse.json(enrichGraphResponse(CURATED_GRAPHS["deepfruits"]));
+    return NextResponse.json(
+      {
+        error: "Query parameter 'q', 'doi', or 'seedId' is required.",
+        seed: null,
+        nodes: [],
+        edges: [],
+      },
+      { status: 400 }
+    );
   }
 
   try {
@@ -430,8 +437,15 @@ export async function GET(req: NextRequest) {
     });
 
     if (!response.ok) {
-      // Fallback to DeepFruits
-      return NextResponse.json(CURATED_GRAPHS["deepfruits"]);
+      return NextResponse.json(
+        {
+          error: `OpenAlex API returned status ${response.status} when looking up "${effectiveTerm}".`,
+          seed: effectiveTerm,
+          nodes: [],
+          edges: [],
+        },
+        { status: 404 }
+      );
     }
 
     // This endpoint accepts either a DOI lookup (a single work) or a search
@@ -440,7 +454,15 @@ export async function GET(req: NextRequest) {
     const work: OpenAlexWork | undefined = payload.results ? payload.results[0] : payload;
 
     if (!work || !work.title) {
-      return NextResponse.json(CURATED_GRAPHS["deepfruits"]);
+      return NextResponse.json(
+        {
+          error: `No scholarly record found matching "${effectiveTerm}". Please check the DOI or search query.`,
+          seed: effectiveTerm,
+          nodes: [],
+          edges: [],
+        },
+        { status: 404 }
+      );
     }
 
     // Build origin node
@@ -568,13 +590,14 @@ export async function GET(req: NextRequest) {
     });
   } catch (err) {
     console.error("Connected graph API error:", err);
-    const fallback = CURATED_GRAPHS["deepfruits"];
-    const priorWorks = fallback.nodes.filter((n) => !n.isOrigin && n.year <= fallback.origin.year);
-    const derivativeWorks = fallback.nodes.filter((n) => !n.isOrigin && n.year > fallback.origin.year);
-    return NextResponse.json({
-      ...fallback,
-      priorWorks,
-      derivativeWorks,
-    });
+    return NextResponse.json(
+      {
+        error: `Failed to construct citation network: ${err instanceof Error ? err.message : String(err)}`,
+        seed: effectiveTerm,
+        nodes: [],
+        edges: [],
+      },
+      { status: 500 }
+    );
   }
 }

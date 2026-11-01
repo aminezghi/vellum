@@ -17,13 +17,97 @@ Zero telemetry. 100% local filesystem.
 from __future__ import annotations
 
 import json
+import logging
 import os
 import re
+import tempfile
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-CONFIG_FILE = Path.home() / ".vellum_config.json"
-DEFAULT_VAULT_DIR = Path.home() / "Vellum_Research_Vault"
+logger = logging.getLogger("vellum_workspace")
+
+
+def _get_fallback_base() -> Path:
+    """Return a verified writable directory (LOCALAPPDATA or tempdir) for non-admin/restricted environments."""
+    local_app_data = os.environ.get("LOCALAPPDATA")
+    if local_app_data:
+        try:
+            p = Path(local_app_data)
+            p.mkdir(parents=True, exist_ok=True)
+            test_file = p / f".write_test_{os.getpid()}"
+            test_file.touch()
+            test_file.unlink()
+            return p
+        except (PermissionError, OSError):
+            pass
+    return Path(tempfile.gettempdir())
+
+
+def get_config_path() -> Path:
+    """
+    Get the path to .vellum_config.json following the interface contract:
+    Priority: os.environ.get("VELLUM_CONFIG_PATH") -> Path.home() / ".vellum_config.json"
+    -> fallback Path(os.environ.get("LOCALAPPDATA", tempfile.gettempdir())) / ".vellum_config.json"
+    """
+    env_cfg = os.environ.get("VELLUM_CONFIG_PATH")
+    if env_cfg:
+        return Path(env_cfg).resolve()
+
+    candidates = []
+    try:
+        candidates.append(Path.home())
+    except (PermissionError, OSError, RuntimeError):
+        pass
+
+    local_app_data = os.environ.get("LOCALAPPDATA")
+    if local_app_data:
+        candidates.append(Path(local_app_data))
+    candidates.append(Path(tempfile.gettempdir()))
+
+    for base in candidates:
+        try:
+            cand = base / ".vellum_config.json"
+            if cand.exists():
+                return cand
+            test_file = base / f".test_cfg_{os.getpid()}"
+            test_file.touch()
+            test_file.unlink()
+            return cand
+        except (PermissionError, OSError, RuntimeError):
+            continue
+
+    return Path(tempfile.gettempdir()) / ".vellum_config.json"
+
+
+def get_default_vault_dir() -> Path:
+    """Get the standard default vault location with permission fallback."""
+    candidates = []
+    try:
+        candidates.append(Path.home())
+    except (PermissionError, OSError, RuntimeError):
+        pass
+
+    local_app_data = os.environ.get("LOCALAPPDATA")
+    if local_app_data:
+        candidates.append(Path(local_app_data))
+    candidates.append(Path(tempfile.gettempdir()))
+
+    for base in candidates:
+        try:
+            cand = base / "Vellum_Research_Vault"
+            cand.mkdir(parents=True, exist_ok=True)
+            test_file = cand / f".write_test_{os.getpid()}"
+            test_file.touch()
+            test_file.unlink()
+            return cand
+        except (PermissionError, OSError, RuntimeError):
+            continue
+
+    return Path(tempfile.gettempdir()) / "Vellum_Research_Vault"
+
+
+CONFIG_FILE = get_config_path()
+DEFAULT_VAULT_DIR = get_default_vault_dir()
 
 
 def _sanitize_project_name(name: str) -> str:
@@ -33,15 +117,16 @@ def _sanitize_project_name(name: str) -> str:
 
 
 def load_config() -> Dict[str, Any]:
-    """Load global Vellum preferences from ~/.vellum_config.json."""
-    if CONFIG_FILE.exists():
+    """Load global Vellum preferences from config path."""
+    cfg_path = get_config_path()
+    if cfg_path.exists():
         try:
-            with open(CONFIG_FILE, "r", encoding="utf-8") as f:
+            with open(cfg_path, "r", encoding="utf-8") as f:
                 return json.load(f)
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning(f"Error loading configuration from {cfg_path}: {exc}")
     return {
-        "vault_dir": str(DEFAULT_VAULT_DIR),
+        "vault_dir": str(get_default_vault_dir()),
         "active_project": "Default_Project",
         "vault_initialized": False,
         "recent_vaults": [],
@@ -51,13 +136,31 @@ def load_config() -> Dict[str, Any]:
     }
 
 
-def save_config(cfg: Dict[str, Any]) -> None:
-    """Save global Vellum preferences to ~/.vellum_config.json."""
+def save_config(cfg: Dict[str, Any]) -> bool:
+    """Save global Vellum preferences to config path. Returns True on success, False on failure."""
+    cfg_path = get_config_path()
     try:
-        with open(CONFIG_FILE, "w", encoding="utf-8") as f:
+        cfg_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(cfg_path, "w", encoding="utf-8") as f:
             json.dump(cfg, f, indent=2)
-    except Exception:
-        pass
+        return True
+    except (PermissionError, OSError) as exc:
+        logger.warning(f"Failed to write config to {cfg_path} ({exc}); attempting fallback location.")
+        if not os.environ.get("VELLUM_CONFIG_PATH"):
+            fallback_path = _get_fallback_base() / ".vellum_config.json"
+            if fallback_path != cfg_path:
+                try:
+                    fallback_path.parent.mkdir(parents=True, exist_ok=True)
+                    with open(fallback_path, "w", encoding="utf-8") as f:
+                        json.dump(cfg, f, indent=2)
+                    return True
+                except Exception as fb_exc:
+                    logger.error(f"Fallback configuration write failed to {fallback_path}: {fb_exc}")
+        logger.error(f"Could not persist configuration: {exc}")
+        return False
+    except Exception as exc:
+        logger.error(f"Unexpected error saving configuration: {exc}")
+        return False
 
 
 def get_user_profile() -> Dict[str, str]:
@@ -110,12 +213,37 @@ def add_recent_vault(path: str) -> None:
 
 
 def get_vault_dir() -> Path:
-    """Get the active Research Vault directory, creating it if needed."""
+    """Get the active Research Vault directory, creating it if needed with permission fallback."""
     cfg = load_config()
-    v_str = os.environ.get("VELLUM_VAULT_DIR") or cfg.get("vault_dir") or str(DEFAULT_VAULT_DIR)
-    p = Path(v_str).resolve()
-    p.mkdir(parents=True, exist_ok=True)
-    return p
+    env_vault = os.environ.get("VELLUM_VAULT_DIR")
+    candidates = []
+    if env_vault:
+        candidates.append(Path(env_vault).resolve())
+    cfg_vault = cfg.get("vault_dir")
+    if cfg_vault:
+        candidates.append(Path(cfg_vault).resolve())
+
+    try:
+        candidates.append((Path.home() / "Vellum_Research_Vault").resolve())
+    except (PermissionError, OSError, RuntimeError):
+        pass
+
+    candidates.append((_get_fallback_base() / "Vellum_Research_Vault").resolve())
+
+    for cand in candidates:
+        try:
+            cand.mkdir(parents=True, exist_ok=True)
+            test_file = cand / f".write_test_{os.getpid()}"
+            test_file.touch()
+            test_file.unlink()
+            return cand
+        except (PermissionError, OSError) as exc:
+            logger.warning(f"Vault candidate '{cand}' is not accessible or writable: {exc}")
+            continue
+
+    fallback = (_get_fallback_base() / "Vellum_Research_Vault").resolve()
+    fallback.mkdir(parents=True, exist_ok=True)
+    return fallback
 
 
 def set_vault_dir(path: Path | str, initialized: bool = True) -> None:
@@ -132,16 +260,20 @@ def set_vault_dir(path: Path | str, initialized: bool = True) -> None:
 
 def list_projects() -> List[str]:
     """List all project directory names in the current vault."""
-    vault = get_vault_dir()
-    projects = []
-    for entry in vault.iterdir():
-        if entry.is_dir() and not entry.name.startswith("."):
-            projects.append(entry.name)
-    if not projects:
-        # Initialize default project if none exists
-        create_project("Default_Project")
-        projects.append("Default_Project")
-    return sorted(projects)
+    try:
+        vault = get_vault_dir()
+        projects = []
+        for entry in vault.iterdir():
+            if entry.is_dir() and not entry.name.startswith("."):
+                projects.append(entry.name)
+        if not projects:
+            # Initialize default project if none exists
+            create_project("Default_Project")
+            projects.append("Default_Project")
+        return sorted(projects)
+    except (PermissionError, OSError) as exc:
+        logger.warning(f"Error listing projects from vault: {exc}")
+        return ["Default_Project"]
 
 
 def get_active_project_name() -> str:
@@ -167,8 +299,12 @@ def get_project_dir(name: Optional[str] = None) -> Path:
     """Get directory for a project, creating standard subdirectories."""
     p_name = name or get_active_project_name()
     p_dir = get_vault_dir() / _sanitize_project_name(p_name)
-    (p_dir / "papers").mkdir(parents=True, exist_ok=True)
-    (p_dir / "exports").mkdir(parents=True, exist_ok=True)
+    try:
+        p_dir.mkdir(parents=True, exist_ok=True)
+        (p_dir / "papers").mkdir(parents=True, exist_ok=True)
+        (p_dir / "exports").mkdir(parents=True, exist_ok=True)
+    except (PermissionError, OSError) as exc:
+        logger.warning(f"Could not create subdirectories in {p_dir}: {exc}")
     return p_dir
 
 
@@ -188,8 +324,11 @@ def create_project(name: str) -> Path:
             "download_queue": [],
             "notes": "",
         }
-        with open(meta_file, "w", encoding="utf-8") as f:
-            json.dump(initial_state, f, indent=2)
+        try:
+            with open(meta_file, "w", encoding="utf-8") as f:
+                json.dump(initial_state, f, indent=2)
+        except (PermissionError, OSError) as exc:
+            logger.warning(f"Could not write initial project.json to {meta_file}: {exc}")
     return p_dir
 
 
@@ -235,12 +374,15 @@ def get_project_stats(name: Optional[str] = None) -> Dict[str, int]:
     appraisals_count = len(data.get("appraisals", {}))
     paper_notes = data.get("paper_notes", {})
     noted_count = len(paper_notes)
+    queue = data.get("download_queue", [])
+    queued_count = sum(1 for item in queue if (isinstance(item, dict) and item.get("status", "pending") in ("pending", "")) or not isinstance(item, dict))
     return {
         "pdfs": pdf_count,
         "search_records": search_count,
         "included": included_count,
         "appraisals": appraisals_count,
         "noted": noted_count,
+        "queued": queued_count,
     }
 
 

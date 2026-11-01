@@ -16,10 +16,10 @@ import type { Accent } from "@/lib/theme";
 export type FernlyAccent = Accent;
 
 const ACCENTS: { id: FernlyAccent; name: string; color: string }[] = [
-  { id: "emerald", name: "Fernly Emerald", color: "#1d7347" },
-  { id: "ocean", name: "Deep Ocean", color: "#1f4fa8" },
-  { id: "plum", name: "Royal Plum", color: "#6a3fb0" },
-  { id: "ember", name: "Warm Ember", color: "#b1491d" },
+  { id: "emerald", name: "Emerald Green", color: "#10b981" },
+  { id: "ocean", name: "Deep Ocean", color: "#3b82f6" },
+  { id: "plum", name: "Royal Plum", color: "#a855f7" },
+  { id: "ember", name: "Warm Ember", color: "#f97316" },
 ];
 
 interface AccentPickerProps {
@@ -92,15 +92,15 @@ export function AccentPicker({ value, onChange }: AccentPickerProps) {
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={`Accent colourway: ${current.name}. Change colourway`}
-        title="Choose Fernly Accent Colourway"
+        title="Choose Accent Colourway"
         className="w-6 h-6 rounded-full border-2 border-[var(--hair)] shadow-xs transition-transform hover:scale-105 cursor-pointer"
-        style={{ backgroundColor: current.color }}
+        style={{ backgroundColor: "var(--g-600)" }}
       />
 
       {open ? (
         <div
           role="listbox"
-          aria-label="Fernly accent colourway"
+          aria-label="Accent colourway"
           className="absolute right-0 top-full mt-2 z-50 flex flex-col gap-1 p-1.5 rounded-2xl bg-[var(--card)] border border-[var(--hair)] shadow-lg"
         >
           {ACCENTS.map((accent, index) => {

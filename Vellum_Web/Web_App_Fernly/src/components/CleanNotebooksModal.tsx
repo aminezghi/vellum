@@ -44,17 +44,21 @@ function CleanNotebooksDialog({
   const handleExecuteClean = async () => {
     setCleaning(true);
     try {
-      if (cleanMode === "all") {
-        await db.notebooks.clear();
-        await db.sources.clear();
-        await db.notes.clear();
-      } else {
-        const emptyNbs = await db.notebooks.filter((nb) => !nb.sourcesCount || nb.sourcesCount === 0).toArray();
-        for (const nb of emptyNbs) {
-          await db.notebooks.delete(nb.id);
-          await db.notes.where("notebookId").equals(nb.id).delete();
+      await db.transaction("rw", [db.notebooks, db.sources, db.notes, db.evidence], async () => {
+        if (cleanMode === "all") {
+          await db.notebooks.clear();
+          await db.sources.clear();
+          await db.notes.clear();
+          await db.evidence.clear();
+        } else {
+          const emptyNbs = await db.notebooks.filter((nb) => !nb.sourcesCount || nb.sourcesCount === 0).toArray();
+          for (const nb of emptyNbs) {
+            await db.notebooks.delete(nb.id);
+            await db.notes.where("notebookId").equals(nb.id).delete();
+            await db.evidence.where("notebookId").equals(nb.id).delete();
+          }
         }
-      }
+      });
       onCleaned();
       onClose();
     } catch (err) {

@@ -1,57 +1,53 @@
 # Vellum Release Verification Report
 
-- **Generated:** 2026-10-22 12:44:11
+- **Generated:** 2026-10-30 21:53:58
 - **Commit:** `unknown`
-- **Checks:** 36 passed, 0 failed, 0 skipped
+- **Checks:** 31 passed, 1 failed, 1 skipped
 
 | # | Check | Result | Detail |
 |---|---|---|---|
-| 1 | git working tree is clean | **PASS** |  |
+| 1 | git working tree is clean | **FAIL** | 56 modified file(s): [' M README_FOR_COLLEAGUES.md', ' M README_FOR_COLLEAGUES.pdf', ' M Vellum_Desktop/CLICK_TO_RUN_STANDALONE_EXE.bat'] |
 | 2 | build-critical assets are tracked | **PASS** |  |
 | 3 | Windows launchers use CRLF endings | **PASS** |  |
-| 4 | pytest Desktop_App/tests | **PASS** | 84 passed |
-| 5 | all 10 Streamlit pages + main app render | **PASS** | 11/11 clean |
+| 4 | pytest Desktop_App/tests | **PASS** | 240 passed |
+| 5 | all Streamlit pages + main app render | **PASS** | 12/12 clean |
 | 6 | TypeScript type-check (tsc --noEmit) | **PASS** | 0 errors |
 | 7 | ESLint (0 errors, 0 warnings) | **PASS** | clean |
-| 8 | production build present (.next) | **PASS** | BUILD_ID=MoOLZRnYzwPAJNgnPXvlx |
-| 9 | installer artefact exists | **PASS** | 129.2 MB  sha256=5503799908217350... |
+| 8 | production build present (.next) | **PASS** | BUILD_ID=a5AUpknzp8N9ycA_hEo6M |
+| 9 | installer artefact exists | **PASS** | 129.3 MB  sha256=db0e5e5eced31efe... |
 | 10 | installer Authenticode status | **PASS** | NotSigned (unsigned installers trigger SmartScreen on first run) |
-| 11 | silent install succeeds | **PASS** | exit=0 exe=present |
-| 12 | installed Vellum.exe serves /_stcore/health | **PASS** | HTTP 200 after 2.1s on port 8501 |
-| 13 | installed app serves the UI shell | **PASS** | HTTP 200, 6467 bytes |
-| 14 | installed Vellum.exe opens its native window and serves | **PASS** | native app healthy on port 8501 |
-| 15 | silent uninstall removes the install directory | **PASS** | exit=0 |
-| 16 | share folder is complete | **PASS** |  |
-| 17 | SHA256SUMS.txt verifies every shipped file | **PASS** |  |
-| 18 | share folder copies to an arbitrary path | **PASS** | C:\Users\azoua\AppData\Local\Temp\vellum_verify\relocated\Vellum Web (copy) |
-| 19 | port 3002 is free before the launch | **PASS** |  |
-| 20 | launcher starts the studio (relocated) | **PASS** | HTTP 200 after 13.7s on port 3002 |
-| 21 | launcher reported a real startup (not an early exit) | **PASS** | startup banner present |
-| 22 | the relocated copy is the one serving | **PASS** | process command line points at the relocated folder |
-| 23 | home page renders with the Vellum identity | **PASS** | HTTP 200, 28017 bytes |
-| 24 | live search API returns real records (OpenAlex) | **PASS** | HTTP 200, 10 result(s), sources=['openalex'] |
-| 25 | trends API returns real records (OpenAlex) | **PASS** | HTTP 200, 8 trending paper(s) |
-| 26 | empty query is handled gracefully | **PASS** | HTTP 200, empty query handled |
-| 27 | studio stops cleanly on request | **PASS** | port 3002 released |
-| 28 | dialogs expose dialog semantics | **PASS** | role="dialog" + aria-modal in the shipped bundle |
-| 29 | dialogs carry an accessible name | **PASS** | aria-labelledby + aria-describedby |
-| 30 | asynchronous results are announced | **PASS** | aria-live live regions |
-| 31 | keyboard focus is visible | **PASS** | :focus-visible rule |
-| 32 | reduced motion is honoured | **PASS** | prefers-reduced-motion block |
-| 33 | the accent picker is a named listbox | **PASS** | aria-haspopup=listbox + role=listbox |
-| 34 | every modal uses the shared accessible primitive | **PASS** |  |
-| 35 | dialog focus is not animation-frame-only | **PASS** | focusFirst() also runs synchronously |
-| 36 | the desktop keyboard shortcut is actually implemented | **PASS** | a keydown listener exists in keyboard_component/ |
+| 11 | clean-room install / launch / uninstall | **SKIP** | skipped by request |
+| 12 | share folder is complete | **PASS** |  |
+| 13 | SHA256SUMS.txt verifies every shipped file | **PASS** |  |
+| 14 | share folder copies to an arbitrary path | **PASS** | C:\Users\azoua\AppData\Local\Temp\vellum_verify\relocated\Vellum Web (copy) |
+| 15 | port 3002 is free before the launch | **PASS** |  |
+| 16 | launcher starts the studio (relocated) | **PASS** | HTTP 200 after 18.3s on port 3002 |
+| 17 | launcher reported a real startup (not an early exit) | **PASS** | startup banner present |
+| 18 | the relocated copy is the one serving | **PASS** | process command line points at the relocated folder |
+| 19 | home page renders with the Vellum identity | **PASS** | HTTP 200, 26865 bytes |
+| 20 | live search API returns real records (OpenAlex) | **PASS** | HTTP 200, 10 result(s), sources=['openalex'] |
+| 21 | trends API returns real records (OpenAlex) | **PASS** | HTTP 200, 8 trending paper(s) |
+| 22 | empty query is handled gracefully | **PASS** | HTTP 200, empty query handled |
+| 23 | studio stops cleanly on request | **PASS** | port 3002 released |
+| 24 | dialogs expose dialog semantics | **PASS** | role="dialog" + aria-modal in the shipped bundle |
+| 25 | dialogs carry an accessible name | **PASS** | aria-labelledby + aria-describedby |
+| 26 | asynchronous results are announced | **PASS** | aria-live live regions |
+| 27 | keyboard focus is visible | **PASS** | :focus-visible rule |
+| 28 | reduced motion is honoured | **PASS** | prefers-reduced-motion block |
+| 29 | the accent picker is a named listbox | **PASS** | aria-haspopup=listbox + role=listbox |
+| 30 | every modal uses the shared accessible primitive | **PASS** |  |
+| 31 | dialog focus is not animation-frame-only | **PASS** | focusFirst() also runs synchronously |
+| 32 | the desktop keyboard shortcut is actually implemented | **PASS** | a keydown listener exists in keyboard_component/ |
 
 ## Distributables
 
 | File | Size | SHA-256 |
 |---|---|---|
-| Vellum-Desktop-V2.1-Setup-x64.exe | 129.2 MB | `550379990821735050dfcff4b980743c54baf8a32cd7352b4a37b6d779af87c5` |
-| Vellum_Standalone_Windows_x64.zip | 177.6 MB | `1ab5995e0269f793c7bdd1f4b95cacdba67f1a9be9527cc98acabe60d3b3699e` |
-| Vellum_Desktop_V2.1_Botanical_Bento.zip | 1.6 MB | `23ae366666ba6cda1ef0274257d04cf2928f4fff9cec47e15012c47c734990f4` |
-| Vellum_Web_Fernly_Latest_Export.zip | 0.2 MB | `f7e8862f05f1d9d29af896c6b1ecf82c5babae8b6f0252292bf42d3bce4baffc` |
-| Vellum_Web_Fernly_SHARE.zip | 127.0 MB | `a3707e3951ab6f0b35e3e35897242b69115c201d9580825f4d202fc6de1549e7` |
+| Vellum-Desktop-V2.1-Setup-x64.exe | 129.3 MB | `db0e5e5eced31efe041562b93d8a37adf43d01678502365b7edce041b3044354` |
+| Vellum_Standalone_Windows_x64.zip | 177.7 MB | `cee9fd71eb3452d53e252ac4ff04d73c63aeda5caccb6578a6d80781a2a6dc47` |
+| Vellum_Desktop_V2.1_Botanical_Bento.zip | 1.6 MB | `26e7fc55e776292aa223371f148b830c06a683798f3c372da4256ccb2e5aaecb` |
+| Vellum_Web_Fernly_Latest_Export.zip | 0.2 MB | `b64a60530b07974f545f6432ef20f7682ad2866cc2b2e36c6a20cb9175b96d54` |
+| Vellum_Web_Fernly_SHARE.zip | 127.1 MB | `b469ca2e4ca1223f31c253db962928246e7517b943d84f9fb5eef71b342beed8` |
 
 ## How to re-verify independently
 

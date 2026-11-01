@@ -14,7 +14,7 @@ import time
 
 import streamlit as st
 
-APP_NAME = "Vellum"
+APP_NAME = "Vellum by Amine"
 BYLINE = "Academic research companion"
 AUTHOR = "Amine Zouaghi"
 EMAIL = "amine.zouaghi@unipr.it"
@@ -32,75 +32,23 @@ def header():
     """Wordmark at the top of every page, above the page's own title."""
     st.markdown(
         f"""
-<div class="header-row">
-  <span class="header-title">{APP_NAME}</span>
-  <span class="header-byline">{BYLINE}</span>
+<div class="header-row" style="display:flex;align-items:center;gap:12px;">
+  <div style="width:36px;height:36px;background:#0B0F19;border-radius:10px;border:1px solid rgba(16,185,129,0.3);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;">
+    <svg width="22" height="22" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="112,96 186,96 256,358 206,445 112,96" fill="#10B981" />
+      <polygon points="400,96 326,96 256,358 306,445 400,96" fill="#059669" />
+      <polygon points="256,176 326,96 256,358 186,96" fill="#34D399" />
+    </svg>
+  </div>
+  <div>
+    <span class="header-title">{APP_NAME}</span>
+    <span class="header-byline">{BYLINE}</span>
+  </div>
 </div>""",
         unsafe_allow_html=True,
     )
 
 
-def workspace_header():
-    """Render the active Research Vault and Project Switcher at the top of the sidebar."""
-    try:
-        import vellum_workspace as VW
-        vault = VW.get_vault_dir()
-        projects = VW.list_projects()
-        active = VW.get_active_project_name()
-        idx = projects.index(active) if active in projects else 0
-
-        with st.sidebar:
-            st.markdown(
-                f"""
-                <div style='padding:10px 12px; background:rgba(255,255,255,0.03); border-radius:8px; border:1px solid rgba(255,255,255,0.08); margin-bottom:10px;'>
-                    <div style='display:flex; justify-content:space-between; align-items:center;'>
-                        <span style='font-size:0.75rem; text-transform:uppercase; letter-spacing:0.06em; color:#a1a1aa; font-weight:600;'>📁 Research Vault</span>
-                        <span style='font-size:0.75rem; color:#71717a;'>{len(projects)} projects</span>
-                    </div>
-                    <div style='font-size:0.85rem; color:#f4f4f5; font-weight:500; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; margin-top:2px;' title='{str(vault)}'>{vault.name}</div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-
-            sel = st.selectbox(
-                "Active Project",
-                projects,
-                index=idx,
-                label_visibility="collapsed",
-                key="_vw_active_project_sel",
-            )
-            if sel != active:
-                VW.set_active_project(sel)
-                st.rerun()
-
-            stats = VW.get_project_stats()
-            st.caption(
-                f"📊 **{stats['search_records']}** searched · **{stats['included']}** included · **{stats['pdfs']}** PDFs"
-            )
-
-            vh_c1, vh_c2 = st.columns([1, 1])
-            with vh_c1:
-                if st.button("➕ Project", key="_vw_new_p_toggle", width="stretch", help="Create new project"):
-                    st.session_state["_show_new_proj_dialog"] = not st.session_state.get("_show_new_proj_dialog", False)
-                    st.rerun()
-            with vh_c2:
-                if st.button("⚙️ Vaults", key="_vw_manage_vaults_btn", width="stretch", help="Switch or create Research Vault"):
-                    st.session_state["_show_welcome_hub"] = True
-                    st.rerun()
-
-            if st.session_state.get("_show_new_proj_dialog", False):
-                with st.container():
-                    new_p = st.text_input("New Project Name", key="_vw_new_p_name", placeholder="e.g. Oncology_2026")
-                    if st.button("Confirm Create", key="_vw_create_btn", width="stretch", type="primary"):
-                        if new_p.strip():
-                            VW.create_project(new_p.strip())
-                            VW.set_active_project(new_p.strip())
-                            st.session_state["_show_new_proj_dialog"] = False
-                            st.rerun()
-            st.divider()
-    except Exception:
-        pass
 
 
 def maybe_clear():
@@ -206,34 +154,3 @@ def exit_button():
         else:
             st.session_state[EXIT_ARMED_KEY] = True
             st.rerun()
-
-
-def sidebar_brand():
-    """App name and copyright at the foot of the sidebar, on every page.
-
-    Rendered after the active page so it lands below the navigation and any
-    per-page sidebar controls rather than competing with them.
-    """
-    with st.sidebar:
-        flash = st.session_state.pop(FLASH_KEY, None)
-        if flash:
-            st.success(flash, icon=":material/check_circle:")
-        clear_button()
-        exit_button()
-        st.markdown(
-            f"""
-<div class="brand-block">
-  <div class="brand-name">{APP_NAME}</div>
-  <div class="brand-byline">{BYLINE}</div>
-  <div class="brand-copy">&copy; {YEAR} {AUTHOR}</div>
-</div>""",
-            unsafe_allow_html=True,
-        )
-        st.markdown(
-            f"""
-<div class="brand-contact">
-  <a href="mailto:{EMAIL}">{EMAIL}</a><span class="sep">&middot;</span>
-  <a href="{LINKEDIN}" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-</div>""",
-            unsafe_allow_html=True,
-        )

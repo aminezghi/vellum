@@ -7,9 +7,14 @@ import { BookOpen, ChevronRight, Globe, User } from "lucide-react";
 interface FeaturedCarouselProps {
   notebooks: Notebook[];
   onSelectNotebook: (notebook: Notebook) => void;
+  onViewAll?: () => void;
 }
 
-export function FeaturedCarousel({ notebooks, onSelectNotebook }: FeaturedCarouselProps) {
+export function FeaturedCarousel({
+  notebooks,
+  onSelectNotebook,
+  onViewAll,
+}: FeaturedCarouselProps) {
   if (notebooks.length === 0) return null;
 
   return (
@@ -23,7 +28,11 @@ export function FeaturedCarousel({ notebooks, onSelectNotebook }: FeaturedCarous
             Featured Research Vaults
           </h2>
         </div>
-        <button className="text-xs text-[var(--g-700)] hover:underline flex items-center gap-1 transition-colors font-semibold cursor-pointer">
+        <button
+          onClick={onViewAll}
+          className="text-xs text-[var(--g-700)] hover:underline flex items-center gap-1 transition-colors font-semibold cursor-pointer"
+          title="View all curated research collections"
+        >
           View all <ChevronRight className="h-3.5 w-3.5" />
         </button>
       </div>
