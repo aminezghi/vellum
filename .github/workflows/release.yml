@@ -82,8 +82,9 @@ jobs:
             } catch {}
           }
           Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue
-          & taskkill /F /IM Vellum.exe /T 2>$null
+          Get-Process -Name Vellum -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
           if (-not $ok) { throw "installed app did not become healthy" }
+          $global:LASTEXITCODE = 0
           Write-Output "installer smoke test passed"
 
       - name: Upload installer
