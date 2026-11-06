@@ -40,7 +40,7 @@ https://github.com/user-attachments/assets/f66ce09c-252b-46f2-869b-1e44669e1c96
 > *That question drove the creation of **Vellum by Amine**: a unified, local-first academic research platform that integrates multi-source search across 250M+ records, D3 citation networks, active-learning screening, multi-tier open-access PDF harvesting, and grounded claim extraction into an elegant, zero-subscription studio. Nothing leaves your workstation. Every note, PDF, and decision belongs entirely to you."*
 
 ### 👤 About the Author & Current Research
-**Amine Zouaghi** is a Doctoral Researcher and **FutureData4EU Fellow** funded under the European Union’s **Marie Skłodowska-Curie Actions (MSCA COFUND / Horizon Europe)**, carrying out research affiliated with the **University of Parma** (Department of Engineering and Architecture / Food Project) and the **University of Bologna**. His research focuses on Big Data, AI, Computer Vision, and Digital Transition:
+**Amine Zouaghi** is a Doctoral Researcher and **FutureData4EU Fellow** funded under the European Union’s **Marie Skłodowska-Curie Actions (MSCA COFUND / Horizon Europe)**, carrying out research affiliated with the **University of Parma** (Department of Food and Drugs) and the **University of Bologna**. His research focuses on Big Data, AI, Computer Vision, and Digital Transition:
 
 - 🏛️ **Doctoral Fellowship Profile:** [FutureData4EU MSCA Fellow — Amine Zouaghi](https://site.unibo.it/futuredata4eu/en/fellows/thematic-area-5-food-bioeconomy-natural-resources-agriculture-and-environment)
 - 🎓 **Institutional Faculty Page:** [University of Parma Profile](https://personale.unipr.it/en/ugovdocenti/person/270639)
